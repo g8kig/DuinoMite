@@ -707,7 +707,7 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define P_PS2CLK			PORTGbits.RG6			// Pin 10 input  - Keyboard clock
 #define P_PS2CLK_PULLUP		CNPUEbits.CNPUE8
 #define P_PS2CLK_INT		CNENbits.CNEN8
-	
+
 #define P_PS2DAT			PORTGbits.RG7			// Pin 11 input  - Keyboard data
 #define P_PS2DAT_PULLUP		CNPUEbits.CNPUE9
 
@@ -721,11 +721,11 @@ Note that we never use TRIS to set a pin as an input because that is the default
 // RB12 -> RD7		(VSync)
 
 #define P_VGA_SELECT		0					// state when VGA selected
-		
+
 #define P_VIDEO_SPI			1					// the SPI peripheral used for video.  note: pin G9 is automatically set as the framing input
 #define P_SPI_INPUT			SPI1BUF				// input buffer for the SPI peripheral
 #define P_SPI_INTERRUPT		_SPI1_TX_IRQ		// interrupt used by the video DMA
-	
+
 #define P_VGA_COMP			PORTDbits.RD1		// VGA/Composite jumper
 
 #define P_VIDEO				PORTDbits.RD0		// video

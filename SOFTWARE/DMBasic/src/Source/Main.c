@@ -197,8 +197,7 @@ unsigned int __attribute__((section(".grg"))) _excep_addr;
 //  In this example the media initialization function is named
 //  "MediaInitialize", the read capacity function is named "ReadCapacity",
 //  etc.
-LUN_FUNCTIONS LUN[MAX_LUN + 1] =
-{
+LUN_FUNCTIONS LUN[MAX_LUN + 1] ={
     {
         &MDD_SDSPI_MediaInitialize,
         &MDD_SDSPI_ReadCapacity,
@@ -213,22 +212,19 @@ LUN_FUNCTIONS LUN[MAX_LUN + 1] =
 
 /* Standard Response to INQUIRY command stored in ROM 	*/
 const ROM InquiryResponse inq_resp = {
-	0x00,		// peripheral device is connected, direct access block device
-	0x80,           // removable
-	0x04,	 	// version = 00=> does not conform to any standard, 4=> SPC-2
-	0x02,		// response is in format specified by SPC-2
-	0x20,		// n-4 = 36-4=32= 0x20
-	0x00,		// sccs etc.
-	0x00,		// bque=1 and cmdque=0,indicates simple queueing 00 is obsolete,
-			// but as in case of other device, we are just using 00
-	0x00,		// 00 obsolete, 0x80 for basic task queueing
-	{'O','l','i','m','e','x'
-    },
-	// this is the T10 assigned Vendor ID
-	{'M','a','s','s',' ','S','t','o','r','a','g','e',' ',' ',' ',' '
-    },
-	{'0','0','0','1'
-    }
+    0x00, // peripheral device is connected, direct access block device
+    0x80, // removable
+    0x04, // version = 00=> does not conform to any standard, 4=> SPC-2
+    0x02, // response is in format specified by SPC-2
+    0x20, // n-4 = 36-4=32= 0x20
+    0x00, // sccs etc.
+    0x00, // bque=1 and cmdque=0,indicates simple queueing 00 is obsolete,
+    // but as in case of other device, we are just using 00
+    0x00, // 00 obsolete, 0x80 for basic task queueing
+    {'O', 'l', 'i', 'm', 'e', 'x'},
+    // this is the T10 assigned Vendor ID
+    {'M', 'a', 's', 's', ' ', 'S', 't', 'o', 'r', 'a', 'g', 'e', ' ', ' ', ' ', ' '},
+    {'0', '0', '0', '1'}
 };
 /****************************************************************************************************************************
 Main program
@@ -268,51 +264,51 @@ int main(void) {
     mOSCSetPBDIV(OSC_PB_DIV_1); // fix the peripheral bus to the main clock speed
     mOSCEnableSOSC();
 
-    RtccInit();            // init the RTCC
-    while(RtccGetClkStat()!=RTCC_CLK_ON);       // wait for the SOSC to be actually running and RTCC to have its clock source
+    RtccInit(); // init the RTCC
+    while (RtccGetClkStat() != RTCC_CLK_ON); // wait for the SOSC to be actually running and RTCC to have its clock source
 #endif
     INTEnableSystemMultiVectoredInt(); // allow vectored interrupts
 #ifdef OLIMEX
-	// SPP +
-	#ifdef	OLIMEX_DUINOMITE_EMEGA       // patch for eMega
-            TRISGbits.TRISG13 = 0;
-            ODCGbits.ODCG13 = 1;
-            LATGbits.LATG13 = 0;
-            TRISDbits.TRISD1 = 1;
-	#else           // original by Geoff Graham for DuinoMite-Mega
-	    TRISBbits.TRISB13 = 0;
-	    ODCBbits.ODCB13 = 1;
-	    PORTBbits.RB13=0;
-            TRISBbits.TRISB11 = 1; //make sure vga/composite select is input
-	#endif
-        for (i=100000; i; i--);	// some delay
-	// SPP -
+    // SPP +
+#ifdef	OLIMEX_DUINOMITE_EMEGA       // patch for eMega
+    TRISGbits.TRISG13 = 0;
+    ODCGbits.ODCG13 = 1;
+    LATGbits.LATG13 = 0;
+    TRISDbits.TRISD1 = 1;
+#else           // original by Geoff Graham for DuinoMite-Mega
+    TRISBbits.TRISB13 = 0;
+    ODCBbits.ODCB13 = 1;
+    PORTBbits.RB13 = 0;
+    TRISBbits.TRISB11 = 1; //make sure vga/composite select is input
+#endif
+    for (i = 100000; i; i--); // some delay
+    // SPP -
 #endif
 #ifdef OLIMEX
     CanInit(); // initialize the CAN driver
 #endif
     LoadSetup(); //load setup from flash
-                 // init global variables
+    // init global variables
     USB_NbrCharsInTxBuf = 0;
     USB_Current_TxBuf = 0;
     InpQueueHead = InpQueueTail = 0;
 
     mSec(50); //delay to let power settle on mega
 
-    if(S.UsbEnable) USBOn = true;
+    if (S.UsbEnable) USBOn = true;
     VideoOn = S.VideoMode;
 
     initKeyboard(); // initilise and startup the keyboard routines
     initTimers(); // initilise and startup the timers
     initExtIO(); // Initialise the external analog and digital I/O
-    if(S.GameDuino) GDInit();   //init gameduino
+    if (S.GameDuino) GDInit(); //init gameduino
 
     mSec(50); //delay to let power settle on mega
 
     if (USBOn) {
         // initilise the USB input/output subsystems
         USBDeviceInit(); // Initialise USB module SFRs and firmware
-          // setup timer 1 to generate a regular interrupt to process any USB activity
+        // setup timer 1 to generate a regular interrupt to process any USB activity
         PR1 = 1000 * ((BUSFREQ / 8) / 1000000) - 1; // nothing is connected to the USB (poll every 1 mSec)
         //PR1 = 100 * ((BUSFREQ / 2) / 1000000) - 1; // start polling at 100 uSec.  the interrupt will adjust this
         T1CON = 0x8010; // T1 on, prescaler 1:8
@@ -320,38 +316,36 @@ int main(void) {
         mT1ClearIntFlag(); // clear interrupt flag
         mT1IntEnable(1); // enable interrupt
     }
-        MMcls(); // clear the video buffer
-        initFont(); // initialise the font table
-    if (VideoOn ) {
+    MMcls(); // clear the video buffer
+    initFont(); // initialise the font table
+    if (VideoOn) {
         initVideo(); // start the video state machine
-    }
-    else
-    {
-            VRes = 432;
-	    HRes = 480;
+    } else {
+        VRes = 432;
+        HRes = 480;
     }
 
     if (S.SerialCon == 1) {
-        sprintf(inpbuf,"COM1:%d",S.BaudRate);
+        sprintf(inpbuf, "COM1:%d", S.BaudRate);
         SerialOpen(inpbuf, 1);
     }
     if (S.SerialCon == 2) {
-        sprintf(inpbuf,"COM2:%d",S.BaudRate);
+        sprintf(inpbuf, "COM2:%d", S.BaudRate);
         SerialOpen(inpbuf, 1);
     }
 
     if (S.SerialCon == 3) {
-        sprintf(inpbuf,"COM3:%d",S.BaudRate);
+        sprintf(inpbuf, "COM3:%d", S.BaudRate);
         SerialOpen(inpbuf, 1);
     }
     if (S.SerialCon == 4) {
-        sprintf(inpbuf,"COM4:%d",S.BaudRate);
+        sprintf(inpbuf, "COM4:%d", S.BaudRate);
         SerialOpen(inpbuf, 1);
     }
 
 
 
-        SoundPlay = 0; // start by not playing a sound
+    SoundPlay = 0; // start by not playing a sound
     P_SOUND_TRIS = P_OUTPUT; // set the sound pin as an output
 
     while (PauseTimer < 1000) MMInkey(); // let everything settle and consume any junk in the input buffer
@@ -368,7 +362,7 @@ int main(void) {
         MMPrintString("\r\n"); // extra line looks better
         Autorun = true;
     }
-   MMBasicStart(); // run BASIC
+    MMBasicStart(); // run BASIC
 }
 
 
@@ -397,11 +391,10 @@ USB related functions
  *
  *****************************************************************************/
 #if defined(USB_CDC_SET_LINE_CODING_HANDLER)
-void mySetLineCodingHandler(void)
-{
+
+void mySetLineCodingHandler(void) {
     //If the request is not in a valid range
-    if(cdc_notice.GetLineCoding.dwDTERate.Val > 115200)
-    {
+    if (cdc_notice.GetLineCoding.dwDTERate.Val > 115200) {
         //NOTE: There are two ways that an unsupported baud rate could be
         //handled.  The first is just to ignore the request and don't change
         //the values.  That is what is currently implemented in this function.
@@ -417,31 +410,30 @@ void mySetLineCodingHandler(void)
         //to crash.
         //---------------------------------------
         //USBStallEndpoint(0,1);
-    }
-    else
-    {
+    } else {
         //DWORD_VAL dwBaud;
 
         //Update the baudrate info in the CDC driver
         CDCSetBaudRate(cdc_notice.GetLineCoding.dwDTERate.Val);
 
         //Update the baudrate of the UART
-//        #if defined(__18CXX)
-//            dwBaud.Val = (GetSystemClock()/4)/line_coding.dwDTERate.Val-1;
-//            SPBRG = dwBaud.v[0];
-//            SPBRGH = dwBaud.v[1];
-//        #elif defined(__C30__)
-//            dwBaud.Val = (((GetPeripheralClock()/2)+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
-//            U2BRG = dwBaud.Val;
-//        #elif defined(__C32__)
-//            U2BRG = ((GetPeripheralClock()+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
-//            //U2MODE = 0;
-//            U2MODEbits.BRGH = BRGH2;
-//            //U2STA = 0;
-//        #endif
+        //        #if defined(__18CXX)
+        //            dwBaud.Val = (GetSystemClock()/4)/line_coding.dwDTERate.Val-1;
+        //            SPBRG = dwBaud.v[0];
+        //            SPBRGH = dwBaud.v[1];
+        //        #elif defined(__C30__)
+        //            dwBaud.Val = (((GetPeripheralClock()/2)+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
+        //            U2BRG = dwBaud.Val;
+        //        #elif defined(__C32__)
+        //            U2BRG = ((GetPeripheralClock()+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
+        //            //U2MODE = 0;
+        //            U2MODEbits.BRGH = BRGH2;
+        //            //U2STA = 0;
+        //        #endif
     }
 }
 #endif
+
 /******************************************************************************************
 Timer 1 interrupt.
 Used to send and get data to or from the USB interface.
@@ -449,50 +441,50 @@ Used to send and get data to or from the USB interface.
 void __ISR(_TIMER_1_VECTOR, ipl4) T1Interrupt(void) {
     int i, numBytesRead;
 
-    if(S.UsbEnable ==1){
+    if (S.UsbEnable == 1) {
 #ifdef  OLIMEX  // edit SPP
-    if (U1OTGSTAT & 8)  // is there 2.3V on the USB?    Thanks to Stefan Kouba (Microchip support) for suggestion!
+        if (U1OTGSTAT & 8) // is there 2.3V on the USB?    Thanks to Stefan Kouba (Microchip support) for suggestion!
 #else
-    if (U1OTGSTAT & 1)  // is there 5V on the USB?
+        if (U1OTGSTAT & 1) // is there 5V on the USB?
 #endif
-    { 
-        USBDeviceTasks(); // do any USB work
-        if (USBGetDeviceState() == DETACHED_STATE) // 5V on the USB but nothing happening
-            PR1 = 500 * ((BUSFREQ / 8) / 1000000) - 1; // probably using USB power only (poll every 500 uSec)
-        else if (USBGetDeviceState() != CONFIGURED_STATE) // we are enumerating with the host
-            PR1 = 75 * ((BUSFREQ / 8) / 1000000) - 1; // maximum speed while we are enumerating (poll every 75 uSec)
-        else { // we must have finished enumerating
-            // at this point we are connected and have enumerated - we can now send and receive data
-            PR1 = 250 * ((BUSFREQ / 8) / 1000000) - 1; // slow speed is only needed (poll every 250 uSec)
+        {
+            USBDeviceTasks(); // do any USB work
+            if (USBGetDeviceState() == DETACHED_STATE) // 5V on the USB but nothing happening
+                PR1 = 500 * ((BUSFREQ / 8) / 1000000) - 1; // probably using USB power only (poll every 500 uSec)
+            else if (USBGetDeviceState() != CONFIGURED_STATE) // we are enumerating with the host
+                PR1 = 75 * ((BUSFREQ / 8) / 1000000) - 1; // maximum speed while we are enumerating (poll every 75 uSec)
+            else { // we must have finished enumerating
+                // at this point we are connected and have enumerated - we can now send and receive data
+                PR1 = 250 * ((BUSFREQ / 8) / 1000000) - 1; // slow speed is only needed (poll every 250 uSec)
 
-            numBytesRead = getsUSBUSART(USB_RxBuf, USB_RX_BUFFER_SIZE); // check for data to be read
-            for (i = 0; i < numBytesRead; i++) { // if we have some data, copy it into the keyboard buffer
-                InpQueue[InpQueueHead] = USB_RxBuf[i]; // add the byte in the keystroke buffer
-                InpQueueHead = (InpQueueHead + 1) % INP_QUEUE_SIZE; // increment the head of the queue
-                if (USB_RxBuf[i] == 3 && !FileXfr) // check for CTRL-C
-                    MMAbort = true; // and if so tell BASIC to stop running
-                if (PrintSignonToUSB) {
-                    strncpy(USB_TxBuf[USB_Current_TxBuf], MES_SIGNON, USB_TX_BUFFER_SIZE); // if first time send signon msg
-                    USB_NbrCharsInTxBuf = strlen(USB_TxBuf[USB_Current_TxBuf]);
-                    PrintSignonToUSB = false;
+                numBytesRead = getsUSBUSART(USB_RxBuf, USB_RX_BUFFER_SIZE); // check for data to be read
+                for (i = 0; i < numBytesRead; i++) { // if we have some data, copy it into the keyboard buffer
+                    InpQueue[InpQueueHead] = USB_RxBuf[i]; // add the byte in the keystroke buffer
+                    InpQueueHead = (InpQueueHead + 1) % INP_QUEUE_SIZE; // increment the head of the queue
+                    if (USB_RxBuf[i] == 3 && !FileXfr) // check for CTRL-C
+                        MMAbort = true; // and if so tell BASIC to stop running
+                    if (PrintSignonToUSB) {
+                        strncpy((char*) USB_TxBuf[USB_Current_TxBuf], MES_SIGNON, USB_TX_BUFFER_SIZE); // if first time send signon msg
+                        USB_NbrCharsInTxBuf = strlen((char*) USB_TxBuf[USB_Current_TxBuf]);
+                        PrintSignonToUSB = false;
+                    }
                 }
-            }
 
-            if (USB_NbrCharsInTxBuf && mUSBUSARTIsTxTrfReady()) { // next, check for data to be sent
-                putUSBUSART(USB_TxBuf[USB_Current_TxBuf], USB_NbrCharsInTxBuf); // and send it
-                USB_Current_TxBuf = !USB_Current_TxBuf;
-                USB_NbrCharsInTxBuf = 0;
+                if (USB_NbrCharsInTxBuf && mUSBUSARTIsTxTrfReady()) { // next, check for data to be sent
+                    putUSBUSART(USB_TxBuf[USB_Current_TxBuf], USB_NbrCharsInTxBuf); // and send it
+                    USB_Current_TxBuf = !USB_Current_TxBuf;
+                    USB_NbrCharsInTxBuf = 0;
+                }
+                CDCTxService(); // send anything that needed sending
             }
-            CDCTxService(); // send anything that needed sending
-        }
-    } else
-        PR1 = 1000 * ((BUSFREQ / 8) / 1000000) - 1; // nothing is connected to the USB (poll every 1 mSec)
+        } else
+            PR1 = 1000 * ((BUSFREQ / 8) / 1000000) - 1; // nothing is connected to the USB (poll every 1 mSec)
     }
-    if(S.UsbEnable ==2){
+    if (S.UsbEnable == 2) {
     }
-    MSDStatus=MSDTasks();
+    MSDStatus = MSDTasks();
     mT1ClearIntFlag(); // Clear the interrupt flag
-            
+
 }
 
 /******************************************************************************************
@@ -533,7 +525,7 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size) {
     }
     return TRUE;
 }
-*/
+ */
 
 // ******************************************************************************************************
 // ************** USB Callback Functions ****************************************************************
@@ -568,37 +560,36 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size) {
  *
  * Note:            None
  *****************************************************************************/
-void USBCBSuspend(void)
-{
-	//Example power saving code.  Insert appropriate code here for the desired
-	//application behavior.  If the microcontroller will be put to sleep, a
-	//process similar to that shown below may be used:
+void USBCBSuspend(void) {
+    //Example power saving code.  Insert appropriate code here for the desired
+    //application behavior.  If the microcontroller will be put to sleep, a
+    //process similar to that shown below may be used:
 
-	//ConfigureIOPinsForLowPower();
-	//SaveStateOfAllInterruptEnableBits();
-	//DisableAllInterruptEnableBits();
-	//EnableOnlyTheInterruptsWhichWillBeUsedToWakeTheMicro();	//should enable at least USBActivityIF as a wake source
-	//Sleep();
-	//RestoreStateOfAllPreviouslySavedInterruptEnableBits();	//Preferrably, this should be done in the USBCBWakeFromSuspend() function instead.
-	//RestoreIOPinsToNormal();									//Preferrably, this should be done in the USBCBWakeFromSuspend() function instead.
+    //ConfigureIOPinsForLowPower();
+    //SaveStateOfAllInterruptEnableBits();
+    //DisableAllInterruptEnableBits();
+    //EnableOnlyTheInterruptsWhichWillBeUsedToWakeTheMicro();	//should enable at least USBActivityIF as a wake source
+    //Sleep();
+    //RestoreStateOfAllPreviouslySavedInterruptEnableBits();	//Preferrably, this should be done in the USBCBWakeFromSuspend() function instead.
+    //RestoreIOPinsToNormal();									//Preferrably, this should be done in the USBCBWakeFromSuspend() function instead.
 
-	//IMPORTANT NOTE: Do not clear the USBActivityIF (ACTVIF) bit here.  This bit is
-	//cleared inside the usb_device.c file.  Clearing USBActivityIF here will cause
-	//things to not work as intended.
+    //IMPORTANT NOTE: Do not clear the USBActivityIF (ACTVIF) bit here.  This bit is
+    //cleared inside the usb_device.c file.  Clearing USBActivityIF here will cause
+    //things to not work as intended.
 
 
-    #if defined(__C30__)
-    #if 0
-        U1EIR = 0xFFFF;
-        U1IR = 0xFFFF;
-        U1OTGIR = 0xFFFF;
-        IFS5bits.USB1IF = 0;
-        IEC5bits.USB1IE = 1;
-        U1OTGIEbits.ACTVIE = 1;
-        U1OTGIRbits.ACTVIF = 1;
-        Sleep();
-    #endif
-    #endif
+#if defined(__C30__)
+#if 0
+    U1EIR = 0xFFFF;
+    U1IR = 0xFFFF;
+    U1OTGIR = 0xFFFF;
+    IFS5bits.USB1IF = 0;
+    IEC5bits.USB1IE = 1;
+    U1OTGIEbits.ACTVIE = 1;
+    U1OTGIRbits.ACTVIF = 1;
+    Sleep();
+#endif
+#endif
 }
 
 
@@ -620,20 +611,19 @@ void USBCBSuspend(void)
  * Note:            None
  *****************************************************************************/
 #if 0
-void __attribute__ ((interrupt)) _USB1Interrupt(void)
-{
-    #if !defined(self_powered)
-        if(U1OTGIRbits.ACTVIF)
-        {
-            IEC5bits.USB1IE = 0;
-            U1OTGIEbits.ACTVIE = 0;
-            IFS5bits.USB1IF = 0;
 
-            //USBClearInterruptFlag(USBActivityIFReg,USBActivityIFBitNum);
-            USBClearInterruptFlag(USBIdleIFReg,USBIdleIFBitNum);
-            //USBSuspendControl = 0;
-        }
-    #endif
+void __attribute__((interrupt)) _USB1Interrupt(void) {
+#if !defined(self_powered)
+    if (U1OTGIRbits.ACTVIF) {
+        IEC5bits.USB1IE = 0;
+        U1OTGIEbits.ACTVIE = 0;
+        IFS5bits.USB1IF = 0;
+
+        //USBClearInterruptFlag(USBActivityIFReg,USBActivityIFBitNum);
+        USBClearInterruptFlag(USBIdleIFReg, USBIdleIFBitNum);
+        //USBSuspendControl = 0;
+    }
+#endif
 }
 #endif
 
@@ -658,16 +648,15 @@ void __attribute__ ((interrupt)) _USB1Interrupt(void)
  *
  * Note:            None
  *****************************************************************************/
-void USBCBWakeFromSuspend(void)
-{
-	// If clock switching or other power savings measures were taken when
-	// executing the USBCBSuspend() function, now would be a good time to
-	// switch back to normal full power run mode conditions.  The host allows
-	// a few milliseconds of wakeup time, after which the device must be
-	// fully back to normal, and capable of receiving and processing USB
-	// packets.  In order to do this, the USB module must receive proper
-	// clocking (IE: 48MHz clock must be available to SIE for full speed USB
-	// operation).
+void USBCBWakeFromSuspend(void) {
+    // If clock switching or other power savings measures were taken when
+    // executing the USBCBSuspend() function, now would be a good time to
+    // switch back to normal full power run mode conditions.  The host allows
+    // a few milliseconds of wakeup time, after which the device must be
+    // fully back to normal, and capable of receiving and processing USB
+    // packets.  In order to do this, the USB module must receive proper
+    // clocking (IE: 48MHz clock must be available to SIE for full speed USB
+    // operation).
 }
 
 /********************************************************************
@@ -688,8 +677,7 @@ void USBCBWakeFromSuspend(void)
  *
  * Note:            None
  *******************************************************************/
-void USBCB_SOF_Handler(void)
-{
+void USBCB_SOF_Handler(void) {
     // No need to clear UIRbits.SOFIF to 0 here.
     // Callback caller is already doing that.
 }
@@ -711,28 +699,26 @@ void USBCB_SOF_Handler(void)
  *
  * Note:            None
  *******************************************************************/
-void USBCBErrorHandler(void)
-{
+void USBCBErrorHandler(void) {
     // No need to clear UEIR to 0 here.
     // Callback caller is already doing that.
 
-	// Typically, user firmware does not need to do anything special
-	// if a USB error occurs.  For example, if the host sends an OUT
-	// packet to your device, but the packet gets corrupted (ex:
-	// because of a bad connection, or the user unplugs the
-	// USB cable during the transmission) this will typically set
-	// one or more USB error interrupt flags.  Nothing specific
-	// needs to be done however, since the SIE will automatically
-	// send a "NAK" packet to the host.  In response to this, the
-	// host will normally retry to send the packet again, and no
-	// data loss occurs.  The system will typically recover
-	// automatically, without the need for application firmware
-	// intervention.
+    // Typically, user firmware does not need to do anything special
+    // if a USB error occurs.  For example, if the host sends an OUT
+    // packet to your device, but the packet gets corrupted (ex:
+    // because of a bad connection, or the user unplugs the
+    // USB cable during the transmission) this will typically set
+    // one or more USB error interrupt flags.  Nothing specific
+    // needs to be done however, since the SIE will automatically
+    // send a "NAK" packet to the host.  In response to this, the
+    // host will normally retry to send the packet again, and no
+    // data loss occurs.  The system will typically recover
+    // automatically, without the need for application firmware
+    // intervention.
 
-	// Nevertheless, this callback function is provided, such as
-	// for debugging purposes.
+    // Nevertheless, this callback function is provided, such as
+    // for debugging purposes.
 }
-
 
 /*******************************************************************
  * Function:        void USBCBCheckOtherReq(void)
@@ -762,12 +748,10 @@ void USBCBErrorHandler(void)
  *
  * Note:            None
  *******************************************************************/
-void USBCBCheckOtherReq(void)
-{
+void USBCBCheckOtherReq(void) {
     USBCheckMSDRequest();
     USBCheckCDCRequest();
 }//end
-
 
 /*******************************************************************
  * Function:        void USBCBStdSetDscHandler(void)
@@ -788,11 +772,9 @@ void USBCBCheckOtherReq(void)
  *
  * Note:            None
  *******************************************************************/
-void USBCBStdSetDscHandler(void)
-{
+void USBCBStdSetDscHandler(void) {
     // Must claim session ownership if supporting this request
 }//end
-
 
 /*******************************************************************
  * Function:        void USBCBInitEP(void)
@@ -814,14 +796,13 @@ void USBCBStdSetDscHandler(void)
  *
  * Note:            None
  *******************************************************************/
-void USBCBInitEP(void)
-{
-    #if (MSD_DATA_IN_EP == MSD_DATA_OUT_EP)
-        USBEnableEndpoint(MSD_DATA_IN_EP,USB_IN_ENABLED|USB_OUT_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
-    #else
-        USBEnableEndpoint(MSD_DATA_IN_EP,USB_IN_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
-        USBEnableEndpoint(MSD_DATA_OUT_EP,USB_OUT_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
-    #endif
+void USBCBInitEP(void) {
+#if (MSD_DATA_IN_EP == MSD_DATA_OUT_EP)
+    USBEnableEndpoint(MSD_DATA_IN_EP, USB_IN_ENABLED | USB_OUT_ENABLED | USB_HANDSHAKE_ENABLED | USB_DISALLOW_SETUP);
+#else
+    USBEnableEndpoint(MSD_DATA_IN_EP, USB_IN_ENABLED | USB_HANDSHAKE_ENABLED | USB_DISALLOW_SETUP);
+    USBEnableEndpoint(MSD_DATA_OUT_EP, USB_OUT_ENABLED | USB_HANDSHAKE_ENABLED | USB_DISALLOW_SETUP);
+#endif
 
     USBMSDInit();
     CDCInitEP();
@@ -914,8 +895,7 @@ void USBCBInitEP(void)
  *                    Make sure to verify using the MPLAB SIM's Stopwatch
  *                    and verify the actual signal on an oscilloscope.
  *******************************************************************/
-void USBCBSendResume(void)
-{
+void USBCBSendResume(void) {
     static WORD delay_count;
 
     //First verify that the host has armed us to perform remote wakeup.
@@ -927,19 +907,17 @@ void USBCBSendResume(void)
     //properties page for the USB device, power management tab, the
     //"Allow this device to bring the computer out of standby." checkbox
     //should be checked).
-    if(USBGetRemoteWakeupStatus() == TRUE)
-    {
+    if (USBGetRemoteWakeupStatus() == TRUE) {
         //Verify that the USB bus is in fact suspended, before we send
         //remote wakeup signalling.
-        if(USBIsBusSuspended() == TRUE)
-        {
+        if (USBIsBusSuspended() == TRUE) {
             USBMaskInterrupts();
 
             //Clock switch to settings consistent with normal USB operation.
             USBCBWakeFromSuspend();
             USBSuspendControl = 0;
-            USBBusIsSuspended = FALSE;  //So we don't execute this code again,
-                                        //until a new suspend condition is detected.
+            USBBusIsSuspended = FALSE; //So we don't execute this code again,
+            //until a new suspend condition is detected.
 
             //Section 7.1.7.7 of the USB 2.0 specifications indicates a USB
             //device must continuously see 5ms+ of idle on the bus, before it sends
@@ -948,19 +926,17 @@ void USBCBSendResume(void)
             //least 3ms from bus idle to USBIsBusSuspended() == TRUE, yeilds
             //5ms+ total delay since start of idle).
             delay_count = 3600U;
-            do
-            {
+            do {
                 delay_count--;
-            }while(delay_count);
+            } while (delay_count);
 
             //Now drive the resume K-state signalling onto the USB bus.
-            USBResumeControl = 1;       // Start RESUME signaling
-            delay_count = 1800U;        // Set RESUME line for 1-13 ms
-            do
-            {
+            USBResumeControl = 1; // Start RESUME signaling
+            delay_count = 1800U; // Set RESUME line for 1-13 ms
+            do {
                 delay_count--;
-            }while(delay_count);
-            USBResumeControl = 0;       //Finished driving resume signalling
+            } while (delay_count);
+            USBResumeControl = 0; //Finished driving resume signalling
 
             USBUnmaskInterrupts();
         }
@@ -988,10 +964,8 @@ void USBCBSendResume(void)
  *
  * Note:            None
  *******************************************************************/
-BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size)
-{
-    switch(event)
-    {
+BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size) {
+    switch (event) {
         case EVENT_TRANSFER:
             //Add application specific callback task or callback function here if desired.
             break;
@@ -1161,8 +1135,7 @@ int MMInkey(void) {
 int MMgetchar(void) {
     int c;
 
-    do
-    {
+    do {
         ShowCursor(true);
         c = MMInkey();
         if (c == '\r') c = '\n';
@@ -1181,7 +1154,7 @@ Video/USB output functions
 // put a character out to the video screen, the serial console and the USB interface
 
 char MMputchar(char c) {
-//    if (!FileXfr && VideoOn) VideoPutc(c); // draw the char on the video screen
+    //    if (!FileXfr && VideoOn) VideoPutc(c); // draw the char on the video screen
     if (!FileXfr && !SupressVideo) VideoPutc(c); // draw the char on the video screen
     if (SerialConsole) SerialPutchar(SerialConsole, c); // send it to the serial console if enabled
     if (!(SerialConsole && FileXfr) && USBOn) USBPutchar(c); // send it to the USB

@@ -126,7 +126,7 @@
 //              will then be able to read from the file.
 #define FS_READ "r"
 #if defined(__32MX795F512L__)
-    #warning FSfopen must use "r" and not READ as input on this device
+//  #warning FSfopen must use "r" and not READ as input on this device
 #else
     #define READ    "r"     //deprecated
 #endif

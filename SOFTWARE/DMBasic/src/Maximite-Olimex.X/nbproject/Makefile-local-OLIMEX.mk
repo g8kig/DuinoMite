@@ -15,23 +15,24 @@
 # $ makeMP_CC="/opt/microchip/mplabc30/v3.30c/bin/pic30-gcc" ...  
 #
 SHELL=cmd.exe
-PATH_TO_IDE_BIN=C:/Program Files (x86)/Microchip/MPLABX 1.41/mplab_ide/mplab_ide/modules/../../bin/
+PATH_TO_IDE_BIN=C:/Program Files (x86)/Microchip/MPLABX/v5.40/mplab_platform/platform/../mplab_ide/modules/../../bin/
 # Adding MPLAB X bin directory to path.
-PATH:=C:/Program Files (x86)/Microchip/MPLABX 1.41/mplab_ide/mplab_ide/modules/../../bin/:$(PATH)
+PATH:=C:/Program Files (x86)/Microchip/MPLABX/v5.40/mplab_platform/platform/../mplab_ide/modules/../../bin/:$(PATH)
 # Path to java used to run MPLAB X when this makefile was created
-MP_JAVA_PATH="C:\Program Files (x86)\Microchip\MPLABX 1.41\sys\java\jre1.6.0_32-windows-x64\java-windows/bin/"
+MP_JAVA_PATH="C:\Program Files (x86)\Microchip\MPLABX\v5.40\sys\java\zulu8.36.0.1-ca-fx-jdk8.0.202-win_x64\jre/bin/"
 OS_CURRENT="$(shell uname -s)"
-MP_CC="C:\Program Files (x86)\Microchip\MPLAB C32\1_11B\bin\pic32-gcc.exe"
+MP_CC="C:\Program Files (x86)\Microchip\MPLAB C32\bin\pic32-gcc.exe"
 # MP_CPPC is not defined
 # MP_BC is not defined
-MP_AS="C:\Program Files (x86)\Microchip\MPLAB C32\1_11B\bin\pic32-as.exe"
-MP_LD="C:\Program Files (x86)\Microchip\MPLAB C32\1_11B\bin\pic32-ld.exe"
-MP_AR="C:\Program Files (x86)\Microchip\MPLAB C32\1_11B\bin\pic32-ar.exe"
-DEP_GEN=${MP_JAVA_PATH}java -jar "C:/Program Files (x86)/Microchip/MPLABX 1.41/mplab_ide/mplab_ide/modules/../../bin/extractobjectdependencies.jar" 
-MP_CC_DIR="C:\Program Files (x86)\Microchip\MPLAB C32\1_11B\bin"
+MP_AS="C:\Program Files (x86)\Microchip\MPLAB C32\bin\pic32-as.exe"
+MP_LD="C:\Program Files (x86)\Microchip\MPLAB C32\bin\pic32-ld.exe"
+MP_AR="C:\Program Files (x86)\Microchip\MPLAB C32\bin\pic32-ar.exe"
+DEP_GEN=${MP_JAVA_PATH}java -jar "C:/Program Files (x86)/Microchip/MPLABX/v5.40/mplab_platform/platform/../mplab_ide/modules/../../bin/extractobjectdependencies.jar"
+MP_CC_DIR="C:\Program Files (x86)\Microchip\MPLAB C32\bin"
 # MP_CPPC_DIR is not defined
 # MP_BC_DIR is not defined
-MP_AS_DIR="C:\Program Files (x86)\Microchip\MPLAB C32\1_11B\bin"
-MP_LD_DIR="C:\Program Files (x86)\Microchip\MPLAB C32\1_11B\bin"
-MP_AR_DIR="C:\Program Files (x86)\Microchip\MPLAB C32\1_11B\bin"
+MP_AS_DIR="C:\Program Files (x86)\Microchip\MPLAB C32\bin"
+MP_LD_DIR="C:\Program Files (x86)\Microchip\MPLAB C32\bin"
+MP_AR_DIR="C:\Program Files (x86)\Microchip\MPLAB C32\bin"
 # MP_BC_DIR is not defined
+DFP_DIR=C:/Program Files (x86)/Microchip/MPLABX/v5.40/packs/Microchip/PIC32MX_DFP/1.3.231

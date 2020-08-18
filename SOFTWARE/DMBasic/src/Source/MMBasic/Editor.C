@@ -35,7 +35,7 @@ char killbuf[KILL_BUF_SIZE];
 char T;
 char *buf;
 char *buf2;
-char LINE_LEN,MAX_LINES,STATUS_LINE;
+char LINE_LEN, MAX_LINES, STATUS_LINE;
 char *helpline[80];
 
 char *HelpScreen = "                      FSE V1.0 Commands (c)2011 Ken Segler";
@@ -56,14 +56,12 @@ void home(void), gotoend(void), paste(void);
 int load(char *fname), save(char *fname);
 void edit_gets(char *str), info(void);
 
-
-
 char putch(char c) {
     // put a character out to the video screen, the serial console and the USB interface
     MMputchar(c);
-//    if (!FileXfr) VideoPutc(c); // draw the char on the video screen
-//    if (SerialConsole) SerialPutchar(SerialConsole, c); // send it to the serial console if enabled
-//    if (!(SerialConsole && FileXfr)) USBPutchar(c); // send it to the USB
+    //    if (!FileXfr) VideoPutc(c); // draw the char on the video screen
+    //    if (SerialConsole) SerialPutchar(SerialConsole, c); // send it to the serial console if enabled
+    //    if (!(SerialConsole && FileXfr)) USBPutchar(c); // send it to the USB
     return c;
 
 }
@@ -71,27 +69,27 @@ char putch(char c) {
 void PrintString(char* s) {
     while (*s) putch(*s++);
 }
-void show_help(void)
-{
-    int i=0;
+
+void show_help(void) {
+    int i = 0;
     int Tscrnx, Tscrny;
-    Tscrnx=scrnx;
-   Tscrny=scrny;
-    scrnx=0;
-    scrny=0;
+    Tscrnx = scrnx;
+    Tscrny = scrny;
+    scrnx = 0;
+    scrny = 0;
     clrscr();
-    gotoxy(0,0);
-    while(help_fse[i++])
-    {
+    gotoxy(0, 0);
+    while (help_fse[i++]) {
         putch(help_fse[i]);
     }
     MMgetchar();
     clrscr();
-//    scrnx=Tscrnx;
-//    scrny=Tscrny;
-    curloc=buf;
+    //    scrnx=Tscrnx;
+    //    scrny=Tscrny;
+    curloc = buf;
     display_scrn(0, 0, curloc);
 }
+
 char getch(void) {
     char c;
     c = MMgetchar();
@@ -128,16 +126,16 @@ void cmd_fse(void) //StartEditor(char *fname)
 {
     char name[20];
     char c;
-    LINE_LEN = ((HRes/6)-1);
-    MAX_LINES = ((VRes/12)-1); //35
-    STATUS_LINE =(MAX_LINES+1); //36
+    LINE_LEN = ((HRes / 6) - 1);
+    MAX_LINES = ((VRes / 12) - 1); //35
+    STATUS_LINE = (MAX_LINES + 1); //36
 
     ClearExternalIO();
     clearstack();
     clearvars();
-    TraceOn = false;    // turn off tron on new
+    TraceOn = false; // turn off tron on new
     clearprog();
-    
+
     memset(name, 0, 20);
     Cursor = C_STANDARD;
     if (*cmdline) {
@@ -325,8 +323,8 @@ void cmd_fse(void) //StartEditor(char *fname)
         }
         help();
     } while (c != 26); /* control-Z quits the editor */
-    if( buf !=NULL ) free(buf);
-    if( buf2 !=NULL ) free(buf2);
+    if (buf != NULL) free(buf);
+    if (buf2 != NULL) free(buf2);
     clrscr();
 }
 
@@ -468,8 +466,8 @@ void delete_char(void) {
  */
 void info(void) {
     clrscr();
-    sprintf((char*)helpline," File Size -> %d",endloc);
-    PrintString((char*)helpline);
+    sprintf((char*) helpline, " File Size -> %d", (unsigned) endloc);
+    PrintString((char*) helpline);
 }
 
 /* Display help line.  You might want to expand on
@@ -479,10 +477,10 @@ void help(void) {
     //*  ESC [ ? 6 l       turn off region - full screen mode
 
     PrintString("\033[?6l");
-    gotoxy(0, STATUS_LINE-1);
+    gotoxy(0, STATUS_LINE - 1);
     ReverseVideo(true);
-    sprintf((char*)helpline, "  FSE V1.0 (C)2011 Ken Segler     F10 - Help                             %d:%d  ", scrny+1, scrnx+1);
-    PrintString((char*)helpline);
+    sprintf((char*) helpline, "  FSE V1.0 (C)2011 Ken Segler     F10 - Help                             %d:%d  ", scrny + 1, scrnx + 1);
+    PrintString((char*) helpline);
     ReverseVideo(false);
     PrintString("\033[1;35r");
     PrintString("\033[?6h");
@@ -656,7 +654,7 @@ void display_scrn(int x, int y, char *p) {
         switch (*p) {
             case '\r':
                 putch('\r');
-                if(y!=(MAX_LINES-1)) putch('\n');
+                if (y != (MAX_LINES - 1)) putch('\n');
                 y++;
                 i = 0;
                 break;
@@ -742,7 +740,7 @@ int load(char *fname) {
     p = buf;
     while (!MMfeof(FileNumber) && p != buf + BUF_SIZE - 2) {
         c = MMfgetc(FileNumber);
-        if (c != '\n' && c != EOF) {
+        if (c != '\n' && c != (char) EOF) {
             *p = c;
             p++;
         }
@@ -861,8 +859,8 @@ void clrscr(void) {
     MMPosX = MMPosY = MMCharPos = 0;
     memset(VA, 0, 408 * (HBUFSIZE / 8));
     PrintString("\033[2J\033[H");
-//    PrintString("\033[1;35r");
-//    PrintString("\033[?6h");
+    //    PrintString("\033[1;35r");
+    //    PrintString("\033[?6h");
 
     /*
      *  ESC [ pt ; pb r   set scroll region
@@ -875,8 +873,8 @@ void clrscr(void) {
    all but the bottom line. */
 void scrolldn(int x, int y) {
     //    PrintString("\33[1;33r");
-    sprintf((char*)helpline,"\033[%d;%dr",y+1,35);
-    PrintString((char*)helpline);
+    sprintf((char*) helpline, "\033[%d;%dr", y + 1, 35);
+    PrintString((char*) helpline);
     PrintString("\033M");
     PrintString("\033[1;35r");
     int *pd = VA + ((HBUFSIZE / 32) * 420); // was 396
@@ -895,13 +893,13 @@ void scrolldn(int x, int y) {
    coordinates. */
 void scrollup(int topx, int topy, int endx, int endy) {
     // PrintString("\33[1;33r");
-//    sprintf(helpline,"\033[%d;%dr",topy,endy);
- //   PrintString(helpline);
+    //    sprintf(helpline,"\033[%d;%dr",topy,endy);
+    //   PrintString(helpline);
     PrintString("\033D");
- //   gotoxy(0,35);
-//      PrintString("                                                                                \r");
- //   PrintString("\033[1;35r");
-    int *pd = VA + (topy*((HBUFSIZE / 32) * 12));
+    //   gotoxy(0,35);
+    //      PrintString("                                                                                \r");
+    //   PrintString("\033[1;35r");
+    int *pd = VA + (topy * ((HBUFSIZE / 32) * 12));
     int *ps = pd + ((HBUFSIZE / 32) * 12);
     int i;
 

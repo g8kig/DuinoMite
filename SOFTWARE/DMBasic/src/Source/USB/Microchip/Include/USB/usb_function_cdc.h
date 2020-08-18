@@ -80,7 +80,7 @@
     
     C:\\Microchip Solutions\\My Demo Application                       
 
-********************************************************************/
+ ********************************************************************/
 
 /********************************************************************
  Change History:
@@ -97,7 +97,7 @@
          structure definitions useful when sending serial state
          notifications over the CDC interrupt endpoint.
 
-********************************************************************/
+ ********************************************************************/
 
 #ifndef CDC_H
 #define CDC_H
@@ -178,41 +178,41 @@
 #define CDC_TX_COMPLETING           3
 
 #if defined(USB_CDC_SET_LINE_CODING_HANDLER) 
-    #define LINE_CODING_TARGET &cdc_notice.SetLineCoding._byte[0]
-    #define LINE_CODING_PFUNC &USB_CDC_SET_LINE_CODING_HANDLER
+#define LINE_CODING_TARGET &cdc_notice.SetLineCoding._byte[0]
+#define LINE_CODING_PFUNC &USB_CDC_SET_LINE_CODING_HANDLER
 #else
-    #define LINE_CODING_TARGET &line_coding._byte[0]
-    #define LINE_CODING_PFUNC NULL
+#define LINE_CODING_TARGET &line_coding._byte[0]
+#define LINE_CODING_PFUNC NULL
 #endif
 
 #if defined(USB_CDC_SUPPORT_HARDWARE_FLOW_CONTROL)
-    #define CONFIGURE_RTS(a) UART_RTS = a;
+#define CONFIGURE_RTS(a) UART_RTS = a;
 #else
-    #define CONFIGURE_RTS(a)
+#define CONFIGURE_RTS(a)
 #endif
 
 #if defined(USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D3)
-    #error This option is not currently supported.
+#error This option is not currently supported.
 #else
-    #define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D3_VAL 0x00
+#define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D3_VAL 0x00
 #endif
 
 #if defined(USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D2)
-    #define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D2_VAL 0x04
+#define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D2_VAL 0x04
 #else
-    #define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D2_VAL 0x00
+#define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D2_VAL 0x00
 #endif
 
 #if defined(USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D1)
-    #define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D1_VAL 0x02
+#define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D1_VAL 0x02
 #else
-    #define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D1_VAL 0x00
+#define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D1_VAL 0x00
 #endif
 
 #if defined(USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D0)
-    #error This option is not currently supported.
+#error This option is not currently supported.
 #else
-    #define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D0_VAL 0x00
+#define USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D0_VAL 0x00
 #endif
 
 #define USB_CDC_ACM_FN_DSC_VAL  \
@@ -281,9 +281,9 @@
         
     Parameters:
         BYTE charFormat - number of stop bits.  Available options are:
-         * NUM_STOP_BITS_1 - 1 Stop bit
-         * NUM_STOP_BITS_1_5 - 1.5 Stop bits
-         * NUM_STOP_BITS_2 - 2 Stop bits
+ * NUM_STOP_BITS_1 - 1 Stop bit
+ * NUM_STOP_BITS_1_5 - 1.5 Stop bits
+ * NUM_STOP_BITS_2 - 2 Stop bits
         
     Return Values:
         None
@@ -322,11 +322,11 @@
         
     Parameters:
         BYTE parityType - Type of parity.  The options are the following:
-            * PARITY_NONE
-            * PARITY_ODD
-            * PARITY_EVEN
-            * PARITY_MARK
-            * PARITY_SPACE
+ * PARITY_NONE
+ * PARITY_ODD
+ * PARITY_EVEN
+ * PARITY_MARK
+ * PARITY_SPACE
         
     Return Values:
         None
@@ -403,15 +403,15 @@
     Parameters:
         DWORD baud - The desired baudrate
         BYTE format - number of stop bits.  Available options are:
-         * NUM_STOP_BITS_1 - 1 Stop bit
-         * NUM_STOP_BITS_1_5 - 1.5 Stop bits
-         * NUM_STOP_BITS_2 - 2 Stop bits
+ * NUM_STOP_BITS_1 - 1 Stop bit
+ * NUM_STOP_BITS_1_5 - 1.5 Stop bits
+ * NUM_STOP_BITS_2 - 2 Stop bits
         BYTE parity - Type of parity.  The options are the following:
-            * PARITY_NONE
-            * PARITY_ODD
-            * PARITY_EVEN
-            * PARITY_MARK
-            * PARITY_SPACE
+ * PARITY_NONE
+ * PARITY_ODD
+ * PARITY_EVEN
+ * PARITY_MARK
+ * PARITY_SPACE
         BYTE dataSize - number of data bits.  The options are 5, 6, 7, 8, or 16.
         
     Return Values:
@@ -613,33 +613,33 @@
     None
   Remarks:
     None                                                                   
-  **************************************************************************/
+ **************************************************************************/
 void CDCInitEP(void);
 
 /******************************************************************************
- 	Function:
- 		void USBCheckCDCRequest(void)
+    Function:
+        void USBCheckCDCRequest(void)
  
- 	Description:
- 		This routine checks the most recently received SETUP data packet to 
- 		see if the request is specific to the CDC class.  If the request was
- 		a CDC specific request, this function will take care of handling the
- 		request and responding appropriately.
+    Description:
+        This routine checks the most recently received SETUP data packet to 
+        see if the request is specific to the CDC class.  If the request was
+        a CDC specific request, this function will take care of handling the
+        request and responding appropriately.
  		
- 	PreCondition:
- 		This function should only be called after a control transfer SETUP
- 		packet has arrived from the host.
+    PreCondition:
+        This function should only be called after a control transfer SETUP
+        packet has arrived from the host.
 
-	Parameters:
-		None
+    Parameters:
+        None
 		
-	Return Values:
-		None
+    Return Values:
+        None
 		
-	Remarks:
-		This function does not change status or do anything if the SETUP packet
-		did not contain a CDC class specific request.		 
-  *****************************************************************************/
+    Remarks:
+        This function does not change status or do anything if the SETUP packet
+        did not contain a CDC class specific request.		 
+ *****************************************************************************/
 void USBCheckCDCRequest(void);
 
 
@@ -657,7 +657,7 @@ void USBCheckCDCRequest(void);
     the information to the USB host.  This can be done by calling 
     CDCNotificationHandler() by itself, or, by calling CDCTxService() which
     also calls CDCNotificationHandler() internally, when appropriate.
-  **************************************************************************/
+ **************************************************************************/
 void CDCNotificationHandler(void);
 
 
@@ -683,7 +683,7 @@ void CDCNotificationHandler(void);
     pdata - pointer to the data that caused the event
     size - the size of the data that is pointed to by pdata
                                                                                    
-  **********************************************************************************/
+ **********************************************************************************/
 BOOL USBCDCEventHandler(USB_EVENT event, void *pdata, WORD size);
 
 
@@ -730,12 +730,12 @@ BOOL USBCDCEventHandler(USB_EVENT event, void *pdata, WORD size);
               can be anything from 0 up to the len input value.  A return value of 0
               indicates that no new CDC bulk OUT endpoint data was available.
                                                                                    
-  **********************************************************************************/
-BYTE getsUSBUSART(char *buffer, BYTE len);
+ **********************************************************************************/
+BYTE getsUSBUSART(volatile char *buffer, BYTE len);
 
 /******************************************************************************
   Function:
-	void putUSBUSART(char *data, BYTE length)
+    void putUSBUSART(char *data, BYTE length)
 		
   Summary:
     putUSBUSART writes an array of data to the USB. Use this version, is
@@ -773,11 +773,11 @@ BYTE getsUSBUSART(char *buffer, BYTE len);
     BYTE length - the number of bytes to be transfered (must be less than 255).
 		
  *****************************************************************************/
-void putUSBUSART(char *data, BYTE Length);
+void putUSBUSART(volatile char *data, BYTE Length);
 
 /******************************************************************************
-	Function:
-		void putsUSBUSART(char *data)
+    Function:
+        void putsUSBUSART(char *data)
 		
   Summary:
     putsUSBUSART writes a string of data to the USB including the null
@@ -856,7 +856,7 @@ void putsUSBUSART(char *data);
                             null character is not found, 255 BYTEs of data
                             will be transferred to the host.
                                                                            
-  **************************************************************************/
+ **************************************************************************/
 void putrsUSBUSART(const ROM char *data);
 
 /************************************************************************
@@ -908,7 +908,7 @@ void putrsUSBUSART(const ROM char *data);
     in the CONFIGURED_STATE.
   Remarks:
     None                                                                 
-  ************************************************************************/
+ ************************************************************************/
 void CDCTxService(void);
 
 
@@ -917,28 +917,26 @@ void CDCTxService(void);
 /* Line Coding Structure */
 #define LINE_CODING_LENGTH          0x07
 
-typedef union _LINE_CODING
-{
-    struct
-    {
+typedef union _LINE_CODING {
+
+    struct {
         BYTE _byte[LINE_CODING_LENGTH];
     };
-    struct
-    {
-        DWORD_VAL   dwDTERate;          // Complex data structure
-        BYTE    bCharFormat;
-        BYTE    bParityType;
-        BYTE    bDataBits;
+
+    struct {
+        DWORD_VAL dwDTERate; // Complex data structure
+        BYTE bCharFormat;
+        BYTE bParityType;
+        BYTE bDataBits;
     };
 } LINE_CODING;
 
-typedef union _CONTROL_SIGNAL_BITMAP
-{
+typedef union _CONTROL_SIGNAL_BITMAP {
     BYTE _byte;
-    struct
-    {
-        unsigned DTE_PRESENT:1;       // [0] Not Present  [1] Present
-        unsigned CARRIER_CONTROL:1;   // [0] Deactivate   [1] Activate
+
+    struct {
+        unsigned DTE_PRESENT : 1; // [0] Not Present  [1] Present
+        unsigned CARRIER_CONTROL : 1; // [0] Deactivate   [1] Activate
     };
 } CONTROL_SIGNAL_BITMAP;
 
@@ -946,78 +944,76 @@ typedef union _CONTROL_SIGNAL_BITMAP
 /* Functional Descriptor Structure - See CDC Specification 1.1 for details */
 
 /* Header Functional Descriptor */
-typedef struct __attribute__((packed)) _USB_CDC_HEADER_FN_DSC
-{
+typedef struct __attribute__((packed)) _USB_CDC_HEADER_FN_DSC {
     BYTE bFNLength;
     BYTE bDscType;
     BYTE bDscSubType;
     WORD bcdCDC;
-} USB_CDC_HEADER_FN_DSC;
+}
+USB_CDC_HEADER_FN_DSC;
 
 /* Abstract Control Management Functional Descriptor */
-typedef struct __attribute__((packed)) _USB_CDC_ACM_FN_DSC
-{
+typedef struct __attribute__((packed)) _USB_CDC_ACM_FN_DSC {
     BYTE bFNLength;
     BYTE bDscType;
     BYTE bDscSubType;
     BYTE bmCapabilities;
-} USB_CDC_ACM_FN_DSC;
+}
+USB_CDC_ACM_FN_DSC;
 
 /* Union Functional Descriptor */
-typedef struct __attribute__((packed)) _USB_CDC_UNION_FN_DSC
-{
+typedef struct __attribute__((packed)) _USB_CDC_UNION_FN_DSC {
     BYTE bFNLength;
     BYTE bDscType;
     BYTE bDscSubType;
     BYTE bMasterIntf;
     BYTE bSaveIntf0;
-} USB_CDC_UNION_FN_DSC;
+}
+USB_CDC_UNION_FN_DSC;
 
 /* Call Management Functional Descriptor */
-typedef struct __attribute__((packed)) _USB_CDC_CALL_MGT_FN_DSC
-{
+typedef struct __attribute__((packed)) _USB_CDC_CALL_MGT_FN_DSC {
     BYTE bFNLength;
     BYTE bDscType;
     BYTE bDscSubType;
     BYTE bmCapabilities;
     BYTE bDataInterface;
-} USB_CDC_CALL_MGT_FN_DSC;
+}
+USB_CDC_CALL_MGT_FN_DSC;
 
-typedef union __attribute__((packed)) _CDC_NOTICE
-{
+typedef union __attribute__((packed)) _CDC_NOTICE {
     LINE_CODING GetLineCoding;
     LINE_CODING SetLineCoding;
     unsigned char packet[CDC_COMM_IN_EP_SIZE];
-} CDC_NOTICE, *PCDC_NOTICE;
+}
+CDC_NOTICE, *PCDC_NOTICE;
 
 /* Bit structure definition for the SerialState notification byte */
-typedef union
-{
+typedef union {
     BYTE byte;
-    struct
-    {
-        BYTE    DCD             :1;
-        BYTE    DSR             :1;
-        BYTE    BreakState      :1;
-        BYTE    RingDetect      :1;
-        BYTE    FramingError    :1;
-        BYTE    ParityError     :1;
-        BYTE    Overrun         :1;
-        BYTE    Reserved        :1;          
-    }bits;    
-}BM_SERIAL_STATE;  
+
+    struct {
+        BYTE DCD : 1;
+        BYTE DSR : 1;
+        BYTE BreakState : 1;
+        BYTE RingDetect : 1;
+        BYTE FramingError : 1;
+        BYTE ParityError : 1;
+        BYTE Overrun : 1;
+        BYTE Reserved : 1;
+    } bits;
+} BM_SERIAL_STATE;
 
 /* Serial State Notification Packet Structure */
-typedef struct
-{
-    BYTE    bmRequestType;  //Always 0xA1 for serial state notification packets
-    BYTE    bNotification;  //Always SERIAL_STATE (0x20) for serial state notification packets
-    UINT16  wValue;     //Always 0 for serial state notification packets
-    UINT16  wIndex;     //Interface number
-    UINT16  wLength;    //Should always be 2 for serial state notification packets
+typedef struct {
+    BYTE bmRequestType; //Always 0xA1 for serial state notification packets
+    BYTE bNotification; //Always SERIAL_STATE (0x20) for serial state notification packets
+    UINT16 wValue; //Always 0 for serial state notification packets
+    UINT16 wIndex; //Interface number
+    UINT16 wLength; //Should always be 2 for serial state notification packets
     BM_SERIAL_STATE SerialState;
-    BYTE    Reserved;
-}SERIAL_STATE_NOTIFICATION;   
+    BYTE Reserved;
+} SERIAL_STATE_NOTIFICATION;
 
 
 /** E X T E R N S ************************************************************/

@@ -74,7 +74,7 @@
     C:\\Microchip Solutions\\Microchip\\Include
     
     C:\\Microchip Solutions\\My Demo Application                                 
-  ********************************************************************************/
+ ********************************************************************************/
 
 /********************************************************************
  Change History:
@@ -99,7 +99,7 @@
   
   2.9b   Updated to implement optional support for DTS reporting.
 
-********************************************************************/
+ ********************************************************************/
 
 /** I N C L U D E S **********************************************************/
 #include "USB/usb.h"
@@ -110,12 +110,12 @@
 
 /** V A R I A B L E S ********************************************************/
 #if defined(__18F14K50) || defined(__18F13K50) || defined(__18LF14K50) || defined(__18LF13K50) 
-    #pragma udata usbram2
+#pragma udata usbram2
 #elif defined(__18F2455) || defined(__18F2550) || defined(__18F4455) || defined(__18F4550)\
     || defined(__18F2458) || defined(__18F2553) || defined(__18F4458) || defined(__18F4553)
-    #pragma udata USB_VARIABLES=0x500
+#pragma udata USB_VARIABLES=0x500
 #elif defined(__18F4450) || defined(__18F2450)
-	#pragma udata USB_VARIABLES=0x480
+#pragma udata USB_VARIABLES=0x480
 #else
 //    #pragma udata
 #endif
@@ -123,34 +123,34 @@
 volatile FAR CDC_NOTICE cdc_notice;
 volatile FAR unsigned char cdc_data_rx[CDC_DATA_OUT_EP_SIZE];
 volatile FAR unsigned char cdc_data_tx[CDC_DATA_IN_EP_SIZE];
-LINE_CODING line_coding;    // Buffer to store line coding information
+LINE_CODING line_coding; // Buffer to store line coding information
 
 #if defined(USB_CDC_SUPPORT_DSR_REPORTING)
-    SERIAL_STATE_NOTIFICATION SerialStatePacket;
+SERIAL_STATE_NOTIFICATION SerialStatePacket;
 #endif
 
 //#pragma udata
-BYTE cdc_rx_len;            // total rx length
+BYTE cdc_rx_len; // total rx length
 
-BYTE cdc_trf_state;         // States are defined cdc.h
-POINTER pCDCSrc;            // Dedicated source pointer
-POINTER pCDCDst;            // Dedicated destination pointer
-BYTE cdc_tx_len;            // total tx length
-BYTE cdc_mem_type;          // _ROM, _RAM
+BYTE cdc_trf_state; // States are defined cdc.h
+POINTER pCDCSrc; // Dedicated source pointer
+POINTER pCDCDst; // Dedicated destination pointer
+BYTE cdc_tx_len; // total tx length
+BYTE cdc_mem_type; // _ROM, _RAM
 
 USB_HANDLE CDCDataOutHandle;
 USB_HANDLE CDCDataInHandle;
 
 
 CONTROL_SIGNAL_BITMAP control_signal_bitmap;
-DWORD BaudRateGen;			// BRG value calculated from baudrate
-extern BYTE  i;
+DWORD BaudRateGen; // BRG value calculated from baudrate
+extern BYTE i;
 extern BYTE_VAL *pDst;
 
 #if defined(USB_CDC_SUPPORT_DSR_REPORTING)
-    BM_SERIAL_STATE SerialStateBitmap;
-    BM_SERIAL_STATE OldSerialStateBitmap;
-    USB_HANDLE CDCNotificationInHandle;
+BM_SERIAL_STATE SerialStateBitmap;
+BM_SERIAL_STATE OldSerialStateBitmap;
+USB_HANDLE CDCNotificationInHandle;
 #endif
 
 /**************************************************************************
@@ -173,83 +173,82 @@ void USBCDCSetLineCoding(void);
 //#pragma code
 
 /** C L A S S  S P E C I F I C  R E Q ****************************************/
-/******************************************************************************
- 	Function:
- 		void USBCheckCDCRequest(void)
- 
- 	Description:
- 		This routine checks the most recently received SETUP data packet to 
- 		see if the request is specific to the CDC class.  If the request was
- 		a CDC specific request, this function will take care of handling the
- 		request and responding appropriately.
- 		
- 	PreCondition:
- 		This function should only be called after a control transfer SETUP
- 		packet has arrived from the host.
 
-	Parameters:
-		None
+/******************************************************************************
+    Function:
+        void USBCheckCDCRequest(void)
+ 
+    Description:
+        This routine checks the most recently received SETUP data packet to 
+        see if the request is specific to the CDC class.  If the request was
+        a CDC specific request, this function will take care of handling the
+        request and responding appropriately.
+ 		
+    PreCondition:
+        This function should only be called after a control transfer SETUP
+        packet has arrived from the host.
+
+    Parameters:
+        None
 		
-	Return Values:
-		None
+    Return Values:
+        None
 		
-	Remarks:
-		This function does not change status or do anything if the SETUP packet
-		did not contain a CDC class specific request.		 
-  *****************************************************************************/
-void USBCheckCDCRequest(void)
-{
+    Remarks:
+        This function does not change status or do anything if the SETUP packet
+        did not contain a CDC class specific request.		 
+ *****************************************************************************/
+void USBCheckCDCRequest(void) {
     /*
      * If request recipient is not an interface then return
      */
-    if(SetupPkt.Recipient != USB_SETUP_RECIPIENT_INTERFACE_BITFIELD) return;
+    if (SetupPkt.Recipient != USB_SETUP_RECIPIENT_INTERFACE_BITFIELD) return;
 
     /*
      * If request type is not class-specific then return
      */
-    if(SetupPkt.RequestType != USB_SETUP_TYPE_CLASS_BITFIELD) return;
+    if (SetupPkt.RequestType != USB_SETUP_TYPE_CLASS_BITFIELD) return;
 
     /*
      * Interface ID must match interface numbers associated with
      * CDC class, else return
      */
-    if((SetupPkt.bIntfID != CDC_COMM_INTF_ID)&&
-       (SetupPkt.bIntfID != CDC_DATA_INTF_ID)) return;
-    
-    switch(SetupPkt.bRequest)
-    {
-        //****** These commands are required ******//
+    if ((SetupPkt.bIntfID != CDC_COMM_INTF_ID)&&
+            (SetupPkt.bIntfID != CDC_DATA_INTF_ID)) return;
+
+    switch (SetupPkt.bRequest) {
+            //****** These commands are required ******//
         case SEND_ENCAPSULATED_COMMAND:
-         //send the packet
-            inPipes[0].pSrc.bRam = (BYTE*)&dummy_encapsulated_cmd_response;
+            //send the packet
+            inPipes[0].pSrc.bRam = (BYTE*) & dummy_encapsulated_cmd_response;
             inPipes[0].wCount.Val = dummy_length;
             inPipes[0].info.bits.ctrl_trf_mem = USB_EP0_RAM;
             inPipes[0].info.bits.busy = 1;
             break;
         case GET_ENCAPSULATED_RESPONSE:
             // Populate dummy_encapsulated_cmd_response first.
-            inPipes[0].pSrc.bRam = (BYTE*)&dummy_encapsulated_cmd_response;
+            inPipes[0].pSrc.bRam = (BYTE*) & dummy_encapsulated_cmd_response;
             inPipes[0].info.bits.busy = 1;
             break;
-        //****** End of required commands ******//
+            //****** End of required commands ******//
 
-        #if defined(USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D1)
+#if defined(USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D1)
         case SET_LINE_CODING:
             outPipes[0].wCount.Val = SetupPkt.wLength;
-            outPipes[0].pDst.bRam = (BYTE*)LINE_CODING_TARGET;
+            outPipes[0].pDst.bRam = (BYTE*) LINE_CODING_TARGET;
             outPipes[0].pFunc = LINE_CODING_PFUNC;
             outPipes[0].info.bits.busy = 1;
             break;
-            
+
         case GET_LINE_CODING:
             USBEP0SendRAMPtr(
-                (BYTE*)&line_coding,
-                LINE_CODING_LENGTH,
-                USB_EP0_INCLUDE_ZERO);
+                    (BYTE*) & line_coding,
+                    LINE_CODING_LENGTH,
+                    USB_EP0_INCLUDE_ZERO);
             break;
 
         case SET_CONTROL_LINE_STATE:
-            control_signal_bitmap._byte = (BYTE)SetupPkt.W_Value.v[0];
+            control_signal_bitmap._byte = (BYTE) SetupPkt.W_Value.v[0];
             //------------------------------------------------------------------            
             //One way to control the RTS pin is to allow the USB host to decide the value
             //that should be output on the RTS pin.  Although RTS and CTS pin functions
@@ -270,42 +269,36 @@ void USBCheckCDCRequest(void)
             //---------            
             //CONFIGURE_RTS(control_signal_bitmap.CARRIER_CONTROL);  
             //------------------------------------------------------------------            
-            
-            #if defined(USB_CDC_SUPPORT_DTR_SIGNALING)
-                if(control_signal_bitmap.DTE_PRESENT == 1)
-                {
-                    UART_DTR = USB_CDC_DTR_ACTIVE_LEVEL;
-                }
-                else
-                {
-                    UART_DTR = (USB_CDC_DTR_ACTIVE_LEVEL ^ 1);
-                }        
-            #endif
+
+#if defined(USB_CDC_SUPPORT_DTR_SIGNALING)
+            if (control_signal_bitmap.DTE_PRESENT == 1) {
+                UART_DTR = USB_CDC_DTR_ACTIVE_LEVEL;
+            } else {
+                UART_DTR = (USB_CDC_DTR_ACTIVE_LEVEL ^ 1);
+            }
+#endif
             inPipes[0].info.bits.busy = 1;
             break;
-        #endif
+#endif
 
-        #if defined(USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D2)
-        case SEND_BREAK:                        // Optional
+#if defined(USB_CDC_SUPPORT_ABSTRACT_CONTROL_MANAGEMENT_CAPABILITIES_D2)
+        case SEND_BREAK: // Optional
             inPipes[0].info.bits.busy = 1;
-			if (SetupPkt.wValue == 0xFFFF)  //0xFFFF means send break indefinitely until a new SEND_BREAK command is received
-			{
-				UART_Tx = 0;       // Prepare to drive TX low (for break signalling)
-				UART_TRISTx = 0;   // Make sure TX pin configured as an output
-				UART_ENABLE = 0;   // Turn off USART (to relinquish TX pin control)
-			}
-			else if (SetupPkt.wValue == 0x0000) //0x0000 means stop sending indefinite break 
-			{
-    			UART_ENABLE = 1;   // turn on USART
-				UART_TRISTx = 1;   // Make TX pin an input
-			}
-			else
-			{
+            if (SetupPkt.wValue == 0xFFFF) //0xFFFF means send break indefinitely until a new SEND_BREAK command is received
+            {
+                UART_Tx = 0; // Prepare to drive TX low (for break signalling)
+                UART_TRISTx = 0; // Make sure TX pin configured as an output
+                UART_ENABLE = 0; // Turn off USART (to relinquish TX pin control)
+            } else if (SetupPkt.wValue == 0x0000) //0x0000 means stop sending indefinite break 
+            {
+                UART_ENABLE = 1; // turn on USART
+                UART_TRISTx = 1; // Make TX pin an input
+            } else {
                 //Send break signalling on the pin for (SetupPkt.wValue) milliseconds
                 UART_SEND_BREAK();
-			}
+            }
             break;
-        #endif
+#endif
         default:
             break;
     }//end switch(SetupPkt.bRequest)
@@ -343,17 +336,16 @@ void USBCheckCDCRequest(void)
     None
   Remarks:
     None                                                                   
-  **************************************************************************/
-void CDCInitEP(void)
-{
-   	//Abstract line coding information
-   	line_coding.dwDTERate.Val = 19200;      // baud rate
-   	line_coding.bCharFormat = 0x00;             // 1 stop bit
-   	line_coding.bParityType = 0x00;             // None
-   	line_coding.bDataBits = 0x08;               // 5,6,7,8, or 16
+ **************************************************************************/
+void CDCInitEP(void) {
+    //Abstract line coding information
+    line_coding.dwDTERate.Val = 19200; // baud rate
+    line_coding.bCharFormat = 0x00; // 1 stop bit
+    line_coding.bParityType = 0x00; // None
+    line_coding.bDataBits = 0x08; // 5,6,7,8, or 16
 
     cdc_rx_len = 0;
-    
+
     /*
      * Do not have to init Cnt of IN pipes here.
      * Reason:  Number of BYTEs to send to the host
@@ -365,37 +357,37 @@ void CDCInitEP(void)
      *          be known right before the data is
      *          sent.
      */
-    USBEnableEndpoint(CDC_COMM_EP,USB_IN_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
-    USBEnableEndpoint(CDC_DATA_EP,USB_IN_ENABLED|USB_OUT_ENABLED|USB_HANDSHAKE_ENABLED|USB_DISALLOW_SETUP);
+    USBEnableEndpoint(CDC_COMM_EP, USB_IN_ENABLED | USB_HANDSHAKE_ENABLED | USB_DISALLOW_SETUP);
+    USBEnableEndpoint(CDC_DATA_EP, USB_IN_ENABLED | USB_OUT_ENABLED | USB_HANDSHAKE_ENABLED | USB_DISALLOW_SETUP);
 
-    CDCDataOutHandle = USBRxOnePacket(CDC_DATA_EP,(BYTE*)&cdc_data_rx,sizeof(cdc_data_rx));
+    CDCDataOutHandle = USBRxOnePacket(CDC_DATA_EP, (BYTE*) & cdc_data_rx, sizeof (cdc_data_rx));
     CDCDataInHandle = NULL;
 
-    #if defined(USB_CDC_SUPPORT_DSR_REPORTING)
-      	CDCNotificationInHandle = NULL;
-        mInitDTSPin();  //Configure DTS as a digital input
-      	SerialStateBitmap.byte = 0x00;
-      	OldSerialStateBitmap.byte = !SerialStateBitmap.byte;    //To force firmware to send an initial serial state packet to the host.
-        //Prepare a SerialState notification element packet (contains info like DSR state)
-        SerialStatePacket.bmRequestType = 0xA1; //Always 0xA1 for this type of packet.
-        SerialStatePacket.bNotification = SERIAL_STATE;
-        SerialStatePacket.wValue = 0x0000;  //Always 0x0000 for this type of packet
-        SerialStatePacket.wIndex = CDC_COMM_INTF_ID;  //Interface number  
-        SerialStatePacket.SerialState.byte = 0x00;
-        SerialStatePacket.Reserved = 0x00;
-        SerialStatePacket.wLength = 0x02;   //Always 2 bytes for this type of packet    
-        CDCNotificationHandler();
-  	#endif
-  	
-  	#if defined(USB_CDC_SUPPORT_DTR_SIGNALING)
-  	    mInitDTRPin();
-  	#endif
-  	
-  	#if defined(USB_CDC_SUPPORT_HARDWARE_FLOW_CONTROL)
-  	    mInitRTSPin();
-  	    mInitCTSPin();
-  	#endif
-    
+#if defined(USB_CDC_SUPPORT_DSR_REPORTING)
+    CDCNotificationInHandle = NULL;
+    mInitDTSPin(); //Configure DTS as a digital input
+    SerialStateBitmap.byte = 0x00;
+    OldSerialStateBitmap.byte = !SerialStateBitmap.byte; //To force firmware to send an initial serial state packet to the host.
+    //Prepare a SerialState notification element packet (contains info like DSR state)
+    SerialStatePacket.bmRequestType = 0xA1; //Always 0xA1 for this type of packet.
+    SerialStatePacket.bNotification = SERIAL_STATE;
+    SerialStatePacket.wValue = 0x0000; //Always 0x0000 for this type of packet
+    SerialStatePacket.wIndex = CDC_COMM_INTF_ID; //Interface number  
+    SerialStatePacket.SerialState.byte = 0x00;
+    SerialStatePacket.Reserved = 0x00;
+    SerialStatePacket.wLength = 0x02; //Always 2 bytes for this type of packet    
+    CDCNotificationHandler();
+#endif
+
+#if defined(USB_CDC_SUPPORT_DTR_SIGNALING)
+    mInitDTRPin();
+#endif
+
+#if defined(USB_CDC_SUPPORT_HARDWARE_FLOW_CONTROL)
+    mInitRTSPin();
+    mInitCTSPin();
+#endif
+
     cdc_trf_state = CDC_TX_READY;
 }//end CDCInitEP
 
@@ -414,25 +406,23 @@ void CDCInitEP(void)
     the information to the USB host.  This can be done by calling 
     CDCNotificationHandler() by itself, or, by calling CDCTxService() which
     also calls CDCNotificationHandler() internally, when appropriate.
-  **************************************************************************/
+ **************************************************************************/
 #if defined(USB_CDC_SUPPORT_DSR_REPORTING)
-void CDCNotificationHandler(void)
-{
+
+void CDCNotificationHandler(void) {
     //Check the DTS I/O pin and if a state change is detected, notify the 
     //USB host by sending a serial state notification element packet.
-    if(UART_DTS == USB_CDC_DSR_ACTIVE_LEVEL) //UART_DTS must be defined to be an I/O pin in the hardware profile to use the DTS feature (ex: "PORTXbits.RXY")
+    if (UART_DTS == USB_CDC_DSR_ACTIVE_LEVEL) //UART_DTS must be defined to be an I/O pin in the hardware profile to use the DTS feature (ex: "PORTXbits.RXY")
     {
         SerialStateBitmap.bits.DSR = 1;
-    }  
-    else
-    {
+    }
+    else {
         SerialStateBitmap.bits.DSR = 0;
-    }        
-    
+    }
+
     //If the state has changed, and the endpoint is available, send a packet to
     //notify the hUSB host of the change.
-    if((SerialStateBitmap.byte != OldSerialStateBitmap.byte) && (!USBHandleBusy(CDCNotificationInHandle)))
-    {
+    if ((SerialStateBitmap.byte != OldSerialStateBitmap.byte) && (!USBHandleBusy(CDCNotificationInHandle))) {
         //Copy the updated value into the USB packet buffer to send.
         SerialStatePacket.SerialState.byte = SerialStateBitmap.byte;
         //We don't need to write to the other bytes in the SerialStatePacket USB
@@ -440,16 +430,15 @@ void CDCNotificationHandler(void)
         //initialized value.
 
         //Send the packet over USB to the host.
-        CDCNotificationInHandle = USBTransferOnePacket(CDC_COMM_EP, IN_TO_HOST, (BYTE*)&SerialStatePacket, sizeof(SERIAL_STATE_NOTIFICATION));
-        
+        CDCNotificationInHandle = USBTransferOnePacket(CDC_COMM_EP, IN_TO_HOST, (BYTE*) & SerialStatePacket, sizeof (SERIAL_STATE_NOTIFICATION));
+
         //Save the old value, so we can detect changes later.
         OldSerialStateBitmap.byte = SerialStateBitmap.byte;
-    }    
+    }
 }//void CDCNotificationHandler(void)    
 #else
-    #define CDCNotificationHandler() {}
+#define CDCNotificationHandler() {}
 #endif
-
 
 /**********************************************************************************
   Function:
@@ -473,18 +462,14 @@ void CDCNotificationHandler(void)
     pdata - pointer to the data that caused the event
     size - the size of the data that is pointed to by pdata
                                                                                    
-  **********************************************************************************/
-BOOL USBCDCEventHandler(USB_EVENT event, void *pdata, WORD size)
-{
-    switch(event)
-    {  
+ **********************************************************************************/
+BOOL USBCDCEventHandler(USB_EVENT event, void *pdata, WORD size) {
+    switch (event) {
         case EVENT_TRANSFER_TERMINATED:
-            if(pdata == CDCDataOutHandle)
-            {
-                CDCDataOutHandle = USBRxOnePacket(CDC_DATA_EP,(BYTE*)&cdc_data_rx,sizeof(cdc_data_rx));  
+            if (pdata == CDCDataOutHandle) {
+                CDCDataOutHandle = USBRxOnePacket(CDC_DATA_EP, (BYTE*) & cdc_data_rx, sizeof (cdc_data_rx));
             }
-            if(pdata == CDCDataInHandle)
-            {
+            if (pdata == CDCDataInHandle) {
                 //flush all of the data in the CDC buffer
                 cdc_trf_state = CDC_TX_READY;
                 cdc_tx_len = 0;
@@ -492,8 +477,8 @@ BOOL USBCDCEventHandler(USB_EVENT event, void *pdata, WORD size)
             break;
         default:
             return FALSE;
-    }      
-    return TRUE; 
+    }
+    return TRUE;
 }
 
 /**********************************************************************************
@@ -534,41 +519,39 @@ BOOL USBCDCEventHandler(USB_EVENT event, void *pdata, WORD size)
     buffer -  Pointer to where received BYTEs are to be stored
     len -     The number of BYTEs expected.
                                                                                    
-  **********************************************************************************/
-BYTE getsUSBUSART(char *buffer, BYTE len)
-{
+ **********************************************************************************/
+BYTE getsUSBUSART(volatile char *buffer, BYTE len) {
     cdc_rx_len = 0;
-    
-    if(!USBHandleBusy(CDCDataOutHandle))
-    {
+
+    if (!USBHandleBusy(CDCDataOutHandle)) {
         /*
          * Adjust the expected number of BYTEs to equal
          * the actual number of BYTEs received.
          */
-        if(len > USBHandleGetLength(CDCDataOutHandle))
+        if (len > USBHandleGetLength(CDCDataOutHandle))
             len = USBHandleGetLength(CDCDataOutHandle);
-        
+
         /*
          * Copy data from dual-ram buffer to user's buffer
          */
-        for(cdc_rx_len = 0; cdc_rx_len < len; cdc_rx_len++)
+        for (cdc_rx_len = 0; cdc_rx_len < len; cdc_rx_len++)
             buffer[cdc_rx_len] = cdc_data_rx[cdc_rx_len];
 
         /*
          * Prepare dual-ram buffer for next OUT transaction
          */
 
-        CDCDataOutHandle = USBRxOnePacket(CDC_DATA_EP,(BYTE*)&cdc_data_rx,sizeof(cdc_data_rx));
+        CDCDataOutHandle = USBRxOnePacket(CDC_DATA_EP, (BYTE*) & cdc_data_rx, sizeof (cdc_data_rx));
 
     }//end if
-    
+
     return cdc_rx_len;
-    
+
 }//end getsUSBUSART
 
 /******************************************************************************
   Function:
-	void putUSBUSART(char *data, BYTE length)
+    void putUSBUSART(char *data, BYTE length)
 		
   Summary:
     putUSBUSART writes an array of data to the USB. Use this version, is
@@ -606,8 +589,7 @@ BYTE getsUSBUSART(char *buffer, BYTE len)
     BYTE length - the number of bytes to be transfered (must be less than 255).
 		
  *****************************************************************************/
-void putUSBUSART(char *data, BYTE  length)
-{
+void putUSBUSART(volatile char *data, BYTE length) {
     /*
      * User should have checked that cdc_trf_state is in CDC_TX_READY state
      * before calling this function.
@@ -632,16 +614,15 @@ void putUSBUSART(char *data, BYTE  length)
      * Use a state machine instead.
      */
     USBMaskInterrupts();
-    if(cdc_trf_state == CDC_TX_READY)
-    {
-        mUSBUSARTTxRam((BYTE*)data, length);     // See cdc.h
+    if (cdc_trf_state == CDC_TX_READY) {
+        mUSBUSARTTxRam((BYTE*) data, length); // See cdc.h
     }
     USBUnmaskInterrupts();
 }//end putUSBUSART
 
 /******************************************************************************
-	Function:
-		void putsUSBUSART(char *data)
+    Function:
+        void putsUSBUSART(char *data)
 		
   Summary:
     putsUSBUSART writes a string of data to the USB including the null
@@ -678,9 +659,8 @@ void putUSBUSART(char *data, BYTE  length)
                             will be transferred to the host.
 		
  *****************************************************************************/
- 
-void putsUSBUSART(char *data)
-{
+
+void putsUSBUSART(char *data) {
     BYTE len;
     char *pData;
 
@@ -708,31 +688,29 @@ void putsUSBUSART(char *data)
      * Use a state machine instead.
      */
     USBMaskInterrupts();
-    if(cdc_trf_state != CDC_TX_READY)
-    {
+    if (cdc_trf_state != CDC_TX_READY) {
         USBUnmaskInterrupts();
         return;
     }
-    
+
     /*
      * While loop counts the number of BYTEs to send including the
      * null character.
      */
     len = 0;
     pData = data;
-    do
-    {
+    do {
         len++;
-        if(len == 255) break;       // Break loop once max len is reached.
-    }while(*pData++);
-    
+        if (len == 255) break; // Break loop once max len is reached.
+    } while (*pData++);
+
     /*
      * Second piece of information (length of data to send) is ready.
      * Call mUSBUSARTTxRam to setup the transfer.
      * The actual transfer process will be handled by CDCTxService(),
      * which should be called once per Main Program loop.
      */
-    mUSBUSARTTxRam((BYTE*)data, len);     // See cdc.h
+    mUSBUSARTTxRam((BYTE*) data, len); // See cdc.h
     USBUnmaskInterrupts();
 }//end putsUSBUSART
 
@@ -775,9 +753,8 @@ void putsUSBUSART(char *data)
                             null character is not found, 255 BYTEs of data
                             will be transferred to the host.
                                                                            
-  **************************************************************************/
-void putrsUSBUSART(const ROM char *data)
-{
+ **************************************************************************/
+void putrsUSBUSART(const ROM char *data) {
     BYTE len;
     const ROM char *pData;
 
@@ -805,24 +782,22 @@ void putrsUSBUSART(const ROM char *data)
      * Use a state machine instead.
      */
     USBMaskInterrupts();
-    if(cdc_trf_state != CDC_TX_READY)
-    {
+    if (cdc_trf_state != CDC_TX_READY) {
         USBUnmaskInterrupts();
         return;
     }
-    
+
     /*
      * While loop counts the number of BYTEs to send including the
      * null character.
      */
     len = 0;
     pData = data;
-    do
-    {
+    do {
         len++;
-        if(len == 255) break;       // Break loop once max len is reached.
-    }while(*pData++);
-    
+        if (len == 255) break; // Break loop once max len is reached.
+    } while (*pData++);
+
     /*
      * Second piece of information (length of data to send) is ready.
      * Call mUSBUSARTTxRom to setup the transfer.
@@ -830,7 +805,7 @@ void putrsUSBUSART(const ROM char *data)
      * which should be called once per Main Program loop.
      */
 
-    mUSBUSARTTxRom((ROM BYTE*)data,len); // See cdc.h
+    mUSBUSARTTxRom((ROM BYTE*) data, len); // See cdc.h
     USBUnmaskInterrupts();
 
 }//end putrsUSBUSART
@@ -884,19 +859,17 @@ void putrsUSBUSART(const ROM char *data)
     in the CONFIGURED_STATE.
   Remarks:
     None                                                                 
-  ************************************************************************/
- 
-void CDCTxService(void)
-{
+ ************************************************************************/
+
+void CDCTxService(void) {
     BYTE byte_to_send;
     BYTE i;
-    
+
     USBMaskInterrupts();
-    
+
     CDCNotificationHandler();
-    
-    if(USBHandleBusy(CDCDataInHandle)) 
-    {
+
+    if (USBHandleBusy(CDCDataInHandle)) {
         USBUnmaskInterrupts();
         return;
     }
@@ -906,81 +879,73 @@ void CDCTxService(void)
      * By having this stage, user can always check cdc_trf_state,
      * and not having to call mCDCUsartTxIsBusy() directly.
      */
-    if(cdc_trf_state == CDC_TX_COMPLETING)
+    if (cdc_trf_state == CDC_TX_COMPLETING)
         cdc_trf_state = CDC_TX_READY;
-    
+
     /*
      * If CDC_TX_READY state, nothing to do, just return.
      */
-    if(cdc_trf_state == CDC_TX_READY)
-    {
+    if (cdc_trf_state == CDC_TX_READY) {
         USBUnmaskInterrupts();
         return;
     }
-    
+
     /*
      * If CDC_TX_BUSY_ZLP state, send zero length packet
      */
-    if(cdc_trf_state == CDC_TX_BUSY_ZLP)
-    {
-        CDCDataInHandle = USBTxOnePacket(CDC_DATA_EP,NULL,0);
+    if (cdc_trf_state == CDC_TX_BUSY_ZLP) {
+        CDCDataInHandle = USBTxOnePacket(CDC_DATA_EP, NULL, 0);
         //CDC_DATA_BD_IN.CNT = 0;
         cdc_trf_state = CDC_TX_COMPLETING;
-    }
-    else if(cdc_trf_state == CDC_TX_BUSY)
-    {
+    } else if (cdc_trf_state == CDC_TX_BUSY) {
         /*
          * First, have to figure out how many byte of data to send.
          */
-    	if(cdc_tx_len > sizeof(cdc_data_tx))
-    	    byte_to_send = sizeof(cdc_data_tx);
-    	else
-    	    byte_to_send = cdc_tx_len;
+        if (cdc_tx_len > sizeof (cdc_data_tx))
+            byte_to_send = sizeof (cdc_data_tx);
+        else
+            byte_to_send = cdc_tx_len;
 
         /*
          * Subtract the number of bytes just about to be sent from the total.
          */
-    	cdc_tx_len = cdc_tx_len - byte_to_send;
-    	  
-        pCDCDst.bRam = (BYTE*)&cdc_data_tx; // Set destination pointer
-        
+        cdc_tx_len = cdc_tx_len - byte_to_send;
+
+        pCDCDst.bRam = (BYTE*) & cdc_data_tx; // Set destination pointer
+
         i = byte_to_send;
-        if(cdc_mem_type == USB_EP0_ROM)            // Determine type of memory source
+        if (cdc_mem_type == USB_EP0_ROM) // Determine type of memory source
         {
-            while(i)
-            {
+            while (i) {
                 *pCDCDst.bRam = *pCDCSrc.bRom;
                 pCDCDst.bRam++;
                 pCDCSrc.bRom++;
                 i--;
             }//end while(byte_to_send)
-        }
-        else // _RAM
+        } else // _RAM
         {
-            while(i)
-            {
+            while (i) {
                 *pCDCDst.bRam = *pCDCSrc.bRam;
                 pCDCDst.bRam++;
                 pCDCSrc.bRam++;
                 i--;
             }//end while(byte_to_send._word)
         }//end if(cdc_mem_type...)
-        
+
         /*
          * Lastly, determine if a zero length packet state is necessary.
          * See explanation in USB Specification 2.0: Section 5.8.3
          */
-        if(cdc_tx_len == 0)
-        {
-            if(byte_to_send == CDC_DATA_IN_EP_SIZE)
+        if (cdc_tx_len == 0) {
+            if (byte_to_send == CDC_DATA_IN_EP_SIZE)
                 cdc_trf_state = CDC_TX_BUSY_ZLP;
             else
                 cdc_trf_state = CDC_TX_COMPLETING;
         }//end if(cdc_tx_len...)
-        CDCDataInHandle = USBTxOnePacket(CDC_DATA_EP,(BYTE*)&cdc_data_tx,byte_to_send);
+        CDCDataInHandle = USBTxOnePacket(CDC_DATA_EP, (BYTE*) & cdc_data_tx, byte_to_send);
 
     }//end if(cdc_tx_sate == CDC_TX_BUSY)
-    
+
     USBUnmaskInterrupts();
 }//end CDCTxService
 
