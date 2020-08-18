@@ -185,9 +185,11 @@ volatile int MMAbort = false;
 volatile int DisableMMAbort = false;
 int FileXfr = false; // true if we are transfering a file
 int SupressVideo = false; //dont print to video
+
 unsigned int __attribute__((section(".grg"))) _excep_dummy;
 unsigned int __attribute__((section(".grg"))) _excep_code;
 unsigned int __attribute__((section(".grg"))) _excep_addr;
+
 #if defined(__C30__) || defined(__C32__)
 //The LUN variable definition is critical to the MSD function driver.  This
 //  array is a structure of function pointers that are the functions that
@@ -197,7 +199,7 @@ unsigned int __attribute__((section(".grg"))) _excep_addr;
 //  In this example the media initialization function is named
 //  "MediaInitialize", the read capacity function is named "ReadCapacity",
 //  etc.
-LUN_FUNCTIONS LUN[MAX_LUN + 1] ={
+const LUN_FUNCTIONS LUN[MAX_LUN + 1] = {
     {
         &MDD_SDSPI_MediaInitialize,
         &MDD_SDSPI_ReadCapacity,
@@ -230,30 +232,11 @@ const ROM InquiryResponse inq_resp = {
 Main program
  *****************************************************************************************************************************/
 
-/*
-int main ()
-{
-    P_E1_ANALOG = 1;
-    P_E1_TRIS = P_OUTPUT;
-    while (1)
-    {
-        P_E1_OUT = P_ON;
-        P_E1_OUT = P_OFF;
-    }
-}
- */
-
 int main(void) {
     int i;
     // initial setup of the I/O ports
     AD1PCFG = 0xFFFF; // Default all pins to digital
     mJTAGPortEnable(0); // turn off jtag
-    //    TRISE = -1;
-    //    LATE = 0;
-    //    ODCE = 0;
-    //    CNCON = 0;
-    //    CNEN = 0;
-    //    CNPUE = 0;
 
     // setup the CPU
     SYSTEMConfigPerformance(CLOCKFREQ); // System config performance
@@ -285,7 +268,7 @@ int main(void) {
     // SPP -
 #endif
 #ifdef OLIMEX
-    CanInit(); // initialize the CAN driver
+    CanInit(); // initialise the CAN driver
 #endif
     LoadSetup(); //load setup from flash
     // init global variables
@@ -298,20 +281,20 @@ int main(void) {
     if (S.UsbEnable) USBOn = true;
     VideoOn = S.VideoMode;
 
-    initKeyboard(); // initilise and startup the keyboard routines
-    initTimers(); // initilise and startup the timers
-    initExtIO(); // Initialise the external analog and digital I/O
+    initKeyboard(); // initialise and startup the keyboard routines
+    initTimers(); // initialise and startup the timers
+    initExtIO(); // Initialise the external analogue and digital I/O
     if (S.GameDuino) GDInit(); //init gameduino
 
     mSec(50); //delay to let power settle on mega
 
     if (USBOn) {
-        // initilise the USB input/output subsystems
+        // initialise the USB input/output subsystems
         USBDeviceInit(); // Initialise USB module SFRs and firmware
         // setup timer 1 to generate a regular interrupt to process any USB activity
         PR1 = 1000 * ((BUSFREQ / 8) / 1000000) - 1; // nothing is connected to the USB (poll every 1 mSec)
         //PR1 = 100 * ((BUSFREQ / 2) / 1000000) - 1; // start polling at 100 uSec.  the interrupt will adjust this
-        T1CON = 0x8010; // T1 on, prescaler 1:8
+        T1CON = 0x8010; // T1 on, pre-scaler 1:8
         mT1SetIntPriority(4); // medium priority
         mT1ClearIntFlag(); // clear interrupt flag
         mT1IntEnable(1); // enable interrupt
@@ -343,8 +326,6 @@ int main(void) {
         SerialOpen(inpbuf, 1);
     }
 
-
-
     SoundPlay = 0; // start by not playing a sound
     P_SOUND_TRIS = P_OUTPUT; // set the sound pin as an output
 
@@ -364,9 +345,6 @@ int main(void) {
     }
     MMBasicStart(); // run BASIC
 }
-
-
-
 
 /****************************************************************************************************************************
 USB related functions
@@ -411,25 +389,8 @@ void mySetLineCodingHandler(void) {
         //---------------------------------------
         //USBStallEndpoint(0,1);
     } else {
-        //DWORD_VAL dwBaud;
-
         //Update the baudrate info in the CDC driver
         CDCSetBaudRate(cdc_notice.GetLineCoding.dwDTERate.Val);
-
-        //Update the baudrate of the UART
-        //        #if defined(__18CXX)
-        //            dwBaud.Val = (GetSystemClock()/4)/line_coding.dwDTERate.Val-1;
-        //            SPBRG = dwBaud.v[0];
-        //            SPBRGH = dwBaud.v[1];
-        //        #elif defined(__C30__)
-        //            dwBaud.Val = (((GetPeripheralClock()/2)+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
-        //            U2BRG = dwBaud.Val;
-        //        #elif defined(__C32__)
-        //            U2BRG = ((GetPeripheralClock()+(BRG_DIV2/2*line_coding.dwDTERate.Val))/BRG_DIV2/line_coding.dwDTERate.Val-1);
-        //            //U2MODE = 0;
-        //            U2MODEbits.BRGH = BRGH2;
-        //            //U2STA = 0;
-        //        #endif
     }
 }
 #endif
@@ -576,20 +537,6 @@ void USBCBSuspend(void) {
     //IMPORTANT NOTE: Do not clear the USBActivityIF (ACTVIF) bit here.  This bit is
     //cleared inside the usb_device.c file.  Clearing USBActivityIF here will cause
     //things to not work as intended.
-
-
-#if defined(__C30__)
-#if 0
-    U1EIR = 0xFFFF;
-    U1IR = 0xFFFF;
-    U1OTGIR = 0xFFFF;
-    IFS5bits.USB1IF = 0;
-    IEC5bits.USB1IE = 1;
-    U1OTGIEbits.ACTVIE = 1;
-    U1OTGIRbits.ACTVIF = 1;
-    Sleep();
-#endif
-#endif
 }
 
 
@@ -1259,8 +1206,6 @@ void _general_exception_handler(void) {
     SoftReset(); // this will restart the processor ? only works when not in debug
 }
 
-
-
 #ifdef __DEBUG
 
 void dump(char *p, int nbr) {
@@ -1288,8 +1233,6 @@ void dump(char *p, int nbr) {
     MMPrintString("\r\n");
 }
 #endif
-
-
 
 #ifdef PROFILE
 int p_enabled = false;

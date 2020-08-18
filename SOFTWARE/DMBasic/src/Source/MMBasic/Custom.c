@@ -26,9 +26,7 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "../MMBasic/MMBasic.h"
 #include "../Maximite.h"
 #include "../IOPorts.h"
-// Ingmar's addition start
 #include "../Video/Video.h"
-// Ingmar's addition end
 
 #define INCLUDE_FUNCTION_DEFINES
 #include "Operators.h"

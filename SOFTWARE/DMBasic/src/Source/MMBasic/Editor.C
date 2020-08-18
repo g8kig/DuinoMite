@@ -3,8 +3,6 @@
 /* Modded For Maximite By kenseglerdesigns.com */
 //
 
-
-
 #include  <stdlib.h>
 #include  <string.h>
 #include  <stdio.h>
