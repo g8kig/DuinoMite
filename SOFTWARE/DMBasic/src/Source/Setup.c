@@ -30,19 +30,21 @@
 
 #define NVM_PAGE_SIZE    4096
 
-struct _SetupStruct SS;
+static struct _SetupStruct SS;
+struct _SetupStruct S;
 
-const long BaudRateList[] = {
+const int BaudRateList[] = {
     9600,
     19200,
     38400,
     57600,
     115200
 };
-char temp[80];
-char c;
-int i;
-int SETUP = 0;
+
+static char temp[80];
+static char c;
+static int i;
+static int SETUP = 0;
 
 volatile unsigned int ScreenSaveTime;
 volatile unsigned char SetupInFlash[NVM_PAGE_SIZE] \

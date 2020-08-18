@@ -1187,7 +1187,7 @@ Utility functions
         to why and where the exception occured.
  */
 
-void _general_exception_handler(void) {
+void __attribute__ ((nomips16)) _general_exception_handler(void) {
 #ifdef MAXIMITE
     P_LED_OUT = 0; // this is the LED
 #endif

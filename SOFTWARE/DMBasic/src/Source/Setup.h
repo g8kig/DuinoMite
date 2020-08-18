@@ -100,7 +100,8 @@ struct  _SetupStruct{
     unsigned CC_BLANKPAD :16;
 
 };
-struct _SetupStruct S;
+
+extern struct _SetupStruct S;
 
 #endif
 //#endif

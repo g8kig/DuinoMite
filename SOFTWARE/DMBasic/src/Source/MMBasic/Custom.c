@@ -518,7 +518,7 @@ void ow_pinChk(int pin) {
 
 
 // send one wire reset and detect presence response - returns 1 if found else 0
-int ow_reset(int pin) {
+int __attribute__ ((nomips16)) ow_reset(int pin) {
 	asm("di");
 	ow_clrPin(pin);																	// drive pin low
 	asm("ei");
@@ -592,7 +592,7 @@ int ow_touchBit(int pin, int owbit) {
 }
 
 
-void ow_writeBit(int pin, int owbit) {
+void __attribute__ ((nomips16)) ow_writeBit(int pin, int owbit) {
 	int status_save;
 
 	if (owbit) {
@@ -623,7 +623,7 @@ void ow_writeBit(int pin, int owbit) {
 }
 
 
-int ow_readBit(int pin) {
+int __attribute__ ((nomips16)) ow_readBit(int pin) {
 	int status_save, result;
 
 	asm("di");

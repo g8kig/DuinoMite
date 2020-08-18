@@ -101,14 +101,14 @@ void fun_mmOW(void);
 
 //	GS OW Start
 void ow_pinChk(int pin);
-int ow_reset(int pin);
+int __attribute__ ((nomips16)) ow_reset(int pin);
 void ow_writeByte(int pin, int data);
 int ow_readByte(int pin);
 int ow_verifyByte(int pin, int data);
 int ow_touchByte(int pin, int data);
 int ow_touchBit(int pin, int bit);
-void ow_writeBit(int pin, int bit);
-int ow_readBit(int pin);
+void __attribute__ ((nomips16)) ow_writeBit(int pin, int bit);
+int __attribute__ ((nomips16)) ow_readBit(int pin);
 
 void setcrc16(unsigned short reset);
 unsigned short docrc16(unsigned short cdata);
