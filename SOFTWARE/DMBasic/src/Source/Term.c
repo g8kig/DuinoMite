@@ -27,7 +27,7 @@ extern int scrollStart;
 extern int scrollEnd;
 extern unsigned char VT100ClearStart;
 extern unsigned char VT100ClearEnd;
-const long TBaudRateList[] = {
+const static long TBaudRateList[] = {
     1200,
     2400,
     9600,
@@ -36,14 +36,13 @@ const long TBaudRateList[] = {
     57600,
     115200
 };
-char *fname;
-int c;
-char BaudRate = 6;
-char ComPort = 1;
-char PortOpen = 0;
-char Capture = 0;
-char HexMode = false;
-char Temp[80];
+static char *fname;
+static int c;
+static char BaudRate = 6;
+static char ComPort = 1;
+static char PortOpen = 0;
+static char HexMode = false;
+static char Temp[80];
 
 void UpdateMenu(void) {
     int TempY, TempX;

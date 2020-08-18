@@ -55,12 +55,12 @@
             corruption in the boot sector.
 
   1.3.0   Modified to support Long File Name(LFN) format
-  1.3.4   1) Initialized some of the local variables to default values
+  1.3.4   1) Initialised some of the local variables to default values
              to remove non-critical compiler warnings for code sanitation.
           2) The sector size of the media device is obtained from the MBR of media.So, 
              instead of using the hard coded macro "DIRENTRIES_PER_SECTOR", the variables
              "dirEntriesPerSector" & "disk->sectorSize" are used in the code. Refer 
-             "Cache_File_Entry","EraseCluster" & "writeDotEntries" fucntions to see 
+             "Cache_File_Entry","EraseCluster" & "writeDotEntries" functions to see 
              the change.
  ********************************************************************/
 

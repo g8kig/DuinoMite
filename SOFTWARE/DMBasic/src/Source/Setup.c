@@ -70,11 +70,11 @@ char SaveSetup(void) {
 void SetupDefaults(void) {
     S.Magic = 0xbeef;
     S.WriteCount = 0x000;
-    S.HardWare = 1; //1=duinomite 0=Maximite
+    S.HardWare = 1;     //1=Duinomite 0=Maximite
     S.VideoMode = 3;
-    S.RTCEnable = 0; //1= nxp 2=dallas
+    S.RTCEnable = 0;    //1= nxp 2=dallas
     S.DateFormat = 0;
-    S.DTimeDate = 0; //Display Date and time at boot
+    S.DTimeDate = 0;    //Display Date and time at boot
     S.SDEnable = 1;
     S.UsbEnable = 1;
     S.SerialCon = 0;
