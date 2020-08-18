@@ -20,7 +20,7 @@
 #include "../MMBasic/Files.h"
 #include "../Keyboard/Keyboard.h"
 #include "../Video/Video.h"
-//#include "../Video/VT100.h"
+
 #include "../Serial/serial.h"
 extern int fontReverse;
 extern int scrollStart;

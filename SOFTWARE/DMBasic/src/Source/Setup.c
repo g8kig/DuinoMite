@@ -42,38 +42,37 @@ const long BaudRateList[] = {
 char temp[80];
 char c;
 int i;
-int SETUP =0;
-volatile unsigned int ScreenSaveTime;
+int SETUP = 0;
 
+volatile unsigned int ScreenSaveTime;
 volatile unsigned char SetupInFlash[NVM_PAGE_SIZE] \
-__attribute__ ((aligned(NVM_PAGE_SIZE),section(".text,\"ax\",@progbits #"))) = \
-{ [0 ...NVM_PAGE_SIZE-1] = 0xFF };  //Map out area of non-volatile memory
+
+__attribute__((aligned(NVM_PAGE_SIZE), section(".text,\"ax\",@progbits #"))) = \
+{[0 ...NVM_PAGE_SIZE - 1] = 0xFF}; //Map out area of non-volatile memory
 
 char SaveSetup(void) {
-    if(!SS.VideoMode && !SS.UsbEnable && !SS.SerialCon)
-    {
-    MMPrintString("\n\r!! No Consoles Enabled are you sure you want to save !! Y/N ");
-    i=MMgetchar();
-        if(i !='y')
-        {
-        return 0;
+    if (!SS.VideoMode && !SS.UsbEnable && !SS.SerialCon) {
+        MMPrintString("\n\r!! No Consoles Enabled are you sure you want to save !! Y/N ");
+        i = MMgetchar();
+        if (i != 'y') {
+            return 0;
         }
     }
-	INTDisableInterrupts();
+    INTDisableInterrupts();
     NVMErasePage((void*) SetupInFlash);
     NVMWriteRow((void*) SetupInFlash, (void*) &SS);
-    	INTEnableInterrupts();
+    INTEnableInterrupts();
     return 1;
-}  
+}
 
 void SetupDefaults(void) {
     S.Magic = 0xbeef;
     S.WriteCount = 0x000;
-    S.HardWare = 1;    //1=duinomite 0=Maximite
+    S.HardWare = 1; //1=duinomite 0=Maximite
     S.VideoMode = 3;
-    S.RTCEnable = 0;    //1= nxp 2=dallas
+    S.RTCEnable = 0; //1= nxp 2=dallas
     S.DateFormat = 0;
-    S.DTimeDate = 0;    //Display Date and time at boot
+    S.DTimeDate = 0; //Display Date and time at boot
     S.SDEnable = 1;
     S.UsbEnable = 1;
     S.SerialCon = 0;
@@ -97,13 +96,13 @@ void SetupDefaults(void) {
     NVMErasePage((void*) SetupInFlash);
     NVMWriteRow((void*) SetupInFlash, (void*) &S);
     INTEnableInterrupts();
-    }
+}
 
 void LoadSetup(void) {
     memcpy(&S, (void *) SetupInFlash, sizeof (S));
     if (S.Magic != 0xbeef)
-            SetupDefaults();
-    if(S.ScreenSave) ScreenSaveTime=(S.ScreenSave*60);
+        SetupDefaults();
+    if (S.ScreenSave) ScreenSaveTime = (S.ScreenSave * 60);
 }
 
 /*
@@ -116,9 +115,9 @@ void SetupMainMenu(void) {
     MMPrintString(" DuinoMite Setup Menu - "SetupVersion"  "Date "\n\r");
     MMPrintString(" -----------------------------------------\n\r");
     MMPrintString(" Hardware Platform - ");
-    if(SS.HardWare==0)
+    if (SS.HardWare == 0)
         MMPrintString("Maximite\n\r");
-    if(SS.HardWare==1)
+    if (SS.HardWare == 1)
         MMPrintString("DuinoMite\n\r");
     MMPrintString(" V) Video Mode     - ");
     switch (SS.VideoMode) {
@@ -140,7 +139,7 @@ void SetupMainMenu(void) {
 
     }
     MMPrintString(" R) RTC On Boot    - ");
-    switch(SS.RTCEnable){
+    switch (SS.RTCEnable) {
         case 0:
             MMPrintString("Off\n\r");
             break;
@@ -157,30 +156,29 @@ void SetupMainMenu(void) {
     else
         MMPrintString("DD/MM/YY\n\r");
     MMPrintString(" T) Show Time Date - ");
-    if(SS.DTimeDate)
+    if (SS.DTimeDate)
         MMPrintString("Enabled\n\r");
     else
         MMPrintString("Disabled\n\r");
-    
+
     MMPrintString(" G) GameDuino Init - ");
-        switch(SS.GameDuino)
-        {
-            case 0:
-                MMPrintString("Disabled\n\r");
-                break;
-            case 1:
-                MMPrintString("Enabled 60hz\n\r");
-                break;
-            case 2:
-                MMPrintString("Enabled 72hz\n\r");
-                break;
-                
-        }
+    switch (SS.GameDuino) {
+        case 0:
+            MMPrintString("Disabled\n\r");
+            break;
+        case 1:
+            MMPrintString("Enabled 60hz\n\r");
+            break;
+        case 2:
+            MMPrintString("Enabled 72hz\n\r");
+            break;
+
+    }
     MMPrintString(" N) Screen Saver   - ");
-    if(SS.ScreenSave) {
-        sprintf(temp,"%d Minutes\n\r",SS.ScreenSave);
-        MMPrintString(temp); }
-    else
+    if (SS.ScreenSave) {
+        sprintf(temp, "%d Minutes\n\r", SS.ScreenSave);
+        MMPrintString(temp);
+    } else
         MMPrintString("Disabled\n\r");
 
     MMPrintString(" S) SD Card        - ");
@@ -191,11 +189,11 @@ void SetupMainMenu(void) {
     MMPrintString(" U) Usb Port       - ");
     switch (SS.UsbEnable) {
         case 0:
-        MMPrintString("Disabled\n\r");
-        break;
+            MMPrintString("Disabled\n\r");
+            break;
         case 1:
-        MMPrintString("Enabled\n\r");
-        break;
+            MMPrintString("Enabled\n\r");
+            break;
     }
     MMPrintString(" L) Load Config    - \n\r");
     MMPrintString(" C) Serial Console - ");
@@ -223,8 +221,6 @@ void SetupMainMenu(void) {
     MMPrintString(" P) Print Custom Video Mode\n\r");
     MMPrintString(" -----------------------------------------\n\r");
     MMPrintString(" Q) Quit Don't Save  X) Exit Save Settings");
- //   sprintf(temp, " Number Of Writes %d\n\r", SS.WriteCount);
- //   MMPrintString(temp);
 }
 
 unsigned int GetInt(void) {
@@ -299,17 +295,17 @@ void PrintCustomMode(void) {
 }
 
 void fun_setup(void) {
-    if(!S.HardWare)
+    if (!S.HardWare)
         SETUP |= 0x01;
-    if(S.DateFormat)
+    if (S.DateFormat)
         SETUP |= 0x02;
-    if(S.SDEnable)
+    if (S.SDEnable)
         SETUP |= 0x04;
-    if(S.UsbEnable)
+    if (S.UsbEnable)
         SETUP |= 0x08;
-    if(S.SerialCon)
+    if (S.SerialCon)
         SETUP |= 0x10;
-    fret = (float)SETUP;
+    fret = (float) SETUP;
 }
 
 void cmd_setup(void) {
@@ -317,7 +313,7 @@ void cmd_setup(void) {
     i = 0;
     S.BaudRate = 9600;
     LoadSetup();
-    SS=S;
+    SS = S;
     SS.WriteCount++;
     while (c != 'x' && c != 'q') {
         SetupMainMenu();
@@ -325,110 +321,105 @@ void cmd_setup(void) {
         switch (c) {
             case 'v':
                 if (++SS.VideoMode > 4) SS.VideoMode = 0;
-                switch(SS.VideoMode) {
+                switch (SS.VideoMode) {
                     case 0: //video disabled
-                    break;
+                        break;
                     case 1: //NTSC
-                    SS.C_VRES = 180;
-                    SS.C_HRES = 304;
-                    SS.C_LINE_N = 262;
-                    SS.C_LINE_T =   5080;
-                    SS.C_VSYNC_N =  3;
-                    SS.C_VBLANK_N  = (SS.C_LINE_N - SS.C_VRES - SS.C_VSYNC_N);
-                    SS.C_PREEQ_N  = ((SS.C_VBLANK_N/2) - 8);
-                    SS.C_POSTEQ_N = (SS.C_VBLANK_N - SS.C_PREEQ_N);
-                    SS.C_PIX_T    = 11;
-                    SS.C_HSYNC_T  = 374;
-                    SS.C_BLANKPAD = 8;
+                        SS.C_VRES = 180;
+                        SS.C_HRES = 304;
+                        SS.C_LINE_N = 262;
+                        SS.C_LINE_T = 5080;
+                        SS.C_VSYNC_N = 3;
+                        SS.C_VBLANK_N = (SS.C_LINE_N - SS.C_VRES - SS.C_VSYNC_N);
+                        SS.C_PREEQ_N = ((SS.C_VBLANK_N / 2) - 8);
+                        SS.C_POSTEQ_N = (SS.C_VBLANK_N - SS.C_PREEQ_N);
+                        SS.C_PIX_T = 11;
+                        SS.C_HSYNC_T = 374;
+                        SS.C_BLANKPAD = 8;
                         break;
                     case 2: //NTSC 480
-                    SS.C_VRES = 234;
-                    SS.C_HRES = 480;
-                    SS.C_LINE_N = 262;
-                    SS.C_LINE_T =   5080;
-                    SS.C_VSYNC_N =  3;
-                    SS.C_VBLANK_N  = (SS.C_LINE_N - SS.C_VRES - SS.C_VSYNC_N);
-                    SS.C_PREEQ_N  = ((SS.C_VBLANK_N/2) - 8);
-                    SS.C_POSTEQ_N = (SS.C_VBLANK_N - SS.C_PREEQ_N);
-                    SS.C_PIX_T    = 9;
-                    SS.C_HSYNC_T  = 374;
-                    SS.C_BLANKPAD = 4;
+                        SS.C_VRES = 234;
+                        SS.C_HRES = 480;
+                        SS.C_LINE_N = 262;
+                        SS.C_LINE_T = 5080;
+                        SS.C_VSYNC_N = 3;
+                        SS.C_VBLANK_N = (SS.C_LINE_N - SS.C_VRES - SS.C_VSYNC_N);
+                        SS.C_PREEQ_N = ((SS.C_VBLANK_N / 2) - 8);
+                        SS.C_POSTEQ_N = (SS.C_VBLANK_N - SS.C_PREEQ_N);
+                        SS.C_PIX_T = 9;
+                        SS.C_HSYNC_T = 374;
+                        SS.C_BLANKPAD = 4;
                         break;
                     case 3: //PAL Default
-                    SS.C_VRES = 216;
-                    SS.C_HRES = 304;
-                    SS.C_LINE_N = 312;
-                    SS.C_LINE_T =   5120;
-                    SS.C_VSYNC_N =  3;
-                    SS.C_VBLANK_N  = (SS.C_LINE_N - SS.C_VRES - SS.C_VSYNC_N);
-                    SS.C_PREEQ_N  = ((SS.C_VBLANK_N/2) - 8);
-                    SS.C_POSTEQ_N = (SS.C_VBLANK_N - SS.C_PREEQ_N);
-                    SS.C_PIX_T    = 11;
-                    SS.C_HSYNC_T  = 374;
-                    SS.C_BLANKPAD = 8;
+                        SS.C_VRES = 216;
+                        SS.C_HRES = 304;
+                        SS.C_LINE_N = 312;
+                        SS.C_LINE_T = 5120;
+                        SS.C_VSYNC_N = 3;
+                        SS.C_VBLANK_N = (SS.C_LINE_N - SS.C_VRES - SS.C_VSYNC_N);
+                        SS.C_PREEQ_N = ((SS.C_VBLANK_N / 2) - 8);
+                        SS.C_POSTEQ_N = (SS.C_VBLANK_N - SS.C_PREEQ_N);
+                        SS.C_PIX_T = 11;
+                        SS.C_HSYNC_T = 374;
+                        SS.C_BLANKPAD = 8;
                         break;
                     case 4:
-                    SS.C_VRES = SS.CC_VRES;
-                    SS.C_HRES = SS.CC_HRES;
-                    SS.C_LINE_N = SS.CC_LINE_N;
-                    SS.C_LINE_T = SS.CC_LINE_T;
-                    SS.C_VSYNC_N = SS.CC_VSYNC_N;
-                    SS.C_VBLANK_N  = (SS.CC_LINE_N - SS.CC_VRES - SS.CC_VSYNC_N);
-                    SS.C_PREEQ_N  = ((SS.CC_VBLANK_N/2) - 8);
-                    SS.C_POSTEQ_N = (SS.CC_VBLANK_N - SS.CC_PREEQ_N);
-                    SS.C_PIX_T    = SS.CC_PIX_T;
-                    SS.C_HSYNC_T  = SS.CC_HSYNC_T;
-                    SS.C_BLANKPAD = SS.CC_BLANKPAD;
-                    break;
+                        SS.C_VRES = SS.CC_VRES;
+                        SS.C_HRES = SS.CC_HRES;
+                        SS.C_LINE_N = SS.CC_LINE_N;
+                        SS.C_LINE_T = SS.CC_LINE_T;
+                        SS.C_VSYNC_N = SS.CC_VSYNC_N;
+                        SS.C_VBLANK_N = (SS.CC_LINE_N - SS.CC_VRES - SS.CC_VSYNC_N);
+                        SS.C_PREEQ_N = ((SS.CC_VBLANK_N / 2) - 8);
+                        SS.C_POSTEQ_N = (SS.CC_VBLANK_N - SS.CC_PREEQ_N);
+                        SS.C_PIX_T = SS.CC_PIX_T;
+                        SS.C_HSYNC_T = SS.CC_HSYNC_T;
+                        SS.C_BLANKPAD = SS.CC_BLANKPAD;
+                        break;
                 }
                 break;
             case 'r':
-                if(++SS.RTCEnable >2) SS.RTCEnable=0;
+                if (++SS.RTCEnable > 2) SS.RTCEnable = 0;
                 break;
             case 'd':
                 SS.DateFormat ^= 1;
                 break;
             case 'g':
-                if(++SS.GameDuino >2) SS.GameDuino=0;
+                if (++SS.GameDuino > 2) SS.GameDuino = 0;
                 break;
             case 's':
                 SS.SDEnable ^= 1;
                 break;
             case 't':
-                SS.DTimeDate ^=1;
+                SS.DTimeDate ^= 1;
                 break;
             case 'c':
                 if (++SS.SerialCon > 4) SS.SerialCon = 0;
-                SS.BaudRate=BaudRateList[0];
+                SS.BaudRate = BaudRateList[0];
                 break;
             case 'u':
-                SS.UsbEnable ^=1;
+                SS.UsbEnable ^= 1;
                 break;
             case 'b':
                 i++;
-                if(SS.SerialCon==1 || SS.SerialCon==2) // Com1 and Com2 max baud 19200
+                if (SS.SerialCon == 1 || SS.SerialCon == 2) // Com1 and Com2 max baud 19200
                 {
-                    if(i>1) i=0;
+                    if (i > 1) i = 0;
+                } else {
+                    if (i > 4) i = 0;
                 }
-                    else
-                    {
-                        if (i > 4) i = 0;
-                    }
                 SS.BaudRate = BaudRateList[i];
                 break;
             case 'x':
-                if(SaveSetup())
-                {
+                if (SaveSetup()) {
                     MMPrintString("\n\rSettings Saved \n\r");
                     MMPrintString("\n\rReset Board");
-                }
-                    else
-                    {
+                } else {
                     MMPrintString("\n\rSettings Not Saved \n\r");
-                    }
+                }
                 break;
             case 'n':
-                if((SS.ScreenSave +=5) > 60) SS.ScreenSave=0;
+                if ((SS.ScreenSave += 5) > 60) SS.ScreenSave = 0;
                 break;
             case 'm':
                 CustomVideoMode();

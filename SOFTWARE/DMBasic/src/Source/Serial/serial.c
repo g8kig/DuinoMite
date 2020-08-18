@@ -27,8 +27,8 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "../MMBasic/External.h"
 #include "serial.h"
 #ifdef OLIMEX
-	#include "../DuinoMite/RTC.h"
-	#include "Setup.h"
+#include "../DuinoMite/RTC.h"
+#include "Setup.h"
 #endif
 
 
@@ -250,9 +250,9 @@ void SerialOpen(char *spec, int as_console) {
         ExtCfg(P_COM3_TX_PIN_NBR, EXT_COM_RESERVED + as_console); // reserve the pin for com use
 
         //      INTEnable(INT_SOURCE_UART_RX(UART2), INT_ENABLED);
-  //      INTEnable(INT_SOURCE_UART_TX(UART2), INT_DISABLED);
-  //      INTSetVectorPriority(INT_VECTOR_UART(UART2), INT_PRIORITY_LEVEL_2);
-  //      INTSetVectorSubPriority(INT_VECTOR_UART(UART2), INT_SUB_PRIORITY_LEVEL_0);
+        //      INTEnable(INT_SOURCE_UART_TX(UART2), INT_DISABLED);
+        //      INTSetVectorPriority(INT_VECTOR_UART(UART2), INT_PRIORITY_LEVEL_2);
+        //      INTSetVectorSubPriority(INT_VECTOR_UART(UART2), INT_SUB_PRIORITY_LEVEL_0);
         if (as_console) SerialConsole = 3;
         com3 = true;
     }
@@ -345,15 +345,15 @@ void SerialClose(int comnbr) {
         HeapUsed -= com4_buf_size * 2;
     }
 #endif
-		// if all com ports are closed we can disable the interrupts and timer
+    // if all com ports are closed we can disable the interrupts and timer
 #ifdef OLIMEX
-		if (!com1 && !com2 && !com3 && !com4) {
+    if (!com1 && !com2 && !com3 && !com4) {
 #else
-		if (!com1 && !com2) {
+    if (!com1 && !com2) {
 #endif
-			mT5IntEnable(0);
-			T5CON = 0;
-		}
+        mT5IntEnable(0);
+        T5CON = 0;
+    }
 }
 
 /***************************************************************************************************
@@ -416,7 +416,7 @@ Get the status the serial receive buffer.
 Returns the number of characters waiting in the buffer
  ****************************************************************************************************/
 int SerialRxStatus(int comnbr) {
-    int i=0;
+    int i = 0;
     if (comnbr == 1) {
         i = com1Rx_head - com1Rx_tail;
         if (i < 0) i += com1_buf_size;
@@ -443,7 +443,7 @@ Get the status the serial transmit buffer.
 Returns the number of characters waiting in the buffer
  ****************************************************************************************************/
 int SerialTxStatus(int comnbr) {
-    int i=0;
+    int i = 0;
     if (comnbr == 1) {
         i = com1Rx_head - com1Rx_tail;
         if (i < 0) i += com1_buf_size;
@@ -528,7 +528,7 @@ void __ISR(_TIMER_5_VECTOR, ipl6) T5Interrupt(void) {
     static int com1Tx_byte; // hold the transmit byte here
     static int com2Rx_byte; // build the received byte here
     static int com2Tx_byte; // hold the transmit byte here
-    
+
     static int com3Rx_byte;
     static int com4Rx_byte;
     if (com1) {
@@ -656,8 +656,8 @@ void __ISR(_TIMER_5_VECTOR, ipl6) T5Interrupt(void) {
             com3Rx_byte = U2RXREG;
             com3Rx_buf[com3Rx_head] = com3Rx_byte; // store the byte in the ring buffer
             com3Rx_head = (com3Rx_head + 1) % com3_buf_size; // advance the head of the queue
-                        if (SerialConsole == 3 && com3Rx_byte == 3 && !FileXfr)
-                            MMAbort = true; // check for CTRL-C and if so tell BASIC to stop running
+            if (SerialConsole == 3 && com3Rx_byte == 3 && !FileXfr)
+                MMAbort = true; // check for CTRL-C and if so tell BASIC to stop running
             if (com3Rx_head == com3Rx_tail) // if the buffer has overflowed throw away the oldest char
                 com3Rx_tail = (com3Rx_tail + 1) % com3_buf_size;
             IFS1bits.U2RXIF = 0;
@@ -676,11 +676,11 @@ void __ISR(_TIMER_5_VECTOR, ipl6) T5Interrupt(void) {
     ///////////////////////////////// this is COM4 ////////////////////////////////////
     if (com4) {
         if (IFS2bits.U5RXIF) {
-            com4Rx_byte=U5RXREG;
+            com4Rx_byte = U5RXREG;
             com4Rx_buf[com4Rx_head] = com4Rx_byte; // store the byte in the ring buffer
             com4Rx_head = (com4Rx_head + 1) % com4_buf_size; // advance the head of the queue
-                        if (SerialConsole == 4 && com4Rx_byte == 3 && !FileXfr)
-                            MMAbort = true; // check for CTRL-C and if so tell BASIC to stop running
+            if (SerialConsole == 4 && com4Rx_byte == 3 && !FileXfr)
+                MMAbort = true; // check for CTRL-C and if so tell BASIC to stop running
             if (com4Rx_head == com4Rx_tail) // if the buffer has overflowed throw away the oldest char
                 com4Rx_tail = (com4Rx_tail + 1) % com4_buf_size;
             IFS2bits.U5RXIF = 0;
@@ -702,19 +702,17 @@ void __ISR(_TIMER_5_VECTOR, ipl6) T5Interrupt(void) {
 }
 #endif
 // UART 2 interrupt handler
- // it is set at priority level 2
- void __ISR(_UART2_VECTOR, ipl2) IntUart2Handler(void)
- {
-   // Is this an RX interrupt?
-   if(mU2RXGetIntFlag())
-   {
-      // Clear the RX interrupt Flag
-      mU2RXClearIntFlag();
-      SleepMMVal=Uart2Int;
-   }
+// it is set at priority level 2
+
+void __ISR(_UART2_VECTOR, ipl2) IntUart2Handler(void) {
+    // Is this an RX interrupt?
+    if (mU2RXGetIntFlag()) {
+        // Clear the RX interrupt Flag
+        mU2RXClearIntFlag();
+        SleepMMVal = Uart2Int;
+    }
     // We don't care about TX interrupt
-   if ( mU2TXGetIntFlag() )
-   {
-      mU2TXClearIntFlag();
-   }
- }
+    if (mU2TXGetIntFlag()) {
+        mU2TXClearIntFlag();
+    }
+}

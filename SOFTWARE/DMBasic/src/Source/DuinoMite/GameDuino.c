@@ -35,7 +35,7 @@ int anim;
 int x, y;
 #define SPRITE_FRAMES 56
 
-static inline __attribute__((always_inline)) unsigned char SPICalutateBRG(unsigned int pb_clk, unsigned int spi_clk) {
+static inline __attribute__((always_inline)) unsigned char SPICalculateBRG(unsigned int pb_clk, unsigned int spi_clk) {
     unsigned int brg;
 
     brg = pb_clk / (2 * spi_clk);
@@ -105,7 +105,7 @@ void StartSpi(void) {
     ExtCfg(7, EXT_DIG_OUT);
     ExtSet(7, 1);
     OpenSPI((PRI_PRESCAL_64_1 | SEC_PRESCAL_8_1 | MASTER_ENABLE_ON | SPI_CKE_ON | SPI_SMP_OFF), SPI_ENABLE); //
-    SPIBRG = SPICalutateBRG(GetPeripheralClock(), 16000000);
+    SPIBRG = SPICalculateBRG(GetPeripheralClock(), 16000000);
     SDCardRemoved = true;
 }
 

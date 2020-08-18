@@ -415,8 +415,7 @@ void CDCNotificationHandler(void) {
     if (UART_DTS == USB_CDC_DSR_ACTIVE_LEVEL) //UART_DTS must be defined to be an I/O pin in the hardware profile to use the DTS feature (ex: "PORTXbits.RXY")
     {
         SerialStateBitmap.bits.DSR = 1;
-    }
-    else {
+    } else {
         SerialStateBitmap.bits.DSR = 0;
     }
 

@@ -54,6 +54,7 @@ static int int2bcd(int val) {
 
 //Tomohiko Sakamoto:
 #if 0
+
 int dayofweek(void) /* 0 = Sunday */ {
     int year = 0;
     static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};

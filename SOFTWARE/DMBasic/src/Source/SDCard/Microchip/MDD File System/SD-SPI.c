@@ -79,6 +79,7 @@
 DWORD MDD_SDSPI_finalLBA;
 WORD gMediaSectorSize;
 BYTE gSDMode;
+
 static MEDIA_INFORMATION mediaInformation;
 static ASYNC_IO ioInfo; //Declared global context, for fast/code efficient access
 
@@ -192,7 +193,7 @@ static void PIC18_Optimized_SPI_Read_Packet(void);
     None                                                  
  *********************************************************/
 
-static inline __attribute__((always_inline)) unsigned char SPICalutateBRG(unsigned int pb_clk, unsigned int spi_clk) {
+static inline __attribute__((always_inline)) unsigned char SPICalculateBRG(unsigned int pb_clk, unsigned int spi_clk) {
     unsigned int brg;
 
     brg = pb_clk / (2 * spi_clk);
@@ -265,8 +266,7 @@ BYTE MDD_SDSPI_MediaDetect(void) {
         if (response.r1._byte != 0x01) {
             CloseSPIM();
             return FALSE;
-        }
-        else {
+        } else {
             //Card is presumably present.  The SDI pin should have a pull up resistor on
             //it, so the odds of SDI "floating" to 0x01 after sending CMD0 is very
             //remote, unless the media is genuinely present.  Therefore, we should
@@ -866,8 +866,7 @@ BYTE MDD_SDSPI_AsyncReadTasks(ASYNC_IO* info) {
             if (ioInfo.dwBytesRemaining <= MEDIA_BLOCK_SIZE) {
                 SingleBlockRead = TRUE;
                 response = SendMMCCmd(READ_SINGLE_BLOCK, ioInfo.dwAddress);
-            }
-            else {
+            } else {
                 SingleBlockRead = FALSE;
                 response = SendMMCCmd(READ_MULTI_BLOCK, ioInfo.dwAddress);
             }
@@ -913,8 +912,7 @@ BYTE MDD_SDSPI_AsyncReadTasks(ASYNC_IO* info) {
                     //Media is still busy.  Start token not received yet.
                     return ASYNC_READ_BUSY;
                 }
-            }
-            else {
+            } else {
                 //The media didn't respond with the start data token in the timeout
                 //interval allowed.  Operation failed.  Abort the operation.
                 info->bStateVariable = ASYNC_READ_ABORT;
@@ -1274,8 +1272,7 @@ BYTE MDD_SDSPI_AsyncWriteTasks(ASYNC_IO* info) {
             //multiple blocks worth of data.
             if (ioInfo.dwBytesRemaining <= MEDIA_BLOCK_SIZE) {
                 command = WRITE_SINGLE_BLOCK;
-            }
-            else {
+            } else {
                 command = WRITE_MULTI_BLOCK;
 
                 //Compute the number of blocks that we are going to be writing in this multi-block write operation.
@@ -1313,8 +1310,7 @@ BYTE MDD_SDSPI_AsyncWriteTasks(ASYNC_IO* info) {
                 //Perhaps the card isn't initialized or present.
                 info->bStateVariable = ASYNC_WRITE_ERROR;
                 return ASYNC_WRITE_ERROR;
-            }
-            else {
+            } else {
                 //Card is ready to receive start token and data bytes.
                 info->bStateVariable = ASYNC_WRITE_TRANSMIT_PACKET;
             }
@@ -1433,8 +1429,7 @@ BYTE MDD_SDSPI_AsyncWriteTasks(ASYNC_IO* info) {
                     //Else we have more data to write in the multi-block write.    
                     info->bStateVariable = ASYNC_WRITE_TRANSMIT_PACKET;
                     return ASYNC_WRITE_SEND_PACKET;
-                }
-                else {
+                } else {
                     //The media is still busy.
                     return ASYNC_WRITE_BUSY;
                 }
@@ -1640,8 +1635,7 @@ BYTE MDD_SDSPI_SectorWrite(DWORD sector_addr, BYTE* buffer, BYTE allowWriteToZer
         status = MDD_SDSPI_AsyncWriteTasks(&info);
         if (status == ASYNC_WRITE_COMPLETE) {
             return TRUE;
-        }
-        else if (status == ASYNC_WRITE_ERROR) {
+        } else if (status == ASYNC_WRITE_ERROR) {
             return FALSE;
         }
     }
@@ -1857,9 +1851,9 @@ void OpenSPIM(unsigned int sync_mode)
     //SPI module initilization depends on processor type
 #ifdef __PIC32MX__
 #if (GetSystemClock() <= 20000000)
-    SPIBRG = SPICalutateBRG(GetPeripheralClock(), 10000);
+    SPIBRG = SPICalculateBRG(GetPeripheralClock(), 10000);
 #else
-    SPIBRG = SPICalutateBRG(GetPeripheralClock(), SPI_FREQUENCY);
+    SPIBRG = SPICalculateBRG(GetPeripheralClock(), SPI_FREQUENCY);
 #endif
     SPICON1bits.CKP = 1;
     SPICON1bits.CKE = 0;
@@ -2010,10 +2004,10 @@ BYTE ReadMediaManual(void) {
  ***************************************************************************************/
 void InitSPISlowMode(void) {
 #if defined __C30__ || defined __C32__
-//  WORD spiconvalue = 0x0003;
+    //  WORD spiconvalue = 0x0003;
 #ifdef __PIC32MX__
     OpenSPI(SPI_START_CFG_1, SPI_START_CFG_2);
-    SPIBRG = SPICalutateBRG(GetPeripheralClock(), 400000);
+    SPIBRG = SPICalculateBRG(GetPeripheralClock(), 400000);
 #else //else C30 = PIC24/dsPIC devices
     WORD timeout;
     // Calculate the prescaler needed for the clock
@@ -2208,8 +2202,7 @@ MEDIA_INFORMATION * MDD_SDSPI_MediaInitialize(void) {
 #endif   
             mediaInformation.errorCode = MEDIA_CANNOT_INITIALIZE;
             return &mediaInformation;
-        }
-        else {
+        } else {
             //Card successfully processed CMD0 and is now in the idle state.
 #ifdef __DEBUG_UART  
             PrintROMASCIIStringUART("Media successfully processed CMD0 after CMD12.\r\n");
@@ -2296,8 +2289,7 @@ MEDIA_INFORMATION * MDD_SDSPI_MediaInitialize(void) {
 #ifdef __DEBUG_UART  
             PrintROMASCIIStringUART("Media successfully processed CMD58: SD card is SDHC v2.0 (or later) physical spec type.\r\n");
 #endif
-        }
-        else {
+        } else {
             gSDMode = SD_MODE_NORMAL;
 
 #ifdef __DEBUG_UART  
@@ -2379,8 +2371,7 @@ MEDIA_INFORMATION * MDD_SDSPI_MediaInitialize(void) {
         PrintRAMBytesUART((unsigned char*) &response, 1);
         UARTSendLineFeedCarriageReturn();
 #endif
-    }
-    else {
+    } else {
         //Media failed to respond to the read CSD register operation.
 #ifdef __DEBUG_UART  
         PrintROMASCIIStringUART("Timeout occurred while processing CMD9 to read CSD register.\r\n");
