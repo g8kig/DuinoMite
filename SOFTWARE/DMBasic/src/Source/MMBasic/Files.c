@@ -997,10 +997,7 @@ void cmd_open(void) {
 
      ********************************************************************************************************************************/
 
-
     // note:  in the project -funsigned-char must be defined
-
-
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Macro to reserve flash memory for saving/loading data and initialise to 0xFF's
@@ -1010,9 +1007,16 @@ void cmd_open(void) {
     //  - sizeof(int) if you intend to write words
     //
     // allocate space in flash for program saves.  "ProgMem" is aligned on erasable page boundary
+#ifndef __XC32__
+    #define NVM_ALLOCATE(name, align, bytes) volatile unsigned char name[(bytes)] \
+        __attribute__ ((aligned(align),section(".text,\"ax\",@progbits #"))) = \
+        { [0 ...(bytes)-1] = 0xFF }
+#else
 #define NVM_ALLOCATE(name, align, bytes) volatile unsigned char name[(bytes)] \
-	__attribute__ ((aligned(align),section(".text,\"ax\",@progbits #"))) = \
-	{ [0 ...(bytes)-1] = 0xFF }
+         __attribute__ ((aligned(align),space(prog),section(".nvm"))) = \
+         { [0 ...(bytes)-1] = 0xFF }
+#endif    
+
     NVM_ALLOCATE(Flash, FLASH_PAGE_SIZE, FLASH_PAGE_SIZE * PROGMEM_NBR_PAGES);
     //
     ///////////////////////////////////////// globals ///////////////////////////////////////////
