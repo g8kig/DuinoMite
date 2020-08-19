@@ -61,8 +61,6 @@ static void ow_inputPin(int pin);
 static void ow_outputPin(int pin);
 static int ow_readPin(int pin);
 
-//	GS OW End
-
 static int LastDiscrepancy;
 static int LastFamilyDiscrepancy;
 static int LastDeviceFlag;
@@ -86,6 +84,7 @@ static const unsigned char dscrc_table[] = {
        87,  9,235,181, 54,104,138,212,149,203, 41,119,244,170, 72, 22,
       233,183, 85, 11,136,214, 52,106, 43,117,151,201, 74, 20,246,168,
       116, 42,200,150, 21, 75,169,247,182,232, 10, 84,215,137,107, 53};
+
 static unsigned short utilcrc16;
 static unsigned char utilcrc8;
 
@@ -149,7 +148,7 @@ void cmd_owReset(void) {
 	}
 
 // set up initial pin status (open drain, output, high)
-	ExtCfg(pin, EXT_NOT_CONFIG);										// set pin to unconfigured
+	ExtCfg(pin, EXT_NOT_CONFIG);                                                // pin not configured
 	ow_onOCPin(pin);
 	ow_setPin(pin);
 	ow_outputPin(pin);
@@ -379,7 +378,7 @@ void cmd_owSearch(void) {
 	if (flag & 0x02) alarm = 1; else alarm = 0;
 
 	// set up initial pin status (open drain, output, high)
-	ExtCfg(pin, EXT_NOT_CONFIG);										// set pin to unconfigured
+	ExtCfg(pin, EXT_NOT_CONFIG);                                                //  pin not configured
 	ow_onOCPin(pin);
 	ow_setPin(pin);
 	ow_outputPin(pin);
@@ -404,12 +403,12 @@ void cmd_owSearch(void) {
 		cptr++;
 	}
 	for (i = 0; i < 8; i++) {
-		if (option & 0x01) {															// numerical variables
+		if (option & 0x01) {													// numerical variables
 			ptr = findvar(argv[i + i + 4], V_NOFIND_NULL);
 			*((float *)ptr) = SerialNum[i];
 		} else if (option & 0x20) {												// string variable
 			*(cptr + i) = SerialNum[i];
-		} else {																					// numeric array
+		} else {																// numeric array
 			*((float *)ptr + i) = SerialNum[i];
 		}
 	}
@@ -522,40 +521,36 @@ void fun_owCRC16(void){
 	fret = (float)us;
 }
 
-
 void fun_mmOW(void) {
 	fret = (float)mmOWvalue;
 }
 
-
 void ow_pinChk(int pin) {
-	#ifdef OLIMEX
-            #ifdef OLIMEX_DUINOMITE_EMEGA
-		if ((pin < 1) || (pin > NBRPINS)) error("Invalid I/O pin"); // CHECK
-            #else
-		if ((pin < 1) || (pin > NBRPINS) || (pin == 11)) error("Invalid I/O pin");
-            #endif
-	#else
-		if ((pin < 11) || (pin > NBRPINS)) error("Invalid I/O pin");
-	#endif
+#ifdef OLIMEX
+    #ifdef OLIMEX_DUINOMITE_EMEGA
+        if ((pin < 1) || (pin > NBRPINS)) error("Invalid I/O pin"); // CHECK
+    #else
+        if ((pin < 1) || (pin > NBRPINS) || (pin == 11)) error("Invalid I/O pin");
+    #endif
+#else
+    if ((pin < 11) || (pin > NBRPINS)) error("Invalid I/O pin");
+#endif
 	if (ExtCurrentConfig[pin] >= EXT_COM_RESERVED) error("Pin is allocated to a communications function");
 	return;
 }
 
-
 // send one wire reset and detect presence response - returns 1 if found else 0
 int ow_reset(int pin) {
-	ow_clrPin(pin);																	// drive pin low
-	uSec(481);																			// wait 481uSec
-	ow_setPin(pin);																	// release the bus
-	ow_inputPin(pin);																// set as input
-	uSec(70);																				// wait 70uSec
-	mmOWvalue = ow_readPin(pin) ^ 0x01;							// read pin and invert response
+	ow_clrPin(pin);																// drive pin low
+	uSec(481);																	// wait 481uSec
+	ow_setPin(pin);																// release the bus
+	ow_inputPin(pin);															// set as input
+	uSec(70);																	// wait 70uSec
+	mmOWvalue = ow_readPin(pin) ^ 0x01;                                         // read pin and invert response
 	ow_outputPin(pin);															// set as output
-	uSec(411);																			// wait 411uSec
+	uSec(411);																	// wait 411uSec
 	return mmOWvalue;
 }
-
 
 void ow_writeByte(int pin, int data) {
 	int loop;
@@ -566,7 +561,6 @@ void ow_writeByte(int pin, int data) {
 	}
 	return;
 }
-
 
 int ow_readByte(int pin) {
 	int loop, result = 0;
@@ -593,7 +587,6 @@ int ow_touchByte(int pin, int data) {
 	return result;
 }
 
-
 int ow_touchBit(int pin, int owbit) {
 	int result = 0;
 
@@ -604,7 +597,6 @@ int ow_touchBit(int pin, int owbit) {
 	}
 	return result;
 }
-
 
 void ow_writeBit(int pin, int owbit) {
 	int status_save;
@@ -701,7 +693,7 @@ int ow_next(int pin, int do_reset, int alarm_only) {
 	int last_zero, serial_byte_number, next_result;
 	unsigned char serial_byte_mask, lastcrc8;
 
-	// initialize for search
+	// initialise for search
 	bit_number = 1;
 	last_zero = 0;
 	serial_byte_number = 0;
@@ -895,7 +887,6 @@ void ow_serialNum(unsigned char *serialnum_buf, int do_read)
 	}
 }
 
-
 //--------------------------------------------------------------------------
 // Setup the search algorithm to find a certain family of devices
 // the next time a search function is called 'owNext'.
@@ -914,7 +905,6 @@ void ow_familySearchSetup(int search_family)
 	LastDeviceFlag = FALSE;
 }
 
-
 //--------------------------------------------------------------------------
 // Set the current search state to skip the current family code.
 //
@@ -928,12 +918,10 @@ void ow_skipFamily(void)
 	if (LastDiscrepancy == 0) LastDeviceFlag = TRUE;
 }
 
-
 void setcrc16(unsigned short reset) {
 	utilcrc16 = reset;
 	return;
 }
-
 
 unsigned short docrc16(unsigned short cdata) {
 	cdata = (cdata ^ (utilcrc16 & 0xff)) & 0xff;
@@ -949,18 +937,15 @@ unsigned short docrc16(unsigned short cdata) {
 	return utilcrc16;
 }
 
-
 void setcrc8(unsigned char reset) {
 	utilcrc8 = reset;
 	return;
 }
 
-
 unsigned char docrc8(unsigned char cdata) {
 	utilcrc8 = dscrc_table[utilcrc8 ^ cdata];
 	return utilcrc8;
 }
-
 
 void ow_onOCPin(int pin) {
 	switch(pin) {
@@ -1142,7 +1127,6 @@ void ow_setPin(int pin) {
 	return;
 }
 
-
 void ow_clrPin(int pin) {
 	switch(pin) {
 		case 1:  P_E1_WRITE0;  return;
@@ -1202,7 +1186,6 @@ void ow_clrPin(int pin) {
 	}
 	return;
 }
-
 
 void ow_inputPin(int pin) {
 	switch(pin) {
@@ -1264,7 +1247,6 @@ void ow_inputPin(int pin) {
 	return;
 }
 
-
 void ow_outputPin(int pin) {
 	switch(pin) {
 		case 1:  P_E1_TRISOUT;  return;
@@ -1324,7 +1306,6 @@ void ow_outputPin(int pin) {
 	}
 	return;
 }
-
 
 int ow_readPin(int pin) {
 	switch(pin) {
@@ -1660,7 +1641,7 @@ void fun_vmem(void) {
 // Ingmar 4.2.2012
 // utility routine used to read a number of bytes
 // only used by cmd_loadbmp() below
-void xread(char *p, int nbr, int fnbr) {
+static void xread(char *p, int nbr, int fnbr) {
     while(nbr--) *p++ = MMfgetc(fnbr);
 }
 
@@ -1772,4 +1753,3 @@ void cmd_loadbmp(void) {
 
     MMfclose(fp);
 }
-

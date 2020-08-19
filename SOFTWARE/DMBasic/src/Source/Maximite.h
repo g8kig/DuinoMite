@@ -52,7 +52,7 @@ If not, see <http://www.gnu.org/licenses/>.
 	//#define ON      1
 
 	#if defined(__DEBUG)
-		#define dp(...) {char s[40];sprintf(s,  __VA_ARGS__); MMPrintString(s); MMPrintString("\r\n");}
+		#define dp(...) {char s[40];sprintf(s,  __VA_ARGS__); MMPrintString(s); MMPrintCRLF();}
 	    #define debughalt() __asm__ volatile (" sdbbp 0")
 		void dump(char *p, int nbr);
 	#else
@@ -84,7 +84,8 @@ If not, see <http://www.gnu.org/licenses/>.
 	extern void AddToKeystrokeBuffer(unsigned char c);
 
 	// functions for sending data to keyboard/USB (defined in Main.c)
-	extern void MMPrintString(char *);
+	extern void MMPrintString(const char *);
+	extern void MMPrintCRLF();
 	extern char PrintSignonToUSB;
 	extern void VideoPutc(char);
 	extern char MMPutc(char c);

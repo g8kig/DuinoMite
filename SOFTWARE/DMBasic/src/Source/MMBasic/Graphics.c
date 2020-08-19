@@ -30,7 +30,7 @@ If not, see <http://www.gnu.org/licenses/>.
 
 #include "../Video/Video.h"
 
-void getcoord(char *p, int *x, int *y);
+static void getcoord(char *p, int *x, int *y);
 
 static int lastx = 0; // the last x and y coordinates that were used
 static int lasty = 0;
@@ -64,9 +64,6 @@ The only actions a command can do to change the program flow is to change nextst
 execute longjmp(mark, 1) if it wants to abort the program.
 
  ********************************************************************************************/
-
-
-
 
 void cmd_cls(void) {
     MMPrintString("\033[2J\033[H"); // vt100 clear screen and home cursor
@@ -198,7 +195,7 @@ void fun_vres(void) {
 // utility routine used to write a number of bytes
 // only used by cmd_savebmp() below
 
-void xwrite(char *p, int nbr, int fnbr) {
+static void xwrite(char *p, int nbr, int fnbr) {
     while (nbr--) MMfputc(*p++, fnbr);
 }
 
@@ -284,7 +281,7 @@ utility functions used by the custom commands
  ************************************************************************************************/
 
 
-void getcoord(char *p, int *x, int *y) {
+static void getcoord(char *p, int *x, int *y) {
     char *tp, *ttp;
     char b[STRINGSIZE];
 

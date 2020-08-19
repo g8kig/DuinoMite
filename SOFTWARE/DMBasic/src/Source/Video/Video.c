@@ -86,7 +86,8 @@ If not, see <http://www.gnu.org/licenses/>.
 
 // global variables used in other parts of the Maximite
 int VRes, HRes; // Global vert and horiz resolution
-int VA[VBUFSIZE*(HBUFSIZE / 32)] __attribute__((aligned(4))); // image buffer.  it is assumed that the startup code will zero this
+
+int VA[VBUFSIZE * (HBUFSIZE / 32)] __attribute__((aligned(4))); // image buffer.  it is assumed that the startup code will zero this
 
 int vga; // true if we are using the VGA video
 

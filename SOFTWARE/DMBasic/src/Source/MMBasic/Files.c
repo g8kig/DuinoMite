@@ -42,57 +42,58 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "Setup.h"
 #endif
 
-FSFILE *MMFilePtr[MAXOPENFILES];
-
 int DefaultDrive = SDFS;
+int OptionErrorAbort = true;
+char MSDEnable = 0;
+
+static FSFILE *MMFilePtr[MAXOPENFILES];
 
 // define the flash file status
 #define CLOSED		0
 #define OPENREAD	1
 #define OPENWRITE	2
-int FlashStatus = CLOSED;
+static int FlashStatus = CLOSED;
 
-int FlashEOF = false;
-int OptionErrorAbort = true;
-int MMerrno = 0;
-char MSDEnable = 0;
+static int FlashEOF = false;
+static int MMerrno = 0;
 
 void FlashList(char *s);
-int FlashFreeSpace(void);
-void FlashOpenRead(char *s);
-void FlashOpenWrite(char *s);
-void FlashOpenAppend(char *s);
-//	GS - Flash fix Start
-void FlashGetEOF(void);
-//	GS - Flash fix End
-void FlashPutc(char c);
 void FlashPutStr(char *s);
-void FlashCloseRead(void);
-void FlashCloseWrite(void);
-unsigned char FlashGetc(void);
-int FlashKill(char *fn);
 volatile struct structBlock *FindFlashBlock(char* fn, int block);
-void FlashRename(char *old, char *new);
+
+static int FlashFreeSpace(void);
+static void FlashOpenRead(char *s);
+static void FlashOpenWrite(char *s);
+static void FlashOpenAppend(char *s);
+static void FlashGetEOF(void);
+static void FlashPutc(char c);
+static void FlashCloseRead(void);
+static void FlashCloseWrite(void);
+static unsigned char FlashGetc(void);
+int FlashKill(char *fn);
+
+static void FlashRename(char *old, char *new);
 
 extern BYTE MSDStatus;
 extern BOOL SoftDetach[0 + 1];
-#define LUNSoftAttach(LUN) SoftDetach[LUN]=FALSE;
-#define LUNSoftDetach(LUN) SoftDetach[LUN]=TRUE;
+
+#define LUNSoftAttach(LUN) SoftDetach[LUN] = FALSE;
+#define LUNSoftDetach(LUN) SoftDetach[LUN] = TRUE;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////// ERROR HANDLING ////////////////////////////////////////////
-
 
 /*****************************************************************************************
 Mapping of errors reported by the Microchip FAT 16/32 file system to MMBasic file errors
  *****************************************************************************************/
-const int ErrorMap[34] = {0, // 0  =   No error
+static const int ErrorMap[34] = {0, // 0  =   No error
     11, // 1  =   An erase failed
     1, // 2  =   No SD card found
     15, // 3  =   The disk is of an unsupported format
     15, // 4  =   The boot record is bad
     15, // 5  =   The file system type is unsupported
-    15, // 6  =   An initialization error has occurred
-    15, // 7  =   An operation was performed on an uninitialized device
+    15, // 6  =   An initialissation error has occurred
+    15, // 7  =   An operation was performed on an uninitialised device
     10, // 8  =   A bad read of a sector occurred
     11, // 9  =   Could not write to a sector
     15, // 10 =  Invalid cluster value
@@ -125,7 +126,7 @@ const int ErrorMap[34] = {0, // 0  =   No error
 Text for the file related error messages reported by MMBasic
  ******************************************************************************************/
 
-const char *FErrorMsg[NBRERRMSG] = {"No error", // 0
+static const char *FErrorMsg[NBRERRMSG] = {"No error", // 0
     "SD card not found", // 1
     "SD card is write protected", // 2
     "No space on media", // 3
@@ -190,8 +191,6 @@ execute longjmp(mark, 1) if it wants to abort the program.
 
  ********************************************************************************************/
 
-
-
 void cmd_open(void) {
     int fnbr, i;
     char *mode, *fname;
@@ -200,6 +199,7 @@ void cmd_open(void) {
     ss[0] = tokenvalue[TKN_FOR];
     ss[1] = tokenvalue[TKN_AS];
     ss[2] = 0;
+
     { // start a new block
         getargs(&cmdline, 5, ss); // getargs macro must be the first executable stmt in a block
         fname = getCstring(argv[0]);
@@ -318,7 +318,7 @@ void cmd_open(void) {
         FSgetcwd(b, STRINGSIZE);
         MMPrintString("Directory: ");
         MMPrintString(b);
-        MMPrintString("\r\n");
+        MMPrintCRLF();
 
         fcnt = 0;
 #ifdef OLIMEX
@@ -357,7 +357,7 @@ void cmd_open(void) {
             else
                 sprintf(b, "%12d", flist[i].fs);
             MMPrintString(b);
-            MMPrintString("\r\n");
+            MMPrintCRLF();
             // check if it is more than a screenfull
             if (ListCnt >= (VRes / (fontHeight * fontScale)) && i < fcnt - 1) {
                 MMPrintString("PRESS ANY KEY OR Q TO STOP");
@@ -564,35 +564,6 @@ void cmd_open(void) {
      ********************************************************************************************
      ********************************************************************************************/
 
-
-
-    // use standard I/O functions if not compiling for the MAXIMITE
-    //#ifndef MAXIMITE
-    //
-    //int MMCharPos;
-    //
-    //char MMGetc() {
-    //	char c;
-    //	c = getchar();
-    //	if(c == '\n' || c == '\r')
-    //		MMCharPos = 1;
-    //	return c;
-    //}
-    //
-    //char MMPutc(char c) {
-    //	MMCharPos++;
-    //	if(c == '\n') {
-    //		putchar('\r');
-    //		MMCharPos = 1;
-    //	}
-    //	return putchar(c);
-    //}
-    //
-    //
-    //#endif
-    //
-
-
     // get a line from the keyboard or a file handle
     // most of the keyboard input is handled by EditInputLine() but it will use this function 
     // if a line greater than he screen width is being entered.
@@ -630,7 +601,6 @@ void cmd_open(void) {
                 }
                 continue;
             }
-
 
             if (c == '\t') { // expand tabs to spaces
                 do {
@@ -684,8 +654,6 @@ void cmd_open(void) {
         while (i--) MMfputc(*p++, filenbr);
     }
 
-
-
     // return the drive designation
     // this will:
     //   - find the drive prefix (A: or B:) in the argument and remove it from the string
@@ -712,7 +680,6 @@ void cmd_open(void) {
         if (!*p || strlen(p) > 12) error("Invalid Filename");
         return fs;
     }
-
 
 
     // fname must be a standard C style string (not the MMBasic style)
@@ -947,7 +914,6 @@ void cmd_open(void) {
 
     }
 
-
     // finds the first available free file number.  Returns with zero if no free file numbers
 
     int FindFreeFileNbr(void) {
@@ -957,13 +923,11 @@ void cmd_open(void) {
         return 0;
     }
 
-
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////// flash filesystem //////////////////////////////////////////////////
     /*
 
-    Structure of the flash filesystem
+    Structure of the flash file system
     =================================
     This filesystem is designed to be simple to implement, work with the PIC32 flash memory and spread the wear 
     load on the flash.
@@ -1008,7 +972,7 @@ void cmd_open(void) {
     //
     // allocate space in flash for program saves.  "ProgMem" is aligned on erasable page boundary
 #ifndef __XC32__
-    #define NVM_ALLOCATE(name, align, bytes) volatile unsigned char name[(bytes)] \
+#define NVM_ALLOCATE(name, align, bytes) volatile unsigned char name[(bytes)] \
         __attribute__ ((aligned(align),section(".text,\"ax\",@progbits #"))) = \
         { [0 ...(bytes)-1] = 0xFF }
 #else

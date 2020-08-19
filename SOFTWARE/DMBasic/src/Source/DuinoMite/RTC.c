@@ -43,6 +43,8 @@ static char I2CAdd;
 static char StartAdd = 0;
 static char StartDow = 0;
 
+static int dayofweek(void);
+
 #define waiti2cIdle() while( (I2C1CON & 0x0000001F) || (I2C1STAT & 0x00004000) );
 
 static int bcd2int(int val) {
@@ -53,18 +55,7 @@ static int int2bcd(int val) {
     return (((val / 10) << 4) + (val % 10));
 }
 
-//Tomohiko Sakamoto:
-#if 0
-
-int dayofweek(void) /* 0 = Sunday */ {
-    int year = 0;
-    static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
-    year -= month < 3;
-    return (year + year / 4 - year / 100 + year / 400 + t[month - 1] + day) % 7;
-}
-#else
-
-int dayofweek(void) /* 0 = Sunday */ {
+static int dayofweek(void) /* 0 = Sunday */ {
     unsigned int d = day, y = year, m = month;
     //==============================================================================================
     //d, m, y used only to preserve day, year & month vars
@@ -75,7 +66,6 @@ int dayofweek(void) /* 0 = Sunday */ {
 
     return d;
 }
-#endif
 
 // some temp commands for testing
 

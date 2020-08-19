@@ -56,9 +56,7 @@ void UpdateMenu(void) {
     MMPosX = 0;
     fontReverse = 1;
     sprintf(Temp, "  %s  [F2] Port - COM%d  [F3] Bits - 8  [F4] Handshake - Off     ", fname, ComPort);
-    //MMPrintString("  [F1] Baud - 115200  [F2] Port - COM4  [F3] Bits - 8  [F4] Handshake - Off     ");
     MMPrintString(Temp);
-    //    MMPrintString("  [F5] Capture - Off  [F6] Port Open    [F8] Exit                               ");
     sprintf(Temp, "  [PageUp] - Upload  [PageDown] - Download                                      ");
     MMPrintString(Temp);
     fontReverse = 0;

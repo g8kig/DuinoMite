@@ -21,9 +21,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 #include "MMBasic.h"
 
-
-
-
 /********************************************************************************************************************************************
  basic operators
  each function is responsible for decoding a basic operator
@@ -43,13 +40,9 @@ If not, see <http://www.gnu.org/licenses/>.
 
  ********************************************************************************************************************************************/
 
-
-
-
 void op_invalid(void) {
 	error("Syntax error");
 }
-
 
 void op_exp(void) {
 	fret = pow(farg1, farg2);

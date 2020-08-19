@@ -47,14 +47,32 @@ static int i;
 static int SETUP = 0;
 
 volatile unsigned int ScreenSaveTime;
-volatile unsigned char SetupInFlash[NVM_PAGE_SIZE] \
 
-__attribute__((aligned(NVM_PAGE_SIZE), section(".text,\"ax\",@progbits #"))) = \
-{[0 ...NVM_PAGE_SIZE - 1] = 0xFF}; //Map out area of non-volatile memory
+#ifndef __XC32__
+#define NVM_ALLOCATE(name, align, bytes) volatile unsigned char name[(NVM_PAGE_SIZE)] \
+        __attribute__ ((aligned(align),section(".text,\"ax\",@progbits #"))) = \
+        { [0 ...NVM_PAGE_SIZE-1] = 0xFF }
+#else
+#define NVM_ALLOCATE(name, align, bytes) volatile unsigned char name[(NVM_PAGE_SIZE)] \
+         __attribute__ ((aligned(align),space(prog),section(".nvm"))) = \
+         { [0 ...NVM_PAGE_SIZE-1] = 0xFF }
+#endif    
+
+NVM_ALLOCATE(SetupInFlash, NVM_PAGE_SIZE, NVM_PAGE_SIZE);
+
+static void MenuPrint(const char *string) {
+    MMPrintCRLF();
+    if (string == NULL) {
+        MMPrintString(" -----------------------------------------");
+    } 
+    else {
+        MMPrintString(string);
+    }
+}
 
 char SaveSetup(void) {
     if (!SS.VideoMode && !SS.UsbEnable && !SS.SerialCon) {
-        MMPrintString("\n\r!! No Consoles Enabled are you sure you want to save !! Y/N ");
+        MenuPrint("!! No Consoles Enabled are you sure you want to save !! Y/N ");
         i = MMgetchar();
         if (i != 'y') {
             return 0;
@@ -70,11 +88,11 @@ char SaveSetup(void) {
 void SetupDefaults(void) {
     S.Magic = 0xbeef;
     S.WriteCount = 0x000;
-    S.HardWare = 1;     //1=Duinomite 0=Maximite
+    S.HardWare = 1;                                                             // 1 = Duinomite 0 = Maximite
     S.VideoMode = 3;
-    S.RTCEnable = 0;    //1= nxp 2=dallas
+    S.RTCEnable = 0;                                                            // 1 = NXP 2 = Dallas Semi
     S.DateFormat = 0;
-    S.DTimeDate = 0;    //Display Date and time at boot
+    S.DTimeDate = 0;                                                            // Display Date and time at boot
     S.SDEnable = 1;
     S.UsbEnable = 1;
     S.SerialCon = 0;
@@ -94,6 +112,7 @@ void SetupDefaults(void) {
     S.C_PIX_T = 11;
     S.C_HSYNC_T = 374;
     S.C_BLANKPAD = 8;
+    
     INTDisableInterrupts();
     NVMErasePage((void*) SetupInFlash);
     NVMWriteRow((void*) SetupInFlash, (void*) &S);
@@ -114,115 +133,112 @@ void LoadSetup(void) {
 void SetupMainMenu(void) {
     MMcls();
     MMPrintString("\033[2J\033[H");
-    MMPrintString(" DuinoMite Setup Menu - "SetupVersion"  "Date "\n\r");
-    MMPrintString(" -----------------------------------------\n\r");
-    MMPrintString(" Hardware Platform - ");
-    if (SS.HardWare == 0)
-        MMPrintString("Maximite\n\r");
-    if (SS.HardWare == 1)
-        MMPrintString("DuinoMite\n\r");
-    MMPrintString(" V) Video Mode     - ");
+    MMPrintString(" DuinoMite Setup Menu - "SetupVersion"  "Date);
+    MenuPrint(NULL);
+    MenuPrint(" Hardware Platform - ");
+    MMPrintString(SS.HardWare == 0 ? "DuinoMite" : "Maximite");
+    MenuPrint(" V) Video Mode     - ");
     switch (SS.VideoMode) {
         case 0:
-            MMPrintString("Video Disabled\n\r");
+            MMPrintString("Video Disabled");
             break;
         case 1:
-            MMPrintString("NTSC\n\r");
+            MMPrintString("NTSC");
             break;
         case 2:
-            MMPrintString("NTSC - 480\n\r");
+            MMPrintString("NTSC(480)");
             break;
         case 3:
-            MMPrintString("PAL\n\r");
+            MMPrintString("PAL");
             break;
         case 4:
-            MMPrintString("Custom\n\r");
+            MMPrintString("Custom");
             break;
 
     }
-    MMPrintString(" R) RTC On Boot    - ");
+    MenuPrint(" R) RTC On Boot    - ");
     switch (SS.RTCEnable) {
         case 0:
-            MMPrintString("Off\n\r");
+            MMPrintString("Off");
             break;
         case 1:
-            MMPrintString("PCF8563\n\r");
+            MMPrintString("PCF8563");
             break;
         case 2:
-            MMPrintString("DS1307\n\r");
+            MMPrintString("DS1307");
             break;
     }
-    MMPrintString(" D) Date Format    - ");
+    MenuPrint(" D) Date Format    - ");
     if (SS.DateFormat)
-        MMPrintString("MM/DD/YY\n\r");
+        MMPrintString("MM/DD/YY");
     else
-        MMPrintString("DD/MM/YY\n\r");
-    MMPrintString(" T) Show Time Date - ");
+        MMPrintString("DD/MM/YY");
+    MenuPrint(" T) Show Time Date - ");
     if (SS.DTimeDate)
-        MMPrintString("Enabled\n\r");
+        MMPrintString("Enabled");
     else
-        MMPrintString("Disabled\n\r");
+        MMPrintString("Disabled");
 
-    MMPrintString(" G) GameDuino Init - ");
+    MenuPrint(" G) GameDuino Init - ");
     switch (SS.GameDuino) {
         case 0:
-            MMPrintString("Disabled\n\r");
+            MMPrintString("Disabled");
             break;
         case 1:
-            MMPrintString("Enabled 60hz\n\r");
+            MMPrintString("Enabled 60hz");
             break;
         case 2:
-            MMPrintString("Enabled 72hz\n\r");
+            MMPrintString("Enabled 72hz");
             break;
 
     }
-    MMPrintString(" N) Screen Saver   - ");
+    MenuPrint(" N) Screen Saver   - ");
     if (SS.ScreenSave) {
-        sprintf(temp, "%d Minutes\n\r", SS.ScreenSave);
+        sprintf(temp, "%d Minutes", SS.ScreenSave);
         MMPrintString(temp);
     } else
-        MMPrintString("Disabled\n\r");
+        MMPrintString("Disabled");
 
-    MMPrintString(" S) SD Card        - ");
+    MenuPrint(" S) SD Card        - ");
     if (SS.SDEnable)
-        MMPrintString("Enabled\n\r");
+        MMPrintString("Enabled");
     else
-        MMPrintString("Disabled\n\r");
-    MMPrintString(" U) Usb Port       - ");
+        MMPrintString("Disabled");
+    MenuPrint(" U) Usb Port       - ");
     switch (SS.UsbEnable) {
         case 0:
-            MMPrintString("Disabled\n\r");
+            MMPrintString("Disabled");
             break;
         case 1:
-            MMPrintString("Enabled\n\r");
+            MMPrintString("Enabled");
             break;
     }
-    MMPrintString(" L) Load Config    - \n\r");
-    MMPrintString(" C) Serial Console - ");
+    MenuPrint(" L) Load Config    - ");
+    MenuPrint(" C) Serial Console - ");
     switch (SS.SerialCon) {
         case 0:
-            MMPrintString("Disabled\n\r");
+            MMPrintString("Disabled");
             break;
         case 1:
-            MMPrintString("Com1:\n\r");
+            MMPrintString("Com1:");
             break;
         case 2:
-            MMPrintString("Com2:\n\r");
+            MMPrintString("Com2:");
             break;
         case 3:
-            MMPrintString("Com3:\n\r");
+            MMPrintString("Com3:");
             break;
         case 4:
-            MMPrintString("Com4:\n\r");
+            MMPrintString("Com4:");
             break;
     }
-    MMPrintString(" B) Baud Rate      - ");
-    sprintf(temp, "%d\n\r", SS.BaudRate);
+    MenuPrint(" B) Baud Rate      - ");
+    sprintf(temp, "%d", SS.BaudRate);
     MMPrintString(temp);
-    MMPrintString(" M) Custom Video Mode\n\r");
-    MMPrintString(" P) Print Custom Video Mode\n\r");
-    MMPrintString(" -----------------------------------------\n\r");
-    MMPrintString(" Q) Quit Don't Save  X) Exit Save Settings");
+    MenuPrint(" M) Custom Video Mode");
+    MenuPrint(" P) Print Custom Video Mode");
+    MenuPrint(NULL);
+    MenuPrint(" Q) Quit Don't Save  X) Exit Save Settings");
 }
 
 unsigned int GetInt(void) {

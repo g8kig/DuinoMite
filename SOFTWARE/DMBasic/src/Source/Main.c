@@ -327,7 +327,7 @@ int main(void) {
         Autorun = false;
     } else {
         MMPrintString(MES_SIGNON); // print signon message
-        MMPrintString("\r\n"); // extra line looks better
+        MMPrintCRLF(); // extra line looks better
         Autorun = true;
     }
     
@@ -1027,13 +1027,15 @@ void USBPutchar(char c) {
     }
 }
 
-
 // print a string to the video and USB interface
 
-void MMPrintString(char* s) {
+void MMPrintString(const char* s) {
     while (*s) MMputchar(*s++);
 }
 
+void MMPrintCRLF() {
+    MMPrintString("\r\n");
+}
 
 
 
@@ -1128,7 +1130,7 @@ void dump(char *p, int nbr) {
         sprintf(inpbuf, "%s   %s", buf1, buf2);
         MMPrintString(inpbuf);
     }
-    MMPrintString("\r\n");
+    MMPrintCRLF();
 }
 #endif
 

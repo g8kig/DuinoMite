@@ -289,7 +289,7 @@ void __attribute__((noreturn)) MMBasicStart(void) {
             USBOn = S.UsbEnable;
             VideoOn = S.VideoMode;
             //                        USBOn = VideoOn = true;									// turn on the outputs;
-            if (MMCharPos > 1) MMPrintString("\r\n"); // prompt should be on a new line
+            if (MMCharPos > 1) MMPrintCRLF(); // prompt should be on a new line
             if ((MMPosY % (fontHeight * fontScale)) != 0)
                 MMPosY += (fontHeight * fontScale) - (MMPosY % (fontHeight * fontScale)); // and ensure that it is an even scan line
             MMPrintString(getCstring(PromptString)); // evaluate prompt string and output the result
@@ -568,7 +568,7 @@ insert_lastcmd: // goto here if we are just editing a command
 
 saveline:
     Cursor = C_STANDARD;
-    MMPrintString("\r\n");
+    MMPrintCRLF();
 }
 
 void ProcessInputLine(void) {
@@ -1503,7 +1503,7 @@ void makeargs(char **p, int maxargs, char *argbuf, char *argv[], int *argc, char
 // this uses longjump to skip back to the command input and cleanup the stack
 
 void __attribute__((noreturn)) error(char *msg) {
-    if (MMCharPos > 1) MMPrintString("\r\n");
+    if (MMCharPos > 1) MMPrintCRLF();
     SetFont(0, 1, 0); // set a reasonable default font
     if (CurrentLineNbr) {
         sprintf(inpbuf, "Error line %d%s%s\r\n", CurrentLineNbr, *msg ? ": " : "", msg);

@@ -40,16 +40,12 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "../Serial/Serial.h"
 #include "Setup.h"
 #include "../DuinoMite/RTC.h"
+
 struct s_inttbl inttbl[NBRPINS + 2];
 char *InterruptReturn;
 
-
-
-
-
-
 /********************************************************************************************************************************************
-Miscelaneous commands and functions
+Miscellaneous commands and functions
 ===================================
 
 Each function is responsible for decoding a command
@@ -75,8 +71,6 @@ execute longjmp(mark, 1) if it wants to abort the program.
 
  ********************************************************************************************************************************************/
 
-
-
 // this is invoked as a command (ie, TIMER = 0)
 // search through the line looking for the equals sign and step over it,
 // evaluate the rest of the command and save in the timer
@@ -86,8 +80,6 @@ void cmd_timer(void) {
     if (!*cmdline) error("Invalid syntax");
     mSecTimer = getnumber(++cmdline);
 }
-
-
 
 // this is invoked as a function
 
@@ -130,8 +122,6 @@ void cmd_pause(void) {
     }
 }
 
-
-
 // this is invoked as a command (ie, date$ = "6/7/2010")
 // search through the line looking for the equals sign and step over it,
 // evaluate the rest of the command, split it up and save in the system counters
@@ -165,8 +155,6 @@ void cmd_date(void) {
     }
 }
 
-
-
 // this is invoked as a function
 
 void fun_date(void) {
@@ -180,14 +168,15 @@ void fun_date(void) {
     mT4IntEnable(1); // enable interrupt
     CtoM(sret);
 }
-#ifdef OLIMEX
 
-void fun_dow(void) { // this will last for the life of the command 											// disable the timer interrupt to prevent any conflicts while updating
+#ifdef OLIMEX
+void fun_dow(void) { 
+    // this will last for the life of the command 											
+    // disable the timer interrupt to prevent any conflicts while updating
     ReadRTCC();
     fret = dow;
 }
 #endif
-
 
 
 // this is invoked as a command (ie, time$ = "6:10:45")
@@ -219,7 +208,6 @@ void cmd_time(void) {
         mT4IntEnable(1); // enable interrupt
     }
 }
-
 
 // this is invoked as a function
 
@@ -261,6 +249,7 @@ void cmd_sound(void) {
     if (d == 0 || f == 0) { // see if the user wants to cancel any playing sound
         SoundPlay = 0;
         CloseTimer2();
+        
 #ifdef MAXIMITE
         CloseOC2();
 #endif
@@ -275,14 +264,15 @@ void cmd_sound(void) {
     period = BUSFREQ / f; // convert the frequency into bus cycles
     if (f < 1250) period /= 64; // adjust if we need to scale the timer's clock
 
-    if (SoundPlay && f == sf)
+    if (SoundPlay && f == sf) {
+        
 #ifdef MAXIMITE
         SetDCOC2PWM((period * dcy) / 1000); // if only changing the duty cycle (avoids glitches)
 #endif
 #ifdef OLIMEX
-    SetDCOC1PWM((period * dcy) / 1000); // if only changing the duty cycle (avoids glitches)
+        SetDCOC1PWM((period * dcy) / 1000); // if only changing the duty cycle (avoids glitches)
 #endif
-
+    }
     else {
         // we are starting up or changing the frequency so do the full configuration
         // enable the output compare which is used to generate the duty cycle
@@ -308,10 +298,7 @@ void cmd_ireturn(void) {
     InterruptReturn = NULL;
 }
 
-
-
 // set up the tick interrupt
-
 void cmd_settick(void) {
     int period;
     int dest;
@@ -360,6 +347,10 @@ void cmd_copyright(void) {
     MMPrintString("UBW32 Firmware and MMBasic V" VERSION "\r\n");
     MMPrintString("For updates goto http://geoffg.net/ubw32.html\r\n\n");
 #endif
+#ifdef DUINOMITE
+    MMPrintString("Duinomite Firmware and MMBasic V" VERSION "\r\n");
+    MMPrintString("For updates goto http://olimex.com\r\n\n");
+#endif
 
     MMPrintString("Overall Copyright (c) " YEAR " Geoff Graham.\r\n");
     MMPrintString("I2C, One Wire Support Copyright 2011 Gerard Sexton.\r\n");
@@ -369,14 +360,13 @@ void cmd_copyright(void) {
 
     MMPrintString("Video and keyboard routines from Lucio Di Jasio's\r\n");
     MMPrintString("book \"Programming 32-bit Microcontrollers in C\".\r\n");
-    //	MMPrintString("USB VID and PIDs are sublicensed by Microchip.\r\n\n");
 
     MMPrintString("This is free software and comes with absolutely\r\n");
     MMPrintString("no warranty.  It may be used and copied under the\r\n");
     MMPrintString("terms of the GNU General Public License V3.0.\r\n");
 }
 
-static inline __attribute__((always_inline)) unsigned char SPICalutateBRG(unsigned int pb_clk, unsigned int spi_clk) {
+static inline __attribute__((always_inline)) unsigned char SPICalculateBRG(unsigned int pb_clk, unsigned int spi_clk) {
     unsigned int brg;
 
     brg = pb_clk / (2 * spi_clk);
@@ -414,13 +404,8 @@ void fun_spi(void) {
         out = 0;
 
     if (rx == 9 && tx == 8 && clk == 10) {
-        //        SPISTAT &= 0x7FFF;
-        //        OpenSPI((PRI_PRESCAL_64_1 | SEC_PRESCAL_8_1 | MASTER_ENABLE_ON | SPI_CKE_ON | SPI_SMP_OFF ), SPI_ENABLE);
-        //        SPIBRG = SPICalutateBRG(GetPeripheralClock(), 8000000);
         putcSPI(out);
         in = getcSPI();
-
-        //       SDCardRemoved=true;
     } else {
 
         if (argc >= 9) {
@@ -608,7 +593,7 @@ void cmd_font(void) {
 interrupt check
  ************************************************************************************************/
 
-// check if an interrupt has occured and if so, set the next command to the interrupt routine
+// check if an interrupt has occurred and if so, set the next command to the interrupt routine
 // will return true if interrupt detected or false if not
 
 int check_interrupt(void) {

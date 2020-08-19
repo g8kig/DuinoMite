@@ -67,13 +67,11 @@ void cmd_SDDisable(void);
 
 extern volatile int SleepMMVal;
 
-
-
-int dayofweek(void);
 void StartRTCC(void);
-void WriteRTCC(void);
 void ReadRTCC(void);
 void ReadRTC(void);
+void WriteRTCC(void);
 void PrintDateTime(void);
+
 #endif
 #endif
