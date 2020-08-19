@@ -34,49 +34,49 @@ If not, see <http://www.gnu.org/licenses/>.
 
 // Parameters for VGA video with 31.5KHz horizontal scanning and 60Hz vertical refresh
 // Graphics is 480x432 pixels.  This gives us 80 chars per line and 36 lines per screen
-#define VGA_VRES     432						// Vert graphics resolution (pixels)
-#define VGA_HRES     480						// Horiz graphics resolution (pixels)
-#define VGA_LINE_N   525        						// number of lines in VGA frame
-#define VGA_LINE_T   2540       						// Tpb clock in a line (31.777us)
-#define VGA_VSYNC_N  2          						// V sync lines
-#define VGA_VBLANK_N (VGA_LINE_N - VGA_VRES - VGA_VSYNC_N)       		// Nbr of blank lines
-#define VGA_PREEQ_N   ((VGA_VBLANK_N/2) - 12)         				// Nbr blank lines at the bottom of the screen
-#define VGA_POSTEQ_N  VGA_VBLANK_N - VGA_PREEQ_N 				// Nbr blank lines at the top of the screen
-#define VGA_PIX_T    4          						// Tpb clock per pixel
-#define VGA_HSYNC_T  300        						// Tpb clock width horizontal pulse
-#define VGA_BLANKPAD  5								// number of zero bytes before sending data
+#define VGA_VRES     432                                                        // Vert graphics resolution (pixels)
+#define VGA_HRES     480                                                        // Horiz graphics resolution (pixels)
+#define VGA_LINE_N   525                                                        // number of lines in VGA frame
+#define VGA_LINE_T   2540                                                       // Tpb clock in a line (31.777us)
+#define VGA_VSYNC_N  2                                                          // V sync lines
+#define VGA_VBLANK_N (VGA_LINE_N - VGA_VRES - VGA_VSYNC_N)                      // Nbr of blank lines
+#define VGA_PREEQ_N   ((VGA_VBLANK_N/2) - 12)                                   // Nbr blank lines at the bottom of the screen
+#define VGA_POSTEQ_N  VGA_VBLANK_N - VGA_PREEQ_N                                // Nbr blank lines at the top of the screen
+#define VGA_PIX_T    4                                                          // Tpb clock per pixel
+#define VGA_HSYNC_T  300                                                        // Tpb clock width horizontal pulse
+#define VGA_BLANKPAD  5                                                         // number of zero bytes before sending data
+
 /*
 // Parameters for PAL composite video
 // Graphics is 304x216 pixels.  This gives us 50 chars per line and 18 lines per screen
-#define C_VRES	     216											// Vert graphics resolution (pixels)
-#define C_HRES	     304											// Horiz graphics resolution (pixels)
-#define C_LINE_N     312        									// number of lines in PAL frames
-#define C_LINE_T     5120       									// Tpb clock in a line (64us)
-#define C_VSYNC_N    3          									// V sync lines
-#define C_VBLANK_N   (C_LINE_N - C_VRES - C_VSYNC_N)  				// Nbr of blank lines
-#define C_PREEQ_N    ((C_VBLANK_N/2) - 8)         					// Nbr blank lines at the bottom of the screen
-#define C_POSTEQ_N   (C_VBLANK_N - C_PREEQ_N)  						// Nbr blank lines at the top of the screen
-#define C_PIX_T      11          									// Tpb clock per pixel
-#define C_HSYNC_T    374        									// Tpb clock width horizontal pulse
-#define C_BLANKPAD   8												// number of zero words (4 bytes each) before sending data
- */
+#define C_VRES	     216                                                        // Vert graphics resolution (pixels)
+#define C_HRES	     304                                                        // Horiz graphics resolution (pixels)
+#define C_LINE_N     312                                                        // number of lines in PAL frames
+#define C_LINE_T     5120                                                       // Tpb clock in a line (64us)
+#define C_VSYNC_N    3                                                          // V sync lines
+#define C_VBLANK_N   (C_LINE_N - C_VRES - C_VSYNC_N)                            // Nbr of blank lines
+#define C_PREEQ_N    ((C_VBLANK_N/2) - 8)                                       // Nbr blank lines at the bottom of the screen
+#define C_POSTEQ_N   (C_VBLANK_N - C_PREEQ_N)                                   // Nbr blank lines at the top of the screen
+#define C_PIX_T      11                                                         // Tpb clock per pixel
+#define C_HSYNC_T    374                                                        // Tpb clock width horizontal pulse
+#define C_BLANKPAD   8                                                          // number of zero words (4 bytes each) before sending data
+*/
 
 // Parameters for NTSC composite video
 // Graphics is 304x216 pixels.  This gives us 50 chars per line and 18 lines per screen
 /*
-#define C_VRES	     234 //216							// Vert graphics resolution (pixels)
-#define C_HRES	     480//304							// Horiz graphics resolution (pixels)
-#define C_LINE_N     262 //(525 / 2)        					// number of lines in NTSC frames
-#define C_LINE_T     5080//5084       						// Tpb clock in a line (63.55us)
-#define C_VSYNC_N    3          						// V sync lines
-#define C_VBLANK_N   (C_LINE_N - C_VRES - C_VSYNC_N)  				// Nbr of blank lines
-#define C_PREEQ_N    ((C_VBLANK_N/2) - 8)         				// Nbr blank lines at the bottom of the screen
-#define C_POSTEQ_N   (C_VBLANK_N - C_PREEQ_N)  					// Nbr blank lines at the top of the screen
-#define C_PIX_T      9//11          						// Tpb clock per pixel
-#define C_HSYNC_T    374        						// Tpb clock width horizontal pulse
-#define C_BLANKPAD   4//8							// number of zero words (4 bytes each) before sending data
- */
-
+#define C_VRES	     234 //216                                                  // Vert graphics resolution (pixels)
+#define C_HRES	     480//304                                                   // Horiz graphics resolution (pixels)
+#define C_LINE_N     262 //(525 / 2)                                            // number of lines in NTSC frames
+#define C_LINE_T     5080//5084                                                 // Tpb clock in a line (63.55us)
+#define C_VSYNC_N    3                                                          // V sync lines
+#define C_VBLANK_N   (C_LINE_N - C_VRES - C_VSYNC_N)                            // Nbr of blank lines
+#define C_PREEQ_N    ((C_VBLANK_N/2) - 8)                                       // Nbr blank lines at the bottom of the screen
+#define C_POSTEQ_N   (C_VBLANK_N - C_PREEQ_N)                                   // Nbr blank lines at the top of the screen
+#define C_PIX_T      9//11                                                      // Tpb clock per pixel
+#define C_HSYNC_T    374                                                        // Tpb clock width horizontal pulse
+#define C_BLANKPAD   4//8                                                       // number of zero words (4 bytes each) before sending data
+*/
 
 // states of the vertical sync state machine
 #define SV_PREEQ    0								// generating blank lines before the vert sync
@@ -85,17 +85,17 @@ If not, see <http://www.gnu.org/licenses/>.
 #define SV_LINE     3								// visible lines, send the video data out
 
 // global variables used in other parts of the Maximite
-int VRes, HRes; // Global vert and horiz resolution
+int VRes, HRes; // Global vertical and horizontal resolution
 
-int VA[VBUFSIZE * (HBUFSIZE / 32)] __attribute__((aligned(4))); // image buffer.  it is assumed that the startup code will zero this
+unsigned int VA[VBUFSIZE * (HBUFSIZE / (sizeof(int)*8))] __attribute__((aligned(4)));     // image buffer.  it is assumed that the startup code will zero this
 
 int vga; // true if we are using the VGA video
 
 volatile int VCount; // counter for the number of lines in a frame
 volatile int VState; // the state of the state machine
 
-int VS[4] = {SV_SYNC, SV_POSTEQ, SV_LINE, SV_PREEQ}; // the next state table
-int VC[4]; // the next counter table (initialise in initVideo() below)
+static const int VS[4] = {SV_SYNC, SV_POSTEQ, SV_LINE, SV_PREEQ}; // the next state table
+static int VC[4]; // the next counter table (initialise in initVideo() below)
 
 const int zero[] = {0, 0, 0};
 
@@ -104,43 +104,54 @@ Initialise the video components
  ***************************************************************************************************/
 void initVideo(void) {
     // setup the I/O pins used by the video
+
 #ifdef MAXIMITE
-    CNCONbits.ON = 1; // turn on Change Notification module
-    P_VGA_COMP_PULLUP = P_ON; // turn on the pullup for pin C14 also called CN0
+    CNCONbits.ON = 1;           // turn on Change Notification module
+    P_VGA_COMP_PULLUP = P_ON;   // turn on the pull up for pin C14 also called CN0
 #endif
+    
     TRISBbits.TRISB11 = 1;
-    vga = (P_VGA_COMP == P_VGA_SELECT); // vga will be true if the jumper is NOT there
-    P_VIDEO_TRIS = P_OUTPUT; //P_VIDEO = 1;					// Video output
-    P_HORIZ_TRIS = P_OUTPUT; //P_HORIZ = 1;                                    // Horiz sync output
+    vga = (P_VGA_COMP == P_VGA_SELECT);                                         // VGA will be true if the jumper is NOT there
+    P_VIDEO_TRIS = P_OUTPUT;                                                    // Video output
+    P_HORIZ_TRIS = P_OUTPUT;                                                    // Horiz sync output
     if (vga)
-        P_VERT_TRIS = P_OUTPUT; //P_VERT_SET_HI;				// Vert sync output used by VGA
+        P_VERT_TRIS = P_OUTPUT;                                 				// Vert sync output used by VGA
 
     if (vga) {
         VRes = VGA_VRES;
         HRes = VGA_HRES;
-        VC[0] = VGA_VSYNC_N; // setup the table used to count lines
+        VC[0] = VGA_VSYNC_N;                                                    // setup the table used to count lines
         VC[1] = VGA_POSTEQ_N;
         VC[2] = VGA_VRES;
         VC[3] = VGA_PREEQ_N;
-        // enable the SPI channel which will clock the video data out.  Set master and framing mode.  The last arg sets the speed
-        SpiChnOpen(P_VIDEO_SPI, SPICON_ON | SPICON_MSTEN | SPICON_MODE32 | SPICON_FRMEN | SPICON_FRMSYNC | SPICON_FRMPOL, VGA_PIX_T);
+        
+        // enable the SPI channel which will clock the video data out.  
+        // Set master and framing mode.  
+        // The last arg sets the speed
+        SpiChnOpen(P_VIDEO_SPI, 
+                   SPICON_ON | SPICON_MSTEN | SPICON_MODE32 | SPICON_FRMEN | SPICON_FRMSYNC | SPICON_FRMPOL, 
+                   VGA_PIX_T);
+        
         // enable the output compare which is used to time the width of the horiz sync pulse
 #ifdef MAXIMITE
         OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, VGA_HSYNC_T);
 #endif
-        // SPP +
 #ifdef OLIMEX
 #ifdef	OLIMEX_DUINOMITE_EMEGA	// patch for eMega
+
         OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, VGA_HSYNC_T);
+
 #else	// original by Geoff Graham for DuinoMite-Mega
+
         OpenOC5(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, VGA_HSYNC_T);
+
 #endif
 #else
         OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, VGA_HSYNC_T);
 #endif
-        // SPP -
         // enable timer 3 and set to the horizontal scanning frequency
         OpenTimer3(T3_ON | T3_PS_1_1 | T3_SOURCE_INT, VGA_LINE_T - 1);
+        
     } else { // this is for the composite output and is the same as VGA with timing differences
         VRes = S.C_VRES;
         HRes = S.C_HRES;
@@ -148,22 +159,28 @@ void initVideo(void) {
         VC[1] = S.C_POSTEQ_N;
         VC[2] = S.C_VRES;
         VC[3] = S.C_PREEQ_N;
-        SpiChnOpen(P_VIDEO_SPI, SPICON_ON | SPICON_MSTEN | SPICON_MODE32 | SPICON_FRMEN | SPICON_FRMSYNC | SPICON_FRMPOL, S.C_PIX_T);
+        
+        SpiChnOpen(P_VIDEO_SPI, 
+                   SPICON_ON | SPICON_MSTEN | SPICON_MODE32 | SPICON_FRMEN | SPICON_FRMSYNC | SPICON_FRMPOL, 
+                   S.C_PIX_T);
 #ifdef MAXIMITE
         OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, S.C_HSYNC_T);
 #endif
 #ifdef OLIMEX
 #ifdef	OLIMEX_DUINOMITE_EMEGA	// patch for eMega
+
         OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, S.C_HSYNC_T);
 #else
+
         OpenOC5(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, S.C_HSYNC_T);
+
 #endif
 #endif
         OpenTimer3(T3_ON | T3_PS_1_1 | T3_SOURCE_INT, S.C_LINE_T - 1);
     }
 
-    VState = SV_PREEQ; // initialise the state machine
-    VCount = 1; // set the count so that the first interrupt will increment the state
+    VState = SV_PREEQ;                                                          // initialise the state machine
+    VCount = 1;                                                                 // set the count so that the first interrupt will increment the state
 
     // setup DMA 1 to send data to SPI channel 2
     DmaChnOpen(1, 1, DMA_OPEN_DEFAULT);
@@ -173,21 +190,23 @@ void initVideo(void) {
         DmaChnSetTxfer(1, (void*) VA, (void *) &P_SPI_INPUT, VGA_HRES / 8, 4, 4);
     else {
         DmaChnSetTxfer(1, (void*) zero, (void *) &P_SPI_INPUT, S.C_BLANKPAD, 4, 4);
+        
         // setup DMA 0 to pump the data from the graphics buffer to the SPI peripheral
         DmaChnOpen(0, 0, DMA_OPEN_DEFAULT);
         DmaChnSetEventControl(0, DMA_EV_START_IRQ_EN | DMA_EV_START_IRQ(P_SPI_INTERRUPT));
         DmaChnSetTxfer(0, (void*) VA, (void *) &P_SPI_INPUT, S.C_HRES / 8 + 6, 4, 4);
+        
         // chain DMA 0 so that it will start on completion of the DMA 1 transfer
         DmaChnSetControlFlags(0, DMA_CTL_CHAIN_EN | DMA_CTL_CHAIN_DIR);
     }
 
-    mT3SetIntPriority(7); // set priority level 7 for the timer 3 interrupt to use shadow register set
-    mT3IntEnable(1); // Enable Timer3 Interrupt
+    mT3SetIntPriority(7);                                                       // set priority level 7 for the timer 3 interrupt to use shadow register set
+    mT3IntEnable(1);                                                            // Enable Timer3 Interrupt
 }
 
 /**************************************************************************************************
 Timer 3 interrupt.
-Used to generate the horiz and vert sync pulse under control of the state machine
+Used to generate the horizontal and vertical sync pulse under control of the state machine
  ***************************************************************************************************/
 void __ISR(_TIMER_3_VECTOR, ipl7) T3Interrupt(void) {
     static int *VPtr;
@@ -207,7 +226,7 @@ void __ISR(_TIMER_3_VECTOR, ipl7) T3Interrupt(void) {
             if (!vga) OC5R = S.C_LINE_T - S.C_HSYNC_T; // start the vertical sync pulse for composite
 #endif
 #endif
-            if (vga) P_VERT_SET_LO; // start the vertical sync pulse for vga
+            if (vga) P_VERT_SET_LO; // start the vertical sync pulse for VGA
             break;
 
         case SV_POSTEQ: // 2
@@ -276,9 +295,6 @@ void MMcls(void) {
     MMPosX = MMPosY = MMCharPos = 0;
     memset(VA, 0, VBUFSIZE * (HBUFSIZE / 8));
 }
-
-
-
 
 /**************************************************************************************************
 Draw a line on a the video output

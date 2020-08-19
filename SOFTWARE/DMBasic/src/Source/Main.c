@@ -153,11 +153,10 @@ Declare all functions
 void InitEverything(void);
 int CopyDataToKeystrokeBuffer(int numBytes);
 
-
 /*****************************************************************************************************************************
 Global memory locations
  ******************************************************************************************************************************/
-extern int VA[]; // pointer to the image buffer
+extern unsigned int VA[];                                                       // pointer to the image buffer
 
 volatile char USB_RxBuf[USB_RX_BUFFER_SIZE];
 volatile char USB_TxBuf[2][USB_TX_BUFFER_SIZE];

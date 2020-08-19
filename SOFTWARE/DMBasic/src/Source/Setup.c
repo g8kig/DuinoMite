@@ -136,7 +136,7 @@ void SetupMainMenu(void) {
     MMPrintString(" DuinoMite Setup Menu - "SetupVersion"  "Date);
     MenuPrint(NULL);
     MenuPrint(" Hardware Platform - ");
-    MMPrintString(SS.HardWare == 0 ? "DuinoMite" : "Maximite");
+    MMPrintString(SS.HardWare == 1 ? "DuinoMite" : "Maximite");
     MenuPrint(" V) Video Mode     - ");
     switch (SS.VideoMode) {
         case 0:

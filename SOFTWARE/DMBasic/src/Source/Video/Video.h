@@ -23,11 +23,11 @@ If not, see <http://www.gnu.org/licenses/>.
 extern int VRes, HRes;
 extern int MMPosX, MMPosY;
 extern int MMCharPos;
-extern int ListCnt;						// line count used by the LIST and FILES commands
+extern int ListCnt;                                                             // line count used by the LIST and FILES commands
 extern int ScrollTop ;
 extern int ScrollBottom ;
-extern int VA[];						// video buffer
-extern int vga;							// true if we are using vga
+extern unsigned int VA[];                                                       // video buffer
+extern int vga;                                                                 // true if we are using VGA
 extern int fontWidth, fontHeight, fontScale;
 
 #define NBRFONTS	10
