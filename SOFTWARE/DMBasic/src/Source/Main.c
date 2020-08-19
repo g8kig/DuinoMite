@@ -122,19 +122,11 @@ TIMER NBR    DESCRIPTION                 INTERRUPT
 #include "./USB/Microchip/Include/GenericTypeDefs.h"
 #include "./USB/Microchip/Include/Compiler.h"
 
-
-//extern void USBDeviceTasks(void);
-
-
-
-
 /*****************************************************************************************************************************
 Configuration defines
  ******************************************************************************************************************************/
 #define USB_RX_BUFFER_SIZE	128
 #define USB_TX_BUFFER_SIZE	256
-
-
 
 /*****************************************************************************************************************************
 Other defines
@@ -155,7 +147,6 @@ Other defines
 			"An internal error was trapped (sorry).\r\n"\
 			"Are you using the PEEK or POKE commands?\r\n\n"
 
-
 /*****************************************************************************************************************************
 Declare all functions
  ******************************************************************************************************************************/
@@ -173,6 +164,7 @@ volatile char USB_TxBuf[2][USB_TX_BUFFER_SIZE];
 volatile int USB_NbrCharsInTxBuf;
 volatile int USB_Current_TxBuf;
 volatile BYTE MSDStatus;
+
 int USBOn, VideoOn; // variables controlling the display of the output
 
 volatile unsigned char InpQueue[INP_QUEUE_SIZE]; // INP_QUEUE_SIZE is defined in Maximite.h
@@ -183,8 +175,9 @@ int Autorun;
 
 volatile int MMAbort = false;
 volatile int DisableMMAbort = false;
+
 int FileXfr = false;                            // true if we are transferring a file
-int SupressVideo = false;                        //don't print to video
+int SuppressVideo = false;                        //don't print to video
 
 unsigned int __attribute__((section(".grg"))) _excep_dummy;
 unsigned int __attribute__((section(".grg"))) _excep_code;
@@ -216,7 +209,7 @@ const LUN_FUNCTIONS LUN[MAX_LUN + 1] = {
 const ROM InquiryResponse inq_resp = {
     0x00, // peripheral device is connected, direct access block device
     0x80, // removable
-    0x04, // version = 00=> does not conform to any standard, 4=> SPC-2
+    0x04, // version = 00 => does not conform to any standard, 4=> SPC-2
     0x02, // response is in format specified by SPC-2
     0x20, // n-4 = 36-4=32= 0x20
     0x00, // sccs etc.
@@ -228,6 +221,7 @@ const ROM InquiryResponse inq_resp = {
     {'M', 'a', 's', 's', ' ', 'S', 't', 'o', 'r', 'a', 'g', 'e', ' ', ' ', ' ', ' '},
     {'0', '0', '0', '1'}
 };
+
 /****************************************************************************************************************************
 Main program
  *****************************************************************************************************************************/
@@ -309,24 +303,16 @@ int main(void) {
         HRes = 480;
     }
 
-    if (S.SerialCon == 1) {
-        sprintf(inpbuf, "COM1:%d", S.BaudRate);
+    switch(S.SerialCon) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        sprintf(inpbuf, "COM%d:%d", S.SerialCon, S.BaudRate);
         SerialOpen(inpbuf, 1);
+        break;
     }
-    if (S.SerialCon == 2) {
-        sprintf(inpbuf, "COM2:%d", S.BaudRate);
-        SerialOpen(inpbuf, 1);
-    }
-
-    if (S.SerialCon == 3) {
-        sprintf(inpbuf, "COM3:%d", S.BaudRate);
-        SerialOpen(inpbuf, 1);
-    }
-    if (S.SerialCon == 4) {
-        sprintf(inpbuf, "COM4:%d", S.BaudRate);
-        SerialOpen(inpbuf, 1);
-    }
-
+    
     SoundPlay = 0; // start by not playing a sound
     P_SOUND_TRIS = P_OUTPUT; // set the sound pin as an output
 
@@ -406,13 +392,14 @@ void __ISR(_TIMER_1_VECTOR, ipl4) T1Interrupt(void) {
 
     if (S.UsbEnable == 1) {
 #ifdef  OLIMEX  // edit SPP
-        if (U1OTGSTAT & 8) // is there 2.3V on the USB?    Thanks to Stefan Kouba (Microchip support) for suggestion!
+        if (U1OTGSTAT & 8)                                                      // is there 2.3V on the USB?    
+                                                                                //Thanks to Stefan Kouba (Microchip support) for suggestion!
 #else
         if (U1OTGSTAT & 1) // is there 5V on the USB?
 #endif
         {
-            USBDeviceTasks(); // do any USB work
-            if (USBGetDeviceState() == DETACHED_STATE)                          // 5V on the USB but nothing happening
+            USBDeviceTasks();                                                   // do any USB work
+            if (USBGetDeviceState() == DETACHED_STATE)                          // power on the USB but nothing happening
                 PR1 = 500 * ((BUSFREQ / 8) / 1000000) - 1;                      // probably using USB power only (poll every 500 uSec)
             else if (USBGetDeviceState() != CONFIGURED_STATE)                   // we are enumerating with the host
                 PR1 = 75 * ((BUSFREQ / 8) / 1000000) - 1;                       // maximum speed while we are enumerating (poll every 75 uSec)
@@ -452,46 +439,6 @@ void __ISR(_TIMER_1_VECTOR, ipl4) T1Interrupt(void) {
 
 }
 
-/******************************************************************************************
-BOOL USER_USB_CALLBACK_EVENT_HANDLER
-This function is called from the USB stack to notify a user application that a USB event
-occured.  This callback is in interrupt context when the USB_INTERRUPT option is selected.
-
-Args:  event - the type of event 
- *pdata - pointer to the event data
-       size - size of the event data
-       
-This function was derived from the demo CDC program provided by Microchip
- *******************************************************************************************/
-/*
-BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size) {
-    switch (event) {
-        case EVENT_CONFIGURED:
-            CDCInitEP();
-            break;
-        case EVENT_SET_DESCRIPTOR:
-            break;
-        case EVENT_EP0_REQUEST:
-            USBCheckCDCRequest();
-            break;
-        case EVENT_SOF:
-            break;
-        case EVENT_SUSPEND:
-            break;
-        case EVENT_RESUME:
-            break;
-        case EVENT_BUS_ERROR:
-            break;
-        case EVENT_TRANSFER:
-            Nop();
-            break;
-        default:
-            break;
-    }
-    return TRUE;
-}
- */
-
 // ******************************************************************************************************
 // ************** USB Callback Functions ****************************************************************
 // ******************************************************************************************************
@@ -526,57 +473,8 @@ BOOL USER_USB_CALLBACK_EVENT_HANDLER(USB_EVENT event, void *pdata, WORD size) {
  * Note:            None
  *****************************************************************************/
 void USBCBSuspend(void) {
-    //Example power saving code.  Insert appropriate code here for the desired
-    //application behaviour.  If the microcontroller will be put to sleep, a
-    //process similar to that shown below may be used:
-
-    //ConfigureIOPinsForLowPower();
-    //SaveStateOfAllInterruptEnableBits();
-    //DisableAllInterruptEnableBits();
-    //EnableOnlyTheInterruptsWhichWillBeUsedToWakeTheMicro();	//should enable at least USBActivityIF as a wake source
-    //Sleep();
-    //RestoreStateOfAllPreviouslySavedInterruptEnableBits();	//Preferably, this should be done in the USBCBWakeFromSuspend() function instead.
-    //RestoreIOPinsToNormal();									//Preferably, this should be done in the USBCBWakeFromSuspend() function instead.
-
-    //IMPORTANT NOTE: Do not clear the USBActivityIF (ACTVIF) bit here.  This bit is
-    //cleared inside the usb_device.c file.  Clearing USBActivityIF here will cause
-    //things to not work as intended.
 }
 
-
-/******************************************************************************
- * Function:        void _USB1Interrupt(void)
- *
- * PreCondition:    None
- *
- * Input:           None
- *
- * Output:          None
- *
- * Side Effects:    None
- *
- * Overview:        This function is called when the USB interrupt bit is set
- *					In this example the interrupt is only used when the device
- *					goes to sleep when it receives a USB suspend command
- *
- * Note:            None
- *****************************************************************************/
-#if 0
-
-void __attribute__((interrupt)) _USB1Interrupt(void) {
-#if !defined(self_powered)
-    if (U1OTGIRbits.ACTVIF) {
-        IEC5bits.USB1IE = 0;
-        U1OTGIEbits.ACTVIE = 0;
-        IFS5bits.USB1IF = 0;
-
-        //USBClearInterruptFlag(USBActivityIFReg,USBActivityIFBitNum);
-        USBClearInterruptFlag(USBIdleIFReg, USBIdleIFBitNum);
-        //USBSuspendControl = 0;
-    }
-#endif
-}
-#endif
 
 /******************************************************************************
  * Function:        void USBCBWakeFromSuspend(void)
@@ -962,14 +860,14 @@ Keyboard/USB input functions
  *****************************************************************************************************************************/
 
 int MMInkeyTask(void) {
-    unsigned int c = -1; // default no character
-    if (InpQueueHead != InpQueueTail) { // is there anything in the keyboard queue?
-        c = InpQueue[InpQueueTail]; // if so, get it
-        InpQueueTail = (InpQueueTail + 1) % INP_QUEUE_SIZE; // and remove from the queue
-    } else if (SerialConsole) { // if there is a serial console
-        c = SerialGetchar(SerialConsole); // get the char from the serial port (returns -1 if nothing)
+    unsigned int c = -1;                                                        // default no character
+    if (InpQueueHead != InpQueueTail) {                                         // is there anything in the keyboard queue?
+        c = InpQueue[InpQueueTail];                                             // if so, get it
+        InpQueueTail = (InpQueueTail + 1) % INP_QUEUE_SIZE;                     // and remove from the queue
+    } else if (SerialConsole) {                                                 // if there is a serial console
+        c = SerialGetchar(SerialConsole);                                       // get the char from the serial port (returns -1 if nothing)
     }
-    if (MMAbort) longjmp(mark, 1); // jump back to the input prompt
+    if (MMAbort) longjmp(mark, 1);                                              // jump back to the input prompt
     return c;
 }
 
@@ -1095,10 +993,6 @@ int MMgetchar(void) {
     return c;
 }
 
-
-
-
-
 /****************************************************************************************************************************
 Video/USB output functions
  *****************************************************************************************************************************/
@@ -1106,7 +1000,7 @@ Video/USB output functions
 
 char MMputchar(char c) {
     //    if (!FileXfr && VideoOn) VideoPutc(c); // draw the char on the video screen
-    if (!FileXfr && !SupressVideo) VideoPutc(c); // draw the char on the video screen
+    if (!FileXfr && !SuppressVideo) VideoPutc(c); // draw the char on the video screen
     if (SerialConsole) SerialPutchar(SerialConsole, c); // send it to the serial console if enabled
     if (!(SerialConsole && FileXfr) && USBOn) USBPutchar(c); // send it to the USB
     return c;

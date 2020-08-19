@@ -174,7 +174,7 @@ unsigned char tokenvalue[TOKEN_LOOKUP_SIZE]; // see InitBasic() below
 int LastErrorLine = 0;
 int autoOn, autoNext = 10, autoIncr = 10; // use by the AUTO command
 
-extern int SupressVideo; // dont print to video
+extern int SuppressVideo; // dont print to video
 
 /********************************************************************************************************************************************
  Program mamagement
@@ -311,7 +311,6 @@ void __attribute__((noreturn)) MMBasicStart(void) {
         } else {
             // we got here via a long jump which means an error or CTRL-C
             ContinuePoint = nextstmt; // save where we were in the program incase the user wants to invoke the continue command
-            //while(MMInkey() != -1);						// consume any characters in the input buffer
         }
     }
 }
@@ -332,7 +331,7 @@ void EditInputLine(int line) {
     startline = MMCharPos - 1; // save the current cursor position
     MMPrintString(inpbuf); // display the contents of the input buffer (if any)
     CharIndex = strlen(inpbuf); // get the current cursor position in the line
-    //if(!autoOn) while(CharIndex)  { MMputchar('\b'); CharIndex--; }                   // and go back to the beginning
+
     UpDownIndex = maxchars;
     insert = false;
     Cursor = C_STANDARD;
@@ -768,10 +767,11 @@ void ExecuteProgram(void) {
             CurrentLineNbr = (((pp[1]) << 8) | (pp[2])); // get the line number for error reporting
             if (TraceOn) {
                 sprintf(inpbuf, "[%d]", CurrentLineNbr);
-                if(TraceOn==2)
-                    SupressVideo=true;
-                MMPrintString(inpbuf);
-                    SupressVideo=false;
+                if(TraceOn==2) {
+                    SuppressVideo=true;
+                    MMPrintString(inpbuf);
+                    SuppressVideo=false;
+                }
             }
             pp += 3; // and step over the number
         }

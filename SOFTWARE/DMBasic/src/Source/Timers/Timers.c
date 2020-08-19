@@ -50,12 +50,14 @@ volatile int hour = 0;
 volatile int day = 1;
 volatile int month = 1;
 volatile int year = 2000;
+
 #ifdef OLIMEX
 volatile int dow = 0;
 #endif
+
 volatile int SDActivityLED = 0;
 
-const char DaysInMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+static const char DaysInMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 volatile int SDCardRemoved = true;
 #ifdef OLIMEX
@@ -78,16 +80,17 @@ void initTimers(void) {
     P_SD_LED_SET_LO; // initialise the SD card activity led (maintained by timers.c)
 }
 
-                                                                                                                    /****************************************************************************************************************
+/****************************************************************************************************************
 Timer 4 interrupt processor
 This fires every millisecond and is responsible for tracking the time and the counts of various timing variables
- *****************************************************************************************************************/void __ISR(_TIMER_4_VECTOR, ipl1) T4Interrupt(void) {
+ *****************************************************************************************************************/
 
+void __ISR(_TIMER_4_VECTOR, ipl1) T4Interrupt(void) {
     /////////////////////////// count up timers /////////////////////////////////////
-    //if(ExtCurrentConfig[11] == EXT_PER_IN) INT1Count++;			// if we are measuring period increment the count
     if (ExtCurrentConfig[5] == EXT_PER_IN) INT2Count++;
     if (ExtCurrentConfig[6] == EXT_PER_IN) INT3Count++;
     if (ExtCurrentConfig[7] == EXT_PER_IN) INT4Count++;
+    
     mSecTimer++; // used by the TIMER function
     TickTimer++; // used in the interrupt tick
     PauseTimer++; // used by the PAUSE command
@@ -109,6 +112,7 @@ This fires every millisecond and is responsible for tracking the time and the co
         }
     }
     //	GS I2C End
+
 #ifdef MAXIMITE
     if (SDActivityLED) {
         P_SD_LED_SET_HI;
@@ -117,9 +121,8 @@ This fires every millisecond and is responsible for tracking the time and the co
         P_SD_LED_SET_LO;
 #endif
 
-    if (SD_CD) SDCardRemoved = true;
-
     // check if the sound has expired
+    
     if (SoundPlay > 0) { // if we are still playing the sound
         SoundPlay--;
         if (SoundPlay == 0) {
@@ -133,7 +136,6 @@ This fires every millisecond and is responsible for tracking the time and the co
         }
     }
 
-
     //////////////////////////////// keep track of the date and time ////////////////////////////////
     ////////////////////////////////// this code runs once a second /////////////////////////////////
     if (++SecondsTimer >= 1000) {
@@ -144,7 +146,6 @@ This fires every millisecond and is responsible for tracking the time and the co
             else
                 mT3IntEnable(0); // turn off video int
         }
-        //if(ExtCurrentConfig[11] == EXT_FREQ_IN) { INT1Value = INT1Count; INT1Count = 0; }
         if (ExtCurrentConfig[5] == EXT_FREQ_IN) {
             INT2Value = INT2Count;
             INT2Count = 0;
@@ -179,5 +180,4 @@ This fires every millisecond and is responsible for tracking the time and the co
 
     // Clear the interrupt flag
     mT4ClearIntFlag();
-    //return;
 }

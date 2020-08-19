@@ -31,8 +31,7 @@ If not, see <http://www.gnu.org/licenses/>.
 int MMPosX, MMPosY; // position in pixels
 int MMCharPos; // position in characters
 int ListCnt; // line count used by the LIST and FILES commands
-int ScrollTop = 1;
-int ScrollBottom = 36;
+
 // cursor control variables
 Cursor_e Cursor = C_OFF;
 
@@ -41,21 +40,21 @@ Cursor_e Cursor = C_OFF;
 struct s_font ftbl[10];
 int fontWidth;
 int fontHeight;
-
-// used to save the font drawing commands from having to constantly look up the font table
-char *fontPtr8;
-uint16 *fontPtr16; // pointer to a font using 16 bit words
-unsigned int *fontPtr32; // pointer to a font using 32 bit words
-int fontStart;
-int fontEnd;
 int fontScale;
 int fontReverse;
-int fontBinary;
+
+// used to save the font drawing commands from having to constantly look up the font table
+static char *fontPtr8;
+static uint16 *fontPtr16; // pointer to a font using 16 bit words
+static unsigned int *fontPtr32; // pointer to a font using 32 bit words
+static int fontStart;
+static int fontEnd;
+static int fontBinary;
 
 // Dimensions of this font is 5 bits wide and 10 bits high with one blank
 // line above, below and to the right.  So overall its dimensions are
 // 6 bits wide x 12 bits high.
-const uint16 fontZero[96][6] = {
+static const uint16 fontZero[96][6] = {
     { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000}, // SPACE
     { 0x0000, 0x0000, 0x00BE, 0x0000, 0x0000, 0x0000}, // !
     { 0x0000, 0x0006, 0x0000, 0x0006, 0x0000, 0x0000}, // "
@@ -158,7 +157,7 @@ const uint16 fontZero[96][6] = {
 // Dimensions of this font is 8 bits wide and 16 bits high with two blank
 // lines top, bottom and the left and three blank on the right side.
 // So overall its dimensions are 13 bits wide x 20 bits high.
-const unsigned int fontOne[95][13] = {
+static const unsigned int fontOne[95][13] = {
     { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000}, //
     { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x000001F0, 0x0000CFFC, 0x0000CFFC, 0x000001F0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000}, // !
     { 0x00000000, 0x00000000, 0x00000000, 0x000000F0, 0x000000F0, 0x00000000, 0x00000000, 0x000000F0, 0x000000F0, 0x00000000, 0x00000000, 0x00000000, 0x00000000}, // "
@@ -260,7 +259,7 @@ const unsigned int fontOne[95][13] = {
 // Dimensions of this font is 22 bits wide and 28 bits high with two blank
 // lines top, bottom and one blank on either side side.
 // So overall its dimensions are 24 bits wide x 32 bits high.
-const unsigned int fontTwo[15][24] = {
+static const unsigned int fontTwo[15][24] = {
     { 0x00000000, 0x00018000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x03ffffc0, 0x07ffffe0, 0x07ffffe0, 0x03ffffc0, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x00018000, 0x00000000}, // +
     { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x47800000, 0x67c00000, 0x77c00000, 0x7fc00000, 0x3fc00000, 0x1f800000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000}, // ,
     { 0x00000000, 0x00000000, 0x00018000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x0003c000, 0x00018000, 0x00000000, 0x00000000}, // -

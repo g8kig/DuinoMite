@@ -38,9 +38,8 @@ If not, see <http://www.gnu.org/licenses/>.
 #define PS2STOP     3
 
 // PS2 KBD state machine and buffer
-int PS2State;
-unsigned char KBDBuf;
-int KState, KCount, KParity;
+static int PS2State;
+static int KCount, KParity;
 
 // key codes that must be tracked for up/down state
 #define CTRL  		0x14			// left and right generate the same code
@@ -50,7 +49,7 @@ int KState, KCount, KParity;
 
 
 // this is a map of the keycode characters and the character to be returned for the keycode
-const char keyCodes[128] = {
+static const char keyCodes[128] = {
     0, F9, 0, F5, F3, F1, F2, F12, //00
     0, F10, F8, F6, F4, TAB, '`', 0, //08
     0, ALT, L_SHFT, 0, CTRL, 'q', '1', 0, //10
@@ -70,7 +69,7 @@ const char keyCodes[128] = {
 };
 
 // this map is with the shift key depressed
-const char keySCodes[128] = {
+static const char keyShiftCodes[128] = {
     0, F9, 0, F5, F3, F1, F2, F12, //00
     0, F10, F8, F6, F4, TAB, '~', 0, //08
     0, ALT, L_SHFT, 0, CTRL, 'Q', '!', 0, //10
@@ -90,7 +89,7 @@ const char keySCodes[128] = {
 };
 
 // this map is for when the keycode preceeded by 0xe0
-const char keyE0Codes[7 * 8] = {
+static const char keyExtendedCodes[7 * 8] = {
     0, 0, '/', 0, 0, 0, 0, 0, //48
     0, 0, 0, 0, 0, 0, 0, 0, //50
     0, 0, NUM_ENT, 0, 0, 0, 0, 0, //58
@@ -206,12 +205,12 @@ void __ISR(_CHANGE_NOTICE_VECTOR, ipl3) CNInterrupt(void) {
                             c = F7; // a second special case
                         else if (KeyE0) {
                             if (Code >= 0x48 && Code < 0x80)
-                                c = keyE0Codes[Code - 0x48]; // a keycode preceeded by 0xe0
+                                c = keyExtendedCodes[Code - 0x48]; // a keycode preceeded by 0xe0
                             else
                                 c = 0; // invalid char
                         } else {
                             if (LShift || RShift)
-                                c = keySCodes[Code % 128]; // a keycode preceeded by a shift
+                                c = keyShiftCodes[Code % 128]; // a keycode preceeded by a shift
                             else
                                 c = keyCodes[Code % 128]; // just a keycode
                         }

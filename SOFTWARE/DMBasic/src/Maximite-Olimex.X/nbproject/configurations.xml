@@ -142,7 +142,7 @@
         <targetDevice>PIC32MX795F512L</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool></platformTool>
+        <platformTool>noID</platformTool>
         <languageToolchain>C32</languageToolchain>
         <languageToolchainVersion>1.11</languageToolchainVersion>
         <platform>3</platform>
@@ -188,7 +188,7 @@
         <property key="generate-16-bit-code" value="true"/>
         <property key="isolate-each-function" value="true"/>
         <property key="make-warnings-into-errors" value="false"/>
-        <property key="optimization-level" value="-O3"/>
+        <property key="optimization-level" value="-Os"/>
         <property key="place-data-into-section" value="true"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
@@ -231,10 +231,10 @@
         <property key="map-file"
                   value="&quot;${DISTDIR}/Maximite-Olimex.X.${IMAGE_TYPE}.map&quot;"/>
         <property key="no-startup-files" value="false"/>
-        <property key="optimization-level" value="-O3"/>
+        <property key="optimization-level" value="-Os"/>
         <property key="preprocessor-macros" value=""/>
         <property key="remove-unused-sections" value="true"/>
-        <property key="report-memory-usage" value="false"/>
+        <property key="report-memory-usage" value="true"/>
         <property key="stack-size" value="6144"/>
         <property key="symbol-stripping" value=""/>
         <property key="trace-symbols" value=""/>

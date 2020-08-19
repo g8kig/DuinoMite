@@ -31,76 +31,61 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "Setup.h"
 #endif
 
-
 // variables for com1
-int com1 = 0; // true if COM1 is enabled
 int com1_buf_size; // size of the buffer used to receive chars
-int com1_div; // determines the baud rate
-int com1_fc; // true if com1 is using flow control
 char *com1_interrupt; // pointer to the interrupt routine
 int com1_ilevel; // number nbr of chars in the buffer for an interrupt
 
-int com1Rx_cnt; // used to count the timer ticks
-int com1Rx_start_cnt; // the starting count for com1Rx_cnt
-unsigned char *com1Rx_buf; // pointer to the buffer for received characters
-volatile int com1Rx_head, com1Rx_tail; // head and tail of the ring buffer for com1
-
-int com1Tx_cnt; // used to count the timer ticks
-int com1Tx_start_cnt; // the starting count for com1Tx_cnt
-unsigned char *com1Tx_buf; // pointer to the buffer for received characters
-volatile int com1Tx_head, com1Tx_tail; // head and tail of the ring buffer for com1
+static int com1 = 0; // true if COM1 is enabled
+static int com1_div; // determines the baud rate
+static int com1_fc; // true if com1 is using flow control
+static int com1Rx_cnt; // used to count the timer ticks
+static int com1Rx_start_cnt; // the starting count for com1Rx_cnt
+static unsigned char *com1Rx_buf; // pointer to the buffer for received characters
+static volatile int com1Rx_head, com1Rx_tail; // head and tail of the ring buffer for com1
+static int com1Tx_cnt; // used to count the timer ticks
+static int com1Tx_start_cnt; // the starting count for com1Tx_cnt
+static unsigned char *com1Tx_buf; // pointer to the buffer for received characters
+static volatile int com1Tx_head, com1Tx_tail; // head and tail of the ring buffer for com1
 
 // variables for com2
-int com2 = 0; // true if COM2 is enabled
 int com2_buf_size; // size of the buffer used to receive chars
-int com2_div; // determines the baud rate
 char *com2_interrupt; // pointer to the interrupt routine
 int com2_ilevel; // number nbr of chars in the buffer for an interrupt
 
-int com2Rx_cnt; // used to count the timer ticks
-int com2Rx_start_cnt; // the starting count for com2Rx_cnt
-unsigned char *com2Rx_buf; // pointer to the buffer for received characters
-volatile int com2Rx_head, com2Rx_tail; // head and tail of the ring buffer for com2Rx
-
-int com2Tx_cnt; // used to count the timer ticks
-int com2Tx_start_cnt; // the starting count for com2Tx_cnt
-unsigned char *com2Tx_buf; // pointer to the buffer for received characters
-volatile int com2Tx_head, com2Tx_tail; // head and tail of the ring buffer for com2Tx
+static int com2 = 0; // true if COM2 is enabled
+static int com2_div; // determines the baud rate
+static int com2Rx_cnt; // used to count the timer ticks
+static int com2Rx_start_cnt; // the starting count for com2Rx_cnt
+static unsigned char *com2Rx_buf; // pointer to the buffer for received characters
+static volatile int com2Rx_head, com2Rx_tail; // head and tail of the ring buffer for com2Rx
+static int com2Tx_cnt; // used to count the timer ticks
+static int com2Tx_start_cnt; // the starting count for com2Tx_cnt
+static unsigned char *com2Tx_buf; // pointer to the buffer for received characters
+static volatile int com2Tx_head, com2Tx_tail; // head and tail of the ring buffer for com2Tx
 
 #ifdef OLIMEX
 // variables for com3  this maps to com3 UART2 on UEXT
-int com3 = 0; // true if COM3 is enabled
 int com3_buf_size; // size of the buffer used to receive chars
-int com3_div; // determines the baud rate
 char *com3_interrupt; // pointer to the interrupt routine
 int com3_ilevel; // number nbr of chars in the buffer for an interrupt
 
-int com3Rx_cnt; // used to count the timer ticks
-int com3Rx_start_cnt; // the starting count for com3Rx_cnt
-unsigned char *com3Rx_buf; // pointer to the buffer for received characters
-volatile int com3Rx_head, com3Rx_tail; // head and tail of the ring buffer for com3Rx
-
-int com3Tx_cnt; // used to count the timer ticks
-int com3Tx_start_cnt; // the starting count for com3Tx_cnt
-unsigned char *com3Tx_buf; // pointer to the buffer for received characters
-volatile int com3Tx_head, com3Tx_tail; // head and tail of the ring buffer for com3Tx
+static int com3 = 0; // true if COM3 is enabled
+static unsigned char *com3Rx_buf; // pointer to the buffer for received characters
+static volatile int com3Rx_head, com3Rx_tail; // head and tail of the ring buffer for com3Rx
+static unsigned char *com3Tx_buf; // pointer to the buffer for received characters
+static volatile int com3Tx_head, com3Tx_tail; // head and tail of the ring buffer for com3Tx
 
 // variables for com4 this maps to UART5 on back of big board
-int com4 = 0; // true if COM4 is enabled
 int com4_buf_size; // size of the buffer used to receive chars
-int com4_div; // determines the baud rate
 char *com4_interrupt; // pointer to the interrupt routine
 int com4_ilevel; // number nbr of chars in the buffer for an interrupt
 
-int com4Rx_cnt; // used to count the timer ticks
-int com4Rx_start_cnt; // the starting count for com4Rx_cnt
-unsigned char *com4Rx_buf; // pointer to the buffer for received characters
-volatile int com4Rx_head, com4Rx_tail; // head and tail of the ring buffer for com4Rx
-
-int com4Tx_cnt; // used to count the timer ticks
-int com4Tx_start_cnt; // the starting count for com4Tx_cnt
-unsigned char *com4Tx_buf; // pointer to the buffer for received characters
-volatile int com4Tx_head, com4Tx_tail; // head and tail of the ring buffer for com4Tx
+static int com4 = 0; // true if COM4 is enabled
+static unsigned char *com4Rx_buf; // pointer to the buffer for received characters
+static volatile int com4Rx_head, com4Rx_tail; // head and tail of the ring buffer for com4Rx
+static unsigned char *com4Tx_buf; // pointer to the buffer for received characters
+static volatile int com4Tx_head, com4Tx_tail; // head and tail of the ring buffer for com4Tx
 #endif
 
 int SerialConsole = 0; // holds the serial port number if the console function is enabled
@@ -399,15 +384,6 @@ unsigned char SerialPutchar(int comnbr, unsigned char c) {
         while (!U5STAbits.TRMT);
         U5TXREG = c;
     }
-    /*
-                while (com4Tx_tail == ((com4Tx_head + 1) % com4_buf_size)) // wait if the buffer is full
-                if (MMAbort) { // allow the user to abort a hung serial port
-                    com4Tx_tail = com4Tx_head = 0; // clear the buffer
-                    longjmp(mark, 1); // and abort
-                }
-            com4Tx_buf[com4Tx_head] = c; // add the char
-            com4Tx_head = (com4Tx_head + 1) % com4_buf_size; // advance the head of the queue
-     */
     return c;
 }
 
@@ -594,7 +570,6 @@ void __ISR(_TIMER_5_VECTOR, ipl6) T5Interrupt(void) {
         }
     }
 
-
     if (com2) {
         ///////////////////////////////// this is COM2 ////////////////////////////////////
         // this is the receive character routine
@@ -662,16 +637,6 @@ void __ISR(_TIMER_5_VECTOR, ipl6) T5Interrupt(void) {
                 com3Rx_tail = (com3Rx_tail + 1) % com3_buf_size;
             IFS1bits.U2RXIF = 0;
         }
-        /*
-               if( com3Tx_head!=com3Tx_tail)
-               {
-               if(U2STAbits.TRMT)
-               {
-               U2TXREG=com3Tx_buf[com3Tx_head];
-               com3Tx_tail = (com3Tx_tail + 1) % com3_buf_size; // advance the tail of the queue
-              }
-              }
-         */
     }
     ///////////////////////////////// this is COM4 ////////////////////////////////////
     if (com4) {
@@ -685,17 +650,7 @@ void __ISR(_TIMER_5_VECTOR, ipl6) T5Interrupt(void) {
                 com4Rx_tail = (com4Rx_tail + 1) % com4_buf_size;
             IFS2bits.U5RXIF = 0;
         }
-        /*
-                if( com4Tx_head!=com4Tx_tail)
-                {
-                if(U5STAbits.TRMT)
-                {
-                U5TXREG=com4Tx_buf[com4Tx_head];
-                com4Tx_tail = (com4Tx_tail + 1) % com4_buf_size; // advance the tail of the queue
-               while(U5STAbits.TRMT == 0);
-               }
-               }
-         */    }
+   }
 #endif
     // Clear the interrupt flag
     mT5ClearIntFlag();

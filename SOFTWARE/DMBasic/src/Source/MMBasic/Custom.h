@@ -97,48 +97,6 @@ void fun_mmOW(void);
 #ifndef CUSTOM_HEADER
 #define CUSTOM_HEADER
 
-// Functions provided by Custom.c
-
-//	GS OW Start
-void ow_pinChk(int pin);
-int __attribute__ ((nomips16)) ow_reset(int pin);
-void ow_writeByte(int pin, int data);
-int ow_readByte(int pin);
-int ow_verifyByte(int pin, int data);
-int ow_touchByte(int pin, int data);
-int ow_touchBit(int pin, int bit);
-void __attribute__ ((nomips16)) ow_writeBit(int pin, int bit);
-int __attribute__ ((nomips16)) ow_readBit(int pin);
-
-void setcrc16(unsigned short reset);
-unsigned short docrc16(unsigned short cdata);
-void setcrc8(unsigned char reset);
-unsigned char docrc8(unsigned char cdata);
-
-int ow_first(int pin, int do_reset, int alarm_only);
-int ow_next(int pin, int do_reset, int alarm_only);
-int ow_verify(int pin, int alarm_only);
-void ow_serialNum(unsigned char *serialnum_buf, int do_read);
-void ow_familySearchSetup(int search_family);
-void ow_skipFamily(void);
-
-void ow_onOCPin(int pin);
-void ow_offOCPin(int pin);
-void ow_setPin(int pin);
-void ow_clrPin(int pin);
-void ow_inputPin(int pin);
-void ow_outputPin(int pin);
-int ow_readPin(int pin);
-
-// SPP +
-#if defined OLIMEX_DUINOMITE_EMEGA
-//int ow_isAnalogPin(int pin);
-void ow_PinFunction(int pin, int function);
-#endif
-// SPP -
-
-//	GS OW End
-
 // Ingmar's additions start
 void cmd_loadbmp(void);
 void fun_vmem(void);

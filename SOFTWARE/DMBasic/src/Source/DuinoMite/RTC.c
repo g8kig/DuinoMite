@@ -30,17 +30,18 @@
 #include "../IOPorts.h"
 
 void WriteRTC(void);
-const char *DayOfWeek[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-const char *Months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-rtccTime tm, tm1; // time structure
-rtccDate dt, dt1; // date structure
+
+static const char *DayOfWeek[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+static const char *Months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+static rtccTime tm, tm1; // time structure
+static rtccDate dt, dt1; // date structure
 
 volatile int SleepMMVal;
 
-char temp[32];
-char I2CAdd;
-char StartAdd = 0;
-char StartDow = 0;
+static char temp[32];
+static char I2CAdd;
+static char StartAdd = 0;
+static char StartDow = 0;
 
 #define waiti2cIdle() while( (I2C1CON & 0x0000001F) || (I2C1STAT & 0x00004000) );
 

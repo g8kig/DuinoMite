@@ -12,7 +12,9 @@
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <asminc-extensions/>
             <make-dep-projects/>
-            <sourceRootList/>
+            <sourceRootList>
+                <sourceRootElem>../Source/MMBasic</sourceRootElem>
+            </sourceRootList>
             <confList>
                 <confElem>
                     <name>OLIMEX</name>

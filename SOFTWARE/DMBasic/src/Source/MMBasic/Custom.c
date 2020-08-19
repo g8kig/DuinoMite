@@ -36,6 +36,33 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "Files.h"
 #include "Custom.h"
 
+static int  ow_reset(int pin);
+static void ow_writeBit(int pin, int bit);
+static int  ow_readBit(int pin);
+static void ow_pinChk(int pin);
+static void ow_writeByte(int pin, int data);
+static int ow_readByte(int pin);
+static int ow_touchBit(int pin, int bit);
+static void setcrc16(unsigned short reset);
+static unsigned short docrc16(unsigned short cdata);
+static void setcrc8(unsigned char reset);
+static unsigned char docrc8(unsigned char cdata);
+static int ow_first(int pin, int do_reset, int alarm_only);
+static int ow_next(int pin, int do_reset, int alarm_only);
+static int ow_verify(int pin, int alarm_only);
+static void ow_serialNum(unsigned char *serialnum_buf, int do_read);
+static void ow_familySearchSetup(int search_family);
+static void ow_skipFamily(void);
+static void ow_onOCPin(int pin);
+static void ow_offOCPin(int pin);
+static void ow_setPin(int pin);
+static void ow_clrPin(int pin);
+static void ow_inputPin(int pin);
+static void ow_outputPin(int pin);
+static int ow_readPin(int pin);
+
+//	GS OW End
+
 static int LastDiscrepancy;
 static int LastFamilyDiscrepancy;
 static int LastDeviceFlag;
@@ -61,7 +88,6 @@ static const unsigned char dscrc_table[] = {
       116, 42,200,150, 21, 75,169,247,182,232, 10, 84,215,137,107, 53};
 static unsigned short utilcrc16;
 static unsigned char utilcrc8;
-
 
 /*************************************************************************************************************************
 **************************************************************************************************************************
@@ -518,20 +544,14 @@ void ow_pinChk(int pin) {
 
 
 // send one wire reset and detect presence response - returns 1 if found else 0
-int __attribute__ ((nomips16)) ow_reset(int pin) {
-	asm("di");
+int ow_reset(int pin) {
 	ow_clrPin(pin);																	// drive pin low
-	asm("ei");
 	uSec(481);																			// wait 481uSec
-	asm("di");
 	ow_setPin(pin);																	// release the bus
 	ow_inputPin(pin);																// set as input
-	asm("ei");
 	uSec(70);																				// wait 70uSec
-	asm("di");
 	mmOWvalue = ow_readPin(pin) ^ 0x01;							// read pin and invert response
 	ow_outputPin(pin);															// set as output
-	asm("ei");
 	uSec(411);																			// wait 411uSec
 	return mmOWvalue;
 }
@@ -557,12 +577,6 @@ int ow_readByte(int pin) {
 	}
 	return result;
 }
-
-
-int ow_verifyByte(int pin, int data) {
-	return (ow_touchByte(pin, data) == data) ? 1 : 0;
-}
-
 
 int ow_touchByte(int pin, int data) {
 	int loop, result = 0;
@@ -592,57 +606,42 @@ int ow_touchBit(int pin, int owbit) {
 }
 
 
-void __attribute__ ((nomips16)) ow_writeBit(int pin, int owbit) {
+void ow_writeBit(int pin, int owbit) {
 	int status_save;
 
 	if (owbit) {
 		// Write '1' bit
-		asm("di");
 		status_save = _CP0_GET_STATUS();
 		_CP0_SET_STATUS(status_save | 0x1000);				// allow interrupts if priority greater than 4
 		ow_clrPin(pin);																// drive pin low
-		asm("ei");
 		uSec(6);																			// wait 6uSec
-		asm("di");
 		ow_setPin(pin);																// release the bus
 		_CP0_SET_STATUS(status_save);									// allow all interrupts
-		asm("ei");
 		uSec(64);																			// wait 64Sec
 	} else {
 		// Write '0' bit
-		asm("di");
 		ow_clrPin(pin);																// drive pin low
-		asm("ei");
 		uSec(60);																			// wait 60uSec
-		asm("di");
 		ow_setPin(pin);																// release the bus
-		asm("ei");
 		uSec(10);																			// wait 10Sec
 	}
 	return;
 }
 
-
-int __attribute__ ((nomips16)) ow_readBit(int pin) {
+int ow_readBit(int pin) {
 	int status_save, result;
 
-	asm("di");
 	status_save = _CP0_GET_STATUS();
-	_CP0_SET_STATUS(status_save | 0x1000);					// allow interrupts if priority greater than 4
-	ow_clrPin(pin);																	// drive pin low
-	asm("ei");
-	uSec(6);																				// wait 6uSec
-	asm("di");
-	ow_setPin(pin);																	// release the bus
-	ow_inputPin(pin);																// set as input
-	asm("ei");
-	uSec(8);																				// wait 8uSec
-	asm("di");
-	result = ow_readPin(pin);												// read pin
+	_CP0_SET_STATUS(status_save | 0x1000);                                      // allow interrupts if priority greater than 4
+	ow_clrPin(pin);																// drive pin low
+	uSec(6);																	// wait 6uSec
+	ow_setPin(pin);																// release the bus
+	ow_inputPin(pin);															// set as input
+	uSec(8);																	// wait 8uSec
+	result = ow_readPin(pin);                                                   // read pin
 	ow_outputPin(pin);															// set as output
-	_CP0_SET_STATUS(status_save);										// allow all interrupts
-	asm("ei");
-	uSec(56);																				// wait 56uSec
+	_CP0_SET_STATUS(status_save);                                               // allow all interrupts
+	uSec(56);																	// wait 56uSec
 	return result;
 }
 
@@ -1435,139 +1434,7 @@ int ow_isAnalogPin(int pin)
 	}
 	return 0;
 }
-
-
-void ow_PinFunction(int pin, int function)
-{
-	int Mask;
-	switch(pin)
-	{
-		#if P_E1_AN_FUN
-		case 1: Mask = 1<<P_E1_ACHAN; break;
-		#endif
-		#if P_E2_AN_FUN
-		case 2: Mask = 1<<P_E2_ACHAN; break;
-		#endif
-		#if P_E3_AN_FUN
-		case 3: Mask = 1<<P_E3_ACHAN; break;
-		#endif
-		#if P_E4_AN_FUN
-		case 4: Mask = 1<<P_E4_ACHAN; break;
-		#endif
-		#if P_E5_AN_FUN
-		case 5: Mask = 1<<P_E5_ACHAN; break;
-		#endif
-		#if P_E6_AN_FUN
-		case 6: Mask = 1<<P_E6_ACHAN; break;
-		#endif
-		#if P_E7_AN_FUN
-		case 7: Mask = 1<<P_E7_ACHAN; break;
-		#endif
-		#if P_E8_AN_FUN
-		case 8: Mask = 1<<P_E8_ACHAN; break;
-		#endif
-		#if P_E9_AN_FUN
-		case 9: Mask = 1<<P_E9_ACHAN; break;
-		#endif
-		#if P_E10_AN_FUN
-		case 10: Mask = 1<<P_E10_ACHAN; break;
-		#endif
-		#if P_E11_AN_FUN
-		case 11: Mask = 1<<P_E11_ACHAN; break;
-		#endif
-		#if P_E21_AN_FUN
-		case 12: Mask = 1<<P_E12_ACHAN; break;
-		#endif
-		#if P_E13_AN_FUN
-		case 13: Mask = 1<<P_E13_ACHAN; break;
-		#endif
-		#if P_E14_AN_FUN
-		case 14: Mask = 1<<P_E14_ACHAN; break;
-		#endif
-		#if P_E15_AN_FUN
-		case 15: Mask = 1<<P_E15_ACHAN; break;
-		#endif
-		#if P_E16_AN_FUN
-		case 16: Mask = 1<<P_E16_ACHAN; break;
-		#endif
-		#if P_E17_AN_FUN
-		case 17: Mask = 1<<P_E17_ACHAN; break;
-		#endif
-		#if P_E18_AN_FUN
-		case 18: Mask = 1<<P_E18_ACHAN; break;
-		#endif
-		#if P_E19_AN_FUN
-		case 19: Mask = 1<<P_E19_ACHAN; break;
-		#endif
-		#if P_E20_AN_FUN
-		case 20: Mask = 1<<P_E20_ACHAN; break;
-		#endif
-		#if P_E21_AN_FUN
-		case 21: Mask = 1<<P_E21_ACHAN; break;
-		#endif
-		#if P_E22_AN_FUN
-		case 22: Mask = 1<<P_E22_ACHAN; break;
-		#endif
-		#if P_E23_AN_FUN
-		case 23: Mask = 1<<P_E23_ACHAN; break;
-		#endif
-		#if P_E24_AN_FUN
-		case 24: Mask = 1<<P_E24_ACHAN; break;
-		#endif
-		#if P_E25_AN_FUN
-		case 25: Mask = 1<<P_E25_ACHAN; break;
-		#endif
-		#if P_E26_AN_FUN
-		case 26: Mask = 1<<P_E26_ACHAN; break;
-		#endif
-		#if P_E27_AN_FUN
-		case 27: Mask = 1<<P_E27_ACHAN; break;
-		#endif
-		#if P_E28_AN_FUN
-		case 28: Mask = 1<<P_E28_ACHAN; break;
-		#endif
-		#if P_E29_AN_FUN
-		case 29: Mask = 1<<P_E29_ACHAN; break;
-		#endif
-		#if P_E30_AN_FUN
-		case 30: Mask = 1<<P_E30_ACHAN; break;
-		#endif
-		#if P_E31_AN_FUN
-		case 31: Mask = 1<<P_E31_ACHAN; break;
-		#endif
-		#if P_E32_AN_FUN
-		case 32: Mask = 1<<P_E32_ACHAN; break;
-		#endif
-		#if P_E33_AN_FUN
-		case 33: Mask = 1<<P_E33_ACHAN; break;
-		#endif
-		#if P_E34_AN_FUN
-		case 34: Mask = 1<<P_E34_ACHAN; break;
-		#endif
-		#if P_E35_AN_FUN
-		case 35: Mask = 1<<P_E35_ACHAN; break;
-		#endif
-		#if P_E36_AN_FUN
-		case 36: Mask = 1<<P_E36_ACHAN; break;
-		#endif
-		#if P_E37_AN_FUN
-		case 37: Mask = 1<<P_E37_ACHAN; break;
-		#endif
-		#if P_E38_AN_FUN
-		case 38: Mask = 1<<P_E38_ACHAN; break;
-		#endif
-		#if P_E39_AN_FUN
-		case 39: Mask = 1<<P_E39_ACHAN; break;
-		#endif
-		default: Mask = 0;	break;
-	}
-	if (function)
-		AD1PCFGSET = Mask;
-	else
-		AD1PCFGCLR = Mask;
-}
 #endif
-// SPP -
 
 //	GS OW End
 
