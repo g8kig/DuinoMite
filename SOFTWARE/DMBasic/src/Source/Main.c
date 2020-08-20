@@ -29,7 +29,6 @@ If you are not using the MPLAB project file distributed with this source you mus
               you have selected the correct processor type
     In Project -> Build Options... -> Project -> MPLAB PIC32 C Compiler
           you have defined the following symbol  PIC32MX795F512L_PIM
-          you have defined either MAXIMITE or UBW32 to define the target platform
           and you have inserted -funsigned-char in the C compiler's command line (this will cause all chars to be unsigned)
     In Project -> Build Options... -> Project -> MPLAB PIC32 Linker
           you must set the Heap Size to 42000
@@ -40,7 +39,7 @@ If you are not using the MPLAB project file distributed with this source you mus
                .\Source\SDCard\Microchip\Include
                .\Source\USB
                .\Source\USB\Microchip\Include
-    Finally, you must use the correct linker script to suit the target platform (Maximite or UBW32)
+    Finally, you must use the correct linker script to suit the target platform
 
 See the README.TXT for more information.
 
@@ -71,13 +70,6 @@ TIMER NBR    DESCRIPTION                 INTERRUPT
     
  ********************************************************************************************************************************/
 
-#if !defined(MAXIMITE) && !defined(UBW32) && !defined(OLIMEX)
-#error Must define either MAXIMITE or UBW32 in the project file
-#endif
-#if defined(MAXIMITE) && defined(UBW32)
-#error Cannot define both MAXIMITE and UBW32 simultaneously
-#endif
-
 #include <p32xxxx.h>							// device specific defines
 #include <plib.h>								// peripheral libraries
 #include <stdlib.h>								// standard library functions
@@ -86,13 +78,8 @@ TIMER NBR    DESCRIPTION                 INTERRUPT
 #define INCLUDE_FUNCTION_DEFINES
 
 #include "Maximite.h"							// helpful defines
-#ifdef MAXIMITE
-#include "Configuration Bits.h"                 // config pragmas
-#endif
 
-#ifdef OLIMEX
 #include "Configuration Bits.h"					// config pragmas
-#endif
 
 #include "IOPorts.h"							// helpful defines
 #include "MMBasic/MMBasic.h"
@@ -103,13 +90,9 @@ TIMER NBR    DESCRIPTION                 INTERRUPT
 #include "Serial/serial.h"
 #include "Setup.h"
 
-#ifdef OLIMEX
-//#include "DuinoMite/Power.h"
 #include "DuinoMite/RTC.h"
 #include "DuinoMite/GameDuino.h"
 #include "DuinoMite/CAN.h"
-#endif
-
 
 /** USB INCLUDES *******************************************************/
 #include "./USB/Microchip/Include/USB/usb.h"
@@ -131,27 +114,11 @@ Configuration defines
 /*****************************************************************************************************************************
 Other defines
  ******************************************************************************************************************************/
-#ifdef MAXIMITE
-#define MES_SIGNON  "\rMaximite BASIC Version " VERSION "\r\n"\
-						"Copyright " YEAR " Geoff Graham\r\n" 
-#endif
-#ifdef UBW32
-#define MES_SIGNON  "\rUBW32 MMBasic Version " VERSION "\r\n"\
-						"Copyright " YEAR " Geoff Graham\r\n" 
-#endif
-#ifdef OLIMEX
 #define MES_SIGNON  "\rDMBasic Build Date: " __DATE__ " Time:" __TIME__ "\r\n"\
 		    "www.olimex.com, Based On MMBasic By Geoff Graham\r\n"
-#endif
 #define MES_EXCEPTION   "\rException code %d at 0x%X\r\n"\
 			"An internal error was trapped (sorry).\r\n"\
 			"Are you using the PEEK or POKE commands?\r\n\n"
-
-/*****************************************************************************************************************************
-Declare all functions
- ******************************************************************************************************************************/
-void InitEverything(void);
-int CopyDataToKeystrokeBuffer(int numBytes);
 
 /*****************************************************************************************************************************
 Global memory locations
@@ -233,18 +200,12 @@ int main(void) {
 
     // setup the CPU
     SYSTEMConfigPerformance(CLOCKFREQ); // System config performance
-#ifdef MAXIMITE
-    mOSCSetPBDIV(OSC_PB_DIV_1); // fix the peripheral bus to the main clock speed
-#endif
-#ifdef OLIMEX
     mOSCSetPBDIV(OSC_PB_DIV_1); // fix the peripheral bus to the main clock speed
     mOSCEnableSOSC();
 
     RtccInit(); // init the RTCC
     while (RtccGetClkStat() != RTCC_CLK_ON); // wait for the SOSC to be actually running and RTCC to have its clock source
-#endif
     INTEnableSystemMultiVectoredInt(); // allow vectored interrupts
-#ifdef OLIMEX
 #ifdef	OLIMEX_DUINOMITE_EMEGA       // patch for eMega
     TRISGbits.TRISG13 = 0;
     ODCGbits.ODCG13 = 1;
@@ -257,10 +218,7 @@ int main(void) {
     TRISBbits.TRISB11 = 1;           // make sure VGA/composite select is input
 #endif
     for (i = 100000; i; i--); // some delay
-#endif
-#ifdef OLIMEX
     CanInit(); // initialise the CAN driver
-#endif
     LoadSetup(); //load setup from flash
     
     // init global variables
@@ -390,12 +348,8 @@ void __ISR(_TIMER_1_VECTOR, ipl4) T1Interrupt(void) {
     int i, numBytesRead;
 
     if (S.UsbEnable == 1) {
-#ifdef  OLIMEX  // edit SPP
         if (U1OTGSTAT & 8)                                                      // is there 2.3V on the USB?    
                                                                                 //Thanks to Stefan Kouba (Microchip support) for suggestion!
-#else
-        if (U1OTGSTAT & 1) // is there 5V on the USB?
-#endif
         {
             USBDeviceTasks();                                                   // do any USB work
             if (USBGetDeviceState() == DETACHED_STATE)                          // power on the USB but nothing happening
@@ -1087,15 +1041,8 @@ Utility functions
  */
 
 void __attribute__ ((nomips16)) _general_exception_handler(void) {
-#ifdef MAXIMITE
     P_LED_OUT = 0; // this is the LED
-#endif
-#ifdef UBW32
-    P_LED_OUT = 1; // this is the LED - the UBW32 wired them upside down !!
-#endif
-#ifdef OLIMEX
-    P_LED_OUT = 0; // this is the LED
-#endif
+
     asm volatile("mfc0 %0,$13" : "=r" (_excep_code));
     asm volatile("mfc0 %0,$14" : "=r" (_excep_addr));
 

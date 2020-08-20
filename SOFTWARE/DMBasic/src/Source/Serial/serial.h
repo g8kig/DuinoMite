@@ -27,22 +27,16 @@ extern char *com1_interrupt;										// pointer to the interrupt routine
 extern int com1_ilevel;												// number nbr of chars in the buffer for an interrupt
 extern char *com2_interrupt;										// pointer to the interrupt routine
 extern int com2_ilevel;												// number nbr of chars in the buffer for an interrupt
-
-#ifdef OLIMEX
 extern char *com3_interrupt; // pointer to the interrupt routine
 extern int com3_ilevel; // number nbr of chars in the buffer for an interrupt
 extern char *com4_interrupt; // pointer to the interrupt routine
 extern int com4_ilevel; // number nbr of chars in the buffer for an interrupt
-#endif
 
 
 extern int com1_buf_size;											// buffer size
 extern int com2_buf_size;
-
-#ifdef OLIMEX
 extern int com3_buf_size; // buffer size
 extern int com4_buf_size;
-#endif
 
 // global functions
 void SerialOpen(char *spec, int as_console);

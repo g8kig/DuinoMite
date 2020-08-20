@@ -24,39 +24,30 @@
 ***********************************************************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
 // format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
 void cmd_canOpen(void);
 void cmd_canClose(void);
 void cmd_canTransmit(void);
 void cmd_canReceive(void);
 #endif
 
-
 /***********************************************************************************************************************
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 ***********************************************************************************************************************/
 #ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
     { "CANOPEN",    T_CMD,  0,  cmd_canOpen     },
     { "CANCLOSE",   T_CMD,  0,  cmd_canClose    },
     { "CANSEND",    T_CMD,  0,  cmd_canTransmit },
     { "CANRCV",     T_CMD,  0,  cmd_canReceive  },
 #endif
 
-
 #ifdef INCLUDE_FUNCTION_DEFINES
+
 #ifndef CAN_H
 #define CAN_H
 /***********************************************************************************************************************
  Function prototypes
 ***********************************************************************************************************************/
 void CanInit(void);
-
 
 #endif /* CAN_H */
 #endif /* INCLUDE_FUNCTION_DEFINES */

@@ -237,9 +237,6 @@ void __attribute__((noreturn)) MMBasicStart(void) {
 #endif
 
     InitBasic();
-#ifdef MAXIMITE
-   ExtSet(0, 1); // turn on the power LED
-#endif
     while (1) {
         if (setjmp(mark) == 0) { // return to here on error or when we want to halt execution
             ShowCursor(false); // just in case it was left on after a CTRL-C
@@ -258,12 +255,7 @@ void __attribute__((noreturn)) MMBasicStart(void) {
                     DefaultDrive = FLASHFS;
                     r = (FindFlashBlock(autorun, 1) != NULL);
                     if (!r) {
-#ifdef UBW32
                         if (InitSDCard() == true)
-#endif
-#ifdef OLIMEX
-                        if (InitSDCard() == true)
-#endif
                         {
                             DefaultDrive = SDFS;
                             OptionErrorAbort = false; // do not flag an error if the file does not exist

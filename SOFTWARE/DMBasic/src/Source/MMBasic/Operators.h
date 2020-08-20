@@ -24,11 +24,6 @@ If not, see <http://www.gnu.org/licenses/>.
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
 void op_invalid(void);
 void op_exp(void);
 void op_mul(void);
@@ -47,32 +42,12 @@ void op_and(void);
 void op_or(void);
 void op_xor(void);
 void op_not(void);
-
 #endif
-
-
-
-
-/**********************************************************************************
- All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
-**********************************************************************************/
-#ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
-#endif
-
 
 /**********************************************************************************
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                    P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
 	{ "^",			T_OPER | T_NBR,			0, op_exp		},
 	{ "*",			T_OPER | T_NBR,			1, op_mul		},
 	{ "/",			T_OPER | T_NBR,			1, op_div		},
@@ -92,6 +67,5 @@ void op_not(void);
 	{ "AND",		T_OPER | T_NBR,			6, op_and		},
 	{ "OR",			T_OPER | T_NBR,			6, op_or		},
 	{ "XOR",		T_OPER | T_NBR,			6, op_xor		},
-	
 #endif
 

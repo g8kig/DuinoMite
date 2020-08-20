@@ -18,17 +18,11 @@ If not, see <http://www.gnu.org/licenses/>.
 ************************************************************************************************************************/
 
 
-
 /**********************************************************************************
  the C language function associated with commands, functions or operators should be
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
 void cmd_pause(void);
 void cmd_timer(void);
 void cmd_date(void);
@@ -38,9 +32,7 @@ void cmd_ireturn(void);
 void cmd_settick(void);
 void cmd_copyright(void);
 void cmd_font(void);
-#ifdef OLIMEX
 void fun_dow(void);
-#endif
 
 void fun_timer(void);
 void fun_date(void);
@@ -50,21 +42,12 @@ void fun_tab(void);
 void fun_pos(void);
 void fun_spi(void);
 void fun_pos(void);
-
 #endif
-
-
-
 
 /**********************************************************************************
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
 	{ "PAUSE",		T_CMD,				0, cmd_pause	},
 	{ "TIMER",		T_CMD | T_FUN,		0, cmd_timer	},
 	{ "DATE$",		T_CMD | T_FUN,		0, cmd_date		},
@@ -75,7 +58,6 @@ void fun_pos(void);
 	{ "SETTICK",	T_CMD,				0, cmd_settick 	},
 	{ "COPYRIGHT",  T_CMD,				0, cmd_copyright},
 	{ "FONT",  		T_CMD,				0, cmd_font		},
-
 #endif
 
 
@@ -83,10 +65,6 @@ void fun_pos(void);
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
 	{ "POS",		T_FNA | T_NBR,		0, fun_pos		},
 	{ "TIMER",		T_FNA | T_NBR,		0, fun_timer	},
 	{ "DATE$",		T_FNA | T_STR,		0, fun_date		},
@@ -94,11 +72,9 @@ void fun_pos(void);
 	{ "INKEY$",		T_FNA | T_STR,		0, fun_inkey	},
 	{ "TAB(",		T_FUN | T_STR,		0, fun_tab,		},
 	{ "SPI(",		T_FUN | T_NBR,		0, fun_spi,		},
-	{ "LOAD",		T_NA,			0, op_invalid	},
-	{ "LOADB",		T_NA,			0, op_invalid	},
-#ifdef OLIMEX
+	{ "LOAD",		T_NA,               0, op_invalid	},
+	{ "LOADB",		T_NA,               0, op_invalid	},
 	{ "DOW",		T_FNA | T_NBR,		0, fun_dow		},
-#endif
 #endif
 
 

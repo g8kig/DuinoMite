@@ -38,9 +38,7 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "../Timers/Timers.h"
 #include "../Serial/Serial.h"
 #include "../Video/Video.h"
-#ifdef OLIMEX
 #include "Setup.h"
-#endif
 
 int DefaultDrive = SDFS;
 int OptionErrorAbort = true;
@@ -205,15 +203,7 @@ void cmd_open(void) {
         fname = getCstring(argv[0]);
         makeupper(fname);
 
-        // check if it is a serial port that we are opening and, if so, handle it as a special case
-
-#ifdef MAXIMITE
-        if (argc == 3 && (memcmp(fname, "COM1:", 5) == 0 || memcmp(fname, "COM2:", 5) == 0)) {
-#endif
-
-#ifdef OLIMEX
             if (argc == 3 && (memcmp(fname, "COM1:", 5) == 0 || memcmp(fname, "COM2:", 5) == 0 || memcmp(fname, "COM3:", 5) == 0 || memcmp(fname, "COM4:", 5) == 0)) {
-#endif
                 i = (str_equal(argv[2], "CONSOLE")) ? 1 : 0;
                 SerialOpen(fname, i);
                 if (i == false) {
@@ -225,10 +215,8 @@ void cmd_open(void) {
                     //MMFilePtr[fnbr - 1] = ((fname[3] == '1') ? COM1_FILE_POINTER : COM2_FILE_POINTER);
                     if ((fname[3]) == '1') MMFilePtr[fnbr - 1] = COM1_FILE_POINTER;
                     if ((fname[3]) == '2') MMFilePtr[fnbr - 1] = COM2_FILE_POINTER;
-#ifdef OLIMEX
                     if ((fname[3]) == '3') MMFilePtr[fnbr - 1] = COM3_FILE_POINTER;
                     if ((fname[3]) == '4') MMFilePtr[fnbr - 1] = COM4_FILE_POINTER;
-#endif
                 }
                 return;
             }
@@ -321,13 +309,9 @@ void cmd_open(void) {
         MMPrintCRLF();
 
         fcnt = 0;
-#ifdef OLIMEX
         P_LED_OUT = ~P_LED_OUT;
-#endif
         r = FindFirst(p, ATTR_HIDDEN | ATTR_SYSTEM | ATTR_READ_ONLY | ATTR_DIRECTORY | ATTR_ARCHIVE, &file);
-#ifdef OLIMEX
         P_LED_OUT = ~P_LED_OUT;
-#endif
         while (!r) {
             if (ErrorCheck()) return;
             if (fcnt >= MAXFILES) error("Too many files to list");
@@ -428,12 +412,10 @@ void cmd_open(void) {
             i = SerialRxStatus(1);
         else if (MMFilePtr[fnbr - 1] == COM2_FILE_POINTER)
             i = SerialRxStatus(2);
-#ifdef OLIMEX
         else if (MMFilePtr[fnbr - 1] == COM3_FILE_POINTER)
             i = SerialRxStatus(3);
         else if (MMFilePtr[fnbr - 1] == COM4_FILE_POINTER)
             i = SerialRxStatus(4);
-#endif
         else
             error("Must be an open COM port");
         if (i > MAXSTRLEN) i = MAXSTRLEN;
@@ -450,12 +432,10 @@ void cmd_open(void) {
             i = com1_buf_size - SerialTxStatus(1);
         else if (MMFilePtr[fnbr - 1] == COM2_FILE_POINTER)
             i = com2_buf_size - SerialTxStatus(2);
-#ifdef OLIMEX
         else if (MMFilePtr[fnbr - 1] == COM3_FILE_POINTER)
             i = com3_buf_size - SerialTxStatus(3);
         else if (MMFilePtr[fnbr - 1] == COM4_FILE_POINTER)
             i = com4_buf_size - SerialTxStatus(4);
-#endif
         else
             error("Must be an open COM port");
         fret = (float) i;
@@ -584,10 +564,8 @@ void cmd_open(void) {
             // ignore EOF on the COM ports
             if (MMFilePtr[filenbr - 1] == COM1_FILE_POINTER && SerialRxStatus(1) == 0) continue;
             if (MMFilePtr[filenbr - 1] == COM2_FILE_POINTER && SerialRxStatus(2) == 0) continue;
-#ifdef OLIMEX
             if (MMFilePtr[filenbr - 1] == COM3_FILE_POINTER && SerialRxStatus(3) == 0) continue;
             if (MMFilePtr[filenbr - 1] == COM4_FILE_POINTER && SerialRxStatus(4) == 0) continue;
-#endif
             if (MMfeof(filenbr)) break; // end of file - stop collecting
 
             c = MMfgetc(filenbr);
@@ -630,7 +608,7 @@ void cmd_open(void) {
             }
 
             if (isprint(c)) {
-                if (filenbr == 0) MMfputc(c, 0); // Maximite requires that chars be specificially echoed
+                if (filenbr == 0) MMfputc(c, 0); // Maximite requires that chars be specifically echoed
             }
             if (++nbrchars > MAXSTRLEN) error("Line is too long"); // stop collecting if maximum length
             *p++ = c; // save our char
@@ -726,12 +704,10 @@ void cmd_open(void) {
             SerialClose(1);
         else if (MMFilePtr[fnbr] == COM2_FILE_POINTER)
             SerialClose(2);
-#ifdef OLIMEX
         else if (MMFilePtr[fnbr] == COM3_FILE_POINTER)
             SerialClose(3);
         else if (MMFilePtr[fnbr] == COM4_FILE_POINTER)
             SerialClose(4);
-#endif
         else if ((int) MMFilePtr[fnbr] == FLASHFS) {
             // Flash filesystem
             if (FlashStatus == OPENREAD)
@@ -758,23 +734,17 @@ void cmd_open(void) {
         fnbr--;
         if (MMFilePtr[fnbr] == COM1_FILE_POINTER) return SerialGetchar(1);
         if (MMFilePtr[fnbr] == COM2_FILE_POINTER) return SerialGetchar(2);
-#ifdef OLIMEX
         if (MMFilePtr[fnbr] == COM3_FILE_POINTER) return SerialGetchar(3);
         if (MMFilePtr[fnbr] == COM4_FILE_POINTER) return SerialGetchar(4);
-#endif
         if ((int) MMFilePtr[fnbr] == FLASHFS) return FlashGetc(); // Flash filesystem
 
         // SD card filesystem
         if (!InitSDCard()) return 0;
         if (MMFilePtr[fnbr] == NULL) error("File number is not open");
         SDActivityLED = SDActivityTime;
-#ifdef OLIMEX
         P_LED_OUT = ~P_LED_OUT;
-#endif
         if (FSfread(&ch, 1, 1, MMFilePtr[fnbr]) == 0) ch = 0xff;
-#ifdef OLIMEX
         P_LED_OUT = ~P_LED_OUT;
-#endif
         ErrorCheck();
         return ch;
     }
@@ -788,10 +758,8 @@ void cmd_open(void) {
         fnbr--;
         if (MMFilePtr[fnbr] == COM1_FILE_POINTER) return SerialPutchar(1, c);
         if (MMFilePtr[fnbr] == COM2_FILE_POINTER) return SerialPutchar(2, c);
-#ifdef OLIMEX
         if (MMFilePtr[fnbr] == COM3_FILE_POINTER) return SerialPutchar(3, c);
         if (MMFilePtr[fnbr] == COM4_FILE_POINTER) return SerialPutchar(4, c);
-#endif
         if ((int) MMFilePtr[fnbr] == FLASHFS) {
             // Flash filesystem
             FlashPutc(c);
@@ -803,13 +771,9 @@ void cmd_open(void) {
             if (!InitSDCard()) return 0;
             if (MMFilePtr[fnbr] == NULL) error("File number is not open");
             SDActivityLED = SDActivityTime;
-#ifdef OLIMEX
             P_LED_OUT = ~P_LED_OUT;
-#endif
             if (FSfwrite(&t, 1, 1, MMFilePtr[nbr]) == 0) if (ErrorCheck() == 0) ErrorThrow(9);
-#ifdef OLIMEX
             P_LED_OUT = ~P_LED_OUT;
-#endif
             return t;
         }
     }
@@ -821,10 +785,8 @@ void cmd_open(void) {
         fnbr--;
         if (MMFilePtr[fnbr] == COM1_FILE_POINTER) return SerialRxStatus(1) == 0;
         if (MMFilePtr[fnbr] == COM2_FILE_POINTER) return SerialRxStatus(2) == 0;
-#ifdef OLIMEX
         if (MMFilePtr[fnbr] == COM3_FILE_POINTER) return SerialRxStatus(3) == 0;
         if (MMFilePtr[fnbr] == COM4_FILE_POINTER) return SerialRxStatus(4) == 0;
-#endif
         if ((int) MMFilePtr[fnbr] == FLASHFS) return FlashEOF; // Flash filesystem
 
         // SD card filesystem
@@ -884,10 +846,7 @@ void cmd_open(void) {
     int InitSDCard(void) {
 #define MDD_MediaDetect         MDD_SDSPI_MediaDetect
         int i;
-#ifdef OLIMEX
-
         if (!S.SDEnable) return false;
-#endif
         ErrorThrow(0); // reset mm.errno to zero
         if (SDCardRemoved == false) return true;
         for (i = 0; i < MAXOPENFILES; i++) MMFilePtr[i] = NULL; // make sure that the table is empty

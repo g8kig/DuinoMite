@@ -91,7 +91,7 @@ endif
 	${MAKE}  -f nbproject/Makefile-OLIMEX.mk dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 
 MP_PROCESSOR_OPTION=32MX795F512L
-MP_LINKER_FILE_OPTION=,--script="..\Source\Maximite.ld"
+MP_LINKER_FILE_OPTION=,--script="..\Source\Duinomite.ld"
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: assemble
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
@@ -485,13 +485,13 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: link
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    ../Source/Maximite.ld
+dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    ../Source/Duinomite.ld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)    -mprocessor=$(MP_PROCESSOR_OPTION) -Os -mips16 -o dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}       -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=_min_heap_size=42000,--defsym=_min_stack_size=6144,--gc-sections,-L"../../Program Files (x86)/Microchip/MPLAB C32/pic32mx/lib",-Map="${DISTDIR}/Maximite-Olimex.X.${IMAGE_TYPE}.map",--report-mem 
+	${MP_CC} $(MP_EXTRA_LD_PRE)    -mprocessor=$(MP_PROCESSOR_OPTION) -Os -mips16 -o dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}       -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=_min_heap_size=44000,--defsym=_min_stack_size=6144,--gc-sections,-Map="${DISTDIR}/Maximite-Olimex.X.${IMAGE_TYPE}.map",--report-mem 
 else
-dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   ../Source/Maximite.ld
+dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   ../Source/Duinomite.ld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -mprocessor=$(MP_PROCESSOR_OPTION) -Os -mips16 -o dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}       -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=_min_heap_size=42000,--defsym=_min_stack_size=6144,--gc-sections,-L"../../Program Files (x86)/Microchip/MPLAB C32/pic32mx/lib",-Map="${DISTDIR}/Maximite-Olimex.X.${IMAGE_TYPE}.map",--report-mem
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -mprocessor=$(MP_PROCESSOR_OPTION) -Os -mips16 -o dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}       -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=_min_heap_size=44000,--defsym=_min_stack_size=6144,--gc-sections,-Map="${DISTDIR}/Maximite-Olimex.X.${IMAGE_TYPE}.map",--report-mem
 	${MP_CC_DIR}\\pic32-bin2hex dist/${CND_CONF}/${IMAGE_TYPE}/Maximite-Olimex.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  
 endif
 

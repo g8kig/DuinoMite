@@ -526,14 +526,10 @@ void fun_mmOW(void) {
 }
 
 void ow_pinChk(int pin) {
-#ifdef OLIMEX
-    #ifdef OLIMEX_DUINOMITE_EMEGA
+#ifdef OLIMEX_DUINOMITE_EMEGA
         if ((pin < 1) || (pin > NBRPINS)) error("Invalid I/O pin"); // CHECK
-    #else
-        if ((pin < 1) || (pin > NBRPINS) || (pin == 11)) error("Invalid I/O pin");
-    #endif
 #else
-    if ((pin < 11) || (pin > NBRPINS)) error("Invalid I/O pin");
+        if ((pin < 1) || (pin > NBRPINS) || (pin == 11)) error("Invalid I/O pin");
 #endif
 	if (ExtCurrentConfig[pin] >= EXT_COM_RESERVED) error("Pin is allocated to a communications function");
 	return;
@@ -969,7 +965,7 @@ void ow_onOCPin(int pin) {
 		case 18: P_E18_ODCON; return;
 		case 19: P_E19_ODCON; return;
 		case 20: P_E20_ODCON; return;
-	#if defined UBW32 || defined OLIMEX_DUINOMITE_EMEGA
+	#if defined OLIMEX_DUINOMITE_EMEGA
 		case 21: P_E21_ODCON;	return;
 		case 22: P_E22_ODCON;	return;
 		case 23: P_E23_ODCON;	return;
@@ -989,19 +985,6 @@ void ow_onOCPin(int pin) {
 		case 37: P_E37_ODCON;	return;
 		case 38: P_E38_ODCON;	return;
 		case 39: P_E39_ODCON;	return;
-	#endif
-	#ifdef UBW32
-		case 40: P_E40_ODCON;	return;
-		case 41: P_E41_ODCON;	return;
-		case 42: P_E42_ODCON;	return;
-		case 43: P_E43_ODCON;	return;
-		case 44: P_E44_ODCON;	return;
-		case 45: P_E45_ODCON;	return;
-		case 46: P_E46_ODCON;	return;
-		case 47: P_E47_ODCON;	return;
-		case 48: P_E48_ODCON;	return;
-		case 49: P_E49_ODCON;	return;
-		case 50: P_E50_ODCON;	return;
 	#endif
 	}
 	return;
@@ -1028,7 +1011,7 @@ void ow_offOCPin(int pin) {
 		case 18: P_E18_ODCOFF; return;
 		case 19: P_E19_ODCOFF; return;
 		case 20: P_E20_ODCOFF; return;
-	#if defined UBW32 || defined OLIMEX_DUINOMITE_EMEGA
+	#if defined OLIMEX_DUINOMITE_EMEGA
 		case 21: P_E21_ODCOFF;	return;
 		case 22: P_E22_ODCOFF;	return;
 		case 23: P_E23_ODCOFF;	return;
@@ -1048,19 +1031,6 @@ void ow_offOCPin(int pin) {
 		case 37: P_E37_ODCOFF;	return;
 		case 38: P_E38_ODCOFF;	return;
 		case 39: P_E39_ODCOFF;	return;
-	#endif
-	#ifdef UBW32
-		case 40: P_E40_ODCOFF;	return;
-		case 41: P_E41_ODCOFF;	return;
-		case 42: P_E42_ODCOFF;	return;
-		case 43: P_E43_ODCOFF;	return;
-		case 44: P_E44_ODCOFF;	return;
-		case 45: P_E45_ODCOFF;	return;
-		case 46: P_E46_ODCOFF;	return;
-		case 47: P_E47_ODCOFF;	return;
-		case 48: P_E48_ODCOFF;	return;
-		case 49: P_E49_ODCOFF;	return;
-		case 50: P_E50_ODCOFF;	return;
 	#endif
 	}
 	return;
@@ -1089,7 +1059,7 @@ void ow_setPin(int pin) {
 		case 18: P_E18_WRITE1; return;
 		case 19: P_E19_WRITE1; return;
 		case 20: P_E20_WRITE1; return;
-	#if defined UBW32 || defined OLIMEX_DUINOMITE_EMEGA
+	#if defined OLIMEX_DUINOMITE_EMEGA
 		case 21: P_E21_WRITE1;	return;
 		case 22: P_E22_WRITE1;	return;
 		case 23: P_E23_WRITE1;	return;
@@ -1109,19 +1079,6 @@ void ow_setPin(int pin) {
 		case 37: P_E37_WRITE1;	return;
 		case 38: P_E38_WRITE1;	return;
 		case 39: P_E39_WRITE1;	return;
-	#endif
-	#ifdef UBW32
-		case 40: P_E40_WRITE1;	return;
-		case 41: P_E41_WRITE1;	return;
-		case 42: P_E42_WRITE1;	return;
-		case 43: P_E43_WRITE1;	return;
-		case 44: P_E44_WRITE1;	return;
-		case 45: P_E45_WRITE1;	return;
-		case 46: P_E46_WRITE1;	return;
-		case 47: P_E47_WRITE1;	return;
-		case 48: P_E48_WRITE1;	return;
-		case 49: P_E49_WRITE1;	return;
-		case 50: P_E50_WRITE1;	return;
 	#endif
 	}
 	return;
@@ -1149,7 +1106,7 @@ void ow_clrPin(int pin) {
 		case 18: P_E18_WRITE0; return;
 		case 19: P_E19_WRITE0; return;
 		case 20: P_E20_WRITE0; return;
-	#if defined UBW32 || defined OLIMEX_DUINOMITE_EMEGA
+	#if defined OLIMEX_DUINOMITE_EMEGA
 		case 21: P_E21_WRITE0;	return;
 		case 22: P_E22_WRITE0;	return;
 		case 23: P_E23_WRITE0;	return;
@@ -1169,19 +1126,6 @@ void ow_clrPin(int pin) {
 		case 37: P_E37_WRITE0;	return;
 		case 38: P_E38_WRITE0;	return;
 		case 39: P_E39_WRITE0;	return;
-	#endif
-	#ifdef UBW32
-		case 40: P_E40_WRITE0;	return;
-		case 41: P_E41_WRITE0;	return;
-		case 42: P_E42_WRITE0;	return;
-		case 43: P_E43_WRITE0;	return;
-		case 44: P_E44_WRITE0;	return;
-		case 45: P_E45_WRITE0;	return;
-		case 46: P_E46_WRITE0;	return;
-		case 47: P_E47_WRITE0;	return;
-		case 48: P_E48_WRITE0;	return;
-		case 49: P_E49_WRITE0;	return;
-		case 50: P_E50_WRITE0;	return;
 	#endif
 	}
 	return;
@@ -1209,7 +1153,7 @@ void ow_inputPin(int pin) {
 		case 18: P_E18_TRISINP; return;
 		case 19: P_E19_TRISINP; return;
 		case 20: P_E20_TRISINP; return;
-	#if defined UBW32 || defined OLIMEX_DUINOMITE_EMEGA
+	#if defined OLIMEX_DUINOMITE_EMEGA
 		case 21: P_E21_TRISINP;	return;
 		case 22: P_E22_TRISINP;	return;
 		case 23: P_E23_TRISINP;	return;
@@ -1229,19 +1173,6 @@ void ow_inputPin(int pin) {
 		case 37: P_E37_TRISINP;	return;
 		case 38: P_E38_TRISINP;	return;
 		case 39: P_E39_TRISINP;	return;
-	#endif
-	#ifdef UBW32
-		case 40: P_E40_TRISINP;	return;
-		case 41: P_E41_TRISINP;	return;
-		case 42: P_E42_TRISINP;	return;
-		case 43: P_E43_TRISINP;	return;
-		case 44: P_E44_TRISINP;	return;
-		case 45: P_E45_TRISINP;	return;
-		case 46: P_E46_TRISINP;	return;
-		case 47: P_E47_TRISINP;	return;
-		case 48: P_E48_TRISINP;	return;
-		case 49: P_E49_TRISINP;	return;
-		case 50: P_E50_TRISINP;	return;
 	#endif
 	}
 	return;
@@ -1269,7 +1200,7 @@ void ow_outputPin(int pin) {
 		case 18: P_E18_TRISOUT; return;
 		case 19: P_E19_TRISOUT; return;
 		case 20: P_E20_TRISOUT; return;
-	#if defined UBW32 || defined OLIMEX_DUINOMITE_EMEGA
+	#if defined OLIMEX_DUINOMITE_EMEGA
 		case 21: P_E21_TRISOUT;	return;
 		case 22: P_E22_TRISOUT;	return;
 		case 23: P_E23_TRISOUT;	return;
@@ -1289,19 +1220,6 @@ void ow_outputPin(int pin) {
 		case 37: P_E37_TRISOUT;	return;
 		case 38: P_E38_TRISOUT;	return;
 		case 39: P_E39_TRISOUT;	return;
-	#endif
-	#ifdef UBW32
-		case 40: P_E40_TRISOUT;	return;
-		case 41: P_E41_TRISOUT;	return;
-		case 42: P_E42_TRISOUT;	return;
-		case 43: P_E43_TRISOUT;	return;
-		case 44: P_E44_TRISOUT;	return;
-		case 45: P_E45_TRISOUT;	return;
-		case 46: P_E46_TRISOUT;	return;
-		case 47: P_E47_TRISOUT;	return;
-		case 48: P_E48_TRISOUT;	return;
-		case 49: P_E49_TRISOUT;	return;
-		case 50: P_E50_TRISOUT;	return;
 	#endif
 	}
 	return;
@@ -1329,7 +1247,7 @@ int ow_readPin(int pin) {
 		case 18: return P_E18_READ;
 		case 19: return P_E19_READ;
 		case 20: return P_E20_READ;
-	#if defined UBW32 || defined OLIMEX_DUINOMITE_EMEGA
+	#if defined OLIMEX_DUINOMITE_EMEGA
 		case 21: return P_E21_READ;
 		case 22: return P_E22_READ;
 		case 23: return P_E23_READ;
@@ -1349,19 +1267,6 @@ int ow_readPin(int pin) {
 		case 37: return P_E37_READ;
 		case 38: return P_E38_READ;
 		case 39: return P_E39_READ;
-	#endif
-	#ifdef UBW32
-		case 40: return P_E40_READ;
-		case 41: return P_E41_READ;
-		case 42: return P_E42_READ;
-		case 43: return P_E43_READ;
-		case 44: return P_E44_READ;
-		case 45: return P_E45_READ;
-		case 46: return P_E46_READ;
-		case 47: return P_E47_READ;
-		case 48: return P_E48_READ;
-		case 49: return P_E49_READ;
-		case 50: return P_E50_READ;
 	#endif
 	}
 	return 0;

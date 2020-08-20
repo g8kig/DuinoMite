@@ -17,7 +17,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 ************************************************************************************************************************/
 
-
 // global keyboard functions
 extern void initKeyboard(void);
 
@@ -56,5 +55,3 @@ extern void initKeyboard(void);
 #define NUM_ENT		ENTER
 #define SLOCK		0x8c
 #define ALT			0x8b
-
-

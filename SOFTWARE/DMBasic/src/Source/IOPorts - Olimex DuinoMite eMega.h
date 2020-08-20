@@ -20,14 +20,11 @@ Edit by SPP for Olimex DuinoMite eMega 19.03.2012
 
  ************************************************************************************************************************/
 
-
 #ifndef IOPORTS_OLIMEX_DUINOMITE_EMEGA_H
 #define IOPORTS_OLIMEX_DUINOMITE_EMEGA_H
-//#include <p32xxxx.h>
-//#include <plib.h>
 
 /*
-Note that we never use TRIS to set a pin as an input because that is the default after powerup
+Note that we never use TRIS to set a pin as an input because that is the default after power up
  */
 
 // General defines
@@ -694,8 +691,6 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define P_E39_ODCOFF		{ODCFCLR = _ODCF_ODCF13_MASK;}
 #define P_E39_READ		((PORTF & _PORTF_RF13_MASK) ? 1 : 0)
 
-
-
 // Keyboard definitions
 
 // D6 (56) -> G6 (10)	(Keyboard Clock)
@@ -747,18 +742,16 @@ Note that we never use TRIS to set a pin as an input because that is the default
 
 #define SD_CS_SET_HI			LATGSET = (1 << 12)		// SD-SPI Chip Set Output bit high
 #define SD_CS_SET_LO			LATGCLR = (1 << 12)		// SD-SPI Set Output bit low
-#define SD_CS_TRIS			TRISGbits.TRISG12			// SD-SPI Chip Select TRIS bit
-#define SD_CS                           PORTGbits.RG12
+#define SD_CS_TRIS              TRISGbits.TRISG12			// SD-SPI Chip Select TRIS bit
+#define SD_CS                   PORTGbits.RG12
 
 #define SD_CS_SET_HI			LATGSET = (1 << 12) //PORTGbits.RG12=1;                       // SD-SPI Chip Set Output bit high
 #define SD_CS_SET_LO			LATGCLR = (1 << 12) //PORTGbits.RG12=0;                       // SD-SPI Set Output bit low
-#define SD_CS_TRIS			TRISGbits.TRISG12
+#define SD_CS_TRIS              TRISGbits.TRISG12
 
-#define SD_CD				0 //PORTDbits.RD4			// SD-SPI Card Detect Input bit
-//#define SD_CD_TRIS			TRISDbits.TRISD4		// SD-SPI Card Detect TRIS bit
+#define SD_CD                   0 			// SD-SPI Card Detect Input bit
 
-#define SD_WE				0 //PORTDbits.RD5			// SD-SPI Write Protect Check Input bit
-//#define SD_WE_TRIS			TRISDbits.TRISD5		// SD-SPI Write Protect Check TRIS bit
+#define SD_WE                   0 			// SD-SPI Write Protect Check Input bit
 
 #define SPICON1				SPI3CON								// The main SPI control register
 #define SPISTAT				SPI3STAT							// The SPI status register
@@ -773,15 +766,11 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define SPIIN				TRISFbits.TRISF2			// The TRIS bit for the SDI pin
 #define SPIOUT				TRISFbits.TRISF8			// The TRIS bit for the SDO pin
 
-#define putcSPI(spichar)		SpiChnPutC(3, spichar)	//SPI library functions
+#define putcSPI(spichar)	SpiChnPutC(3, spichar)	//SPI library functions
 #define getcSPI()			SpiChnGetC(3)
 #define OpenSPI(config1, config2)	SpiChnOpen(3, config1, config2)
-#define CloseSPI()                      SpiChnClose(3)
+#define CloseSPI()          SpiChnClose(3)
 
-
-// Serial ports defines
-// COM3 Rx = UEXT3A (RF4) ; Tx = UEXT3A (RF5)
-// COM4 Rx = UEXT3B (RF12); Tx = UEXT3B (RF13)
 
 #define P_COM1_RX_PIN_NBR		13
 #define P_COM1_RX_PORT			PORTEbits.RE2
@@ -804,13 +793,6 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define P_COM2_TX_SET_HI		LATESET = (1 << 7)
 #define P_COM2_TX_SET_LO		LATECLR = (1 << 7)
 
-/*
-#define P_COM3_RX_PIN_NBR		22
-#define P_COM3_TX_PIN_NBR		23
-
-#define P_COM4_RX_PIN_NBR		11
-#define P_COM4_TX_PIN_NBR		12
- */
 #define P_COM3_RX_PIN_NBR		36
 #define P_COM3_TX_PIN_NBR		37
 

@@ -704,13 +704,8 @@ void i2c_disable() {
 		I2C1CONCLR = _I2C1CON_I2CEN_MASK; 							// disable I2C1 module
 		I2C_Status = 0;												// clear status flags
 	}
-#ifdef OLIMEX
 	ExtCfg(5, EXT_NOT_CONFIG);										// set pins to unconfigured
 	ExtCfg(6, EXT_NOT_CONFIG);
-#else
-	ExtCfg(12, EXT_NOT_CONFIG);										// set pins to unconfigured
-	ExtCfg(13, EXT_NOT_CONFIG);
-#endif
 }
 
 
@@ -735,13 +730,8 @@ void i2c_slave_disable() {
 		I2C1CONCLR = _I2C1CON_I2CEN_MASK; 							// disable I2C1 module
 		I2C_Status = 0;												// clear status flags
 	}
-#ifdef OLIMEX
 	ExtCfg(5, EXT_NOT_CONFIG);										// set pins to unconfigured
 	ExtCfg(6, EXT_NOT_CONFIG);
-#else
-	ExtCfg(12, EXT_NOT_CONFIG);										// set pins to unconfigured
-	ExtCfg(13, EXT_NOT_CONFIG);
-#endif
 }
 
 
@@ -759,13 +749,8 @@ void i2c_enable(int bps) {
 	}
 	if (!(I2C_Status & I2C_Status_Enabled)) {
 		I2C_Status |= I2C_Status_Enabled;
-	#ifdef OLIMEX
 		ExtCfg(5, EXT_COM_RESERVED);					// clear BASIC interrupts and disable PIN and SETPIN
 		ExtCfg(6, EXT_COM_RESERVED);
-	#else
-		ExtCfg(12, EXT_COM_RESERVED);					// clear BASIC interrupts and disable PIN and SETPIN
-		ExtCfg(13, EXT_COM_RESERVED);
-	#endif
     	mI2C1SetIntPriority(5);							// priority 5
     	I2C1CONCLR = _I2C1CON_DISSLW_MASK;
 		I2C1CONSET = _I2C1CON_I2CEN_MASK | _I2C1CON_STRICT_MASK;	// enable I2C1 module & strict addressing enforced
@@ -799,13 +784,8 @@ void i2c_slave_enable(int options) {
 	}
 	if (!(I2C_Status & I2C_Status_Enabled)) {
 		I2C_Status |= I2C_Status_Enabled;
-	#ifdef OLIMEX
 		ExtCfg(5, EXT_COM_RESERVED);					// clear BASIC interrupts and disable PIN and SETPIN
 		ExtCfg(6, EXT_COM_RESERVED);
-	#else
-		ExtCfg(12, EXT_COM_RESERVED);					// clear BASIC interrupts and disable PIN and SETPIN
-		ExtCfg(13, EXT_COM_RESERVED);
-	#endif
     	mI2C1SetIntPriority(5);							// priority 5
     	I2C1CONCLR = _I2C1CON_DISSLW_MASK;
 		I2C1CONSET = _I2C1CON_I2CEN_MASK | _I2C1CON_STRICT_MASK;	// enable I2C1 module & strict addressing enforced

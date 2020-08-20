@@ -1,6 +1,4 @@
 /***********************************************************************************************************************
-Maximite
-
 External.c
 
 Handles reading and writing to the digital and analog input/output pins ising the SETPIN and PIN commands
@@ -32,10 +30,8 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "../Timers/Timers.h"
 #include "../Serial/Serial.h"
 #include "I2C.h"
-#ifdef OLIMEX
 #include "Setup.h"
 #include "DuinoMite/RTC.h"
-#endif
 
 int ExtCurrentConfig[NBRPINS + 1];
 
@@ -192,22 +188,15 @@ void ClearExternalIO(void) {
     // stop the sound
     SoundPlay = 0;
     CloseTimer2();
-#ifdef OLIMEX
     CloseOC1();
-#else
-    CloseOC2();
-#endif
     inttbl[NBRPINS + 2].intp = NULL; // disable the tick interrupt
     for (i = 1; i < NBRPINS + 1; i++) {
         inttbl[i].intp = NULL; // disable all interrupts
-#ifdef OLIMEX
+
 #ifdef  OLIMEX_DUINOMITE_EMEGA
         if (ExtCurrentConfig[i] != EXT_CONSOLE_RESERVED && i != 35) { // don't reset the serial console
 #else
         if (ExtCurrentConfig[i] != EXT_CONSOLE_RESERVED && i != 21) { // don't reset the serial console
-#endif
-#else
-        if (ExtCurrentConfig[i] != EXT_CONSOLE_RESERVED) { // don't reset the serial console
 #endif
             ExtCfg(i, EXT_NOT_CONFIG); // all set to unconfigured
             ExtSet(i, 0); // all outputs (when set) default to low
@@ -226,19 +215,13 @@ void initExtIO(void) {
         ExtCfg(i, EXT_NOT_CONFIG); // all set to unconfigured
         ExtSet(i, 0); // all outputs (when set) default to low
     }
-#ifndef OLIMEX
-    CNCONbits.ON = 1; // turn on Change Notification module
-    CNPUEbits.CNPUE1 = 1; // turn on the pullup for pin C13 also called CN1
-#endif
     ExtCurrentConfig[0] = EXT_DIG_IN; // and show that we can read from it
     P_LED_TRIS = P_OUTPUT; // make the LED pin an output
     ExtSet(0, 0); // and turn it off
-#ifdef OLIMEX
 #ifdef OLIMEX_DUINOMITE_EMEGA
     ExtCurrentConfig[35] = EXT_ANA_IN;
 #else
     ExtCurrentConfig[21] = EXT_ANA_IN;
-#endif
 #endif
 
     // setup the analog (ADC) function
@@ -260,25 +243,16 @@ int ExtCfg(int pin, int cfg) {
     if (pin < 0 || pin > NBRPINS) return false; // initial sanity check
 
     // make sure that interrupts are disabled in case we are changing from an interrupt input
-#ifdef OLIMEX
     if (pin == 5) ConfigINT2(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_DISABLE);
     if (pin == 6) ConfigINT3(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_DISABLE);
-#ifdef  OLIMEX_DUINOMITE_EMEGA
-#else
+#ifndef  OLIMEX_DUINOMITE_EMEGA
     if (pin == 7) ConfigINT4(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_DISABLE);
-#endif
-#else
-    if (pin == 11) ConfigINT1(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_DISABLE);
-    if (pin == 12) ConfigINT2(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_DISABLE);
-    if (pin == 13) ConfigINT3(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_DISABLE);
-    if (pin == 14) ConfigINT4(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_DISABLE);
 #endif
 
     inttbl[pin].intp = NULL; // also disable a software interrupt on this pin
 
     switch (cfg) {
         case EXT_NOT_CONFIG:
-#ifdef OLIMEX
             if (pin == 5) {
                 P_E5_TRIS = 1;
                 P_E5_OC = 1;
@@ -295,11 +269,9 @@ int ExtCfg(int pin, int cfg) {
                 P_E12_TRIS = 1;
                 P_E12_OC = 1;
             }
-#endif
             break;
 
         case EXT_ANA_IN:
-#ifdef OLIMEX
             if (pin > 6 && pin < 19) return false;
             if (pin == 5) {
                 P_E5_TRIS = 1;
@@ -309,9 +281,6 @@ int ExtCfg(int pin, int cfg) {
                 P_E6_TRIS = 1;
                 P_E6_OC = 1;
             }
-#else
-            if (pin > 10) return false;
-#endif
             tris = 1;
             oc = 1;
             break;
@@ -319,23 +288,9 @@ int ExtCfg(int pin, int cfg) {
         case EXT_FREQ_IN: // same as counting, so fall through
         case EXT_PER_IN: // same as counting, so fall through
         case EXT_CNT_IN:
-#ifdef OLIMEX
-#else
-            if (pin == 11) {
-                INT1Count = INT1Value = 0;
-                ConfigINT1(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_ENABLE);
-                tris = 1;
-                ana = 1;
-                oc = 1;
-            }
-#endif
-#ifdef OLIMEX
             if (pin == 5) {
                 P_E5_TRIS = 1;
                 P_E5_OC = 1;
-#else
-            if (pin == 12) {
-#endif
                 INT2Count = INT2Value = 0;
                 ConfigINT2(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_ENABLE);
                 tris = 1;
@@ -343,13 +298,9 @@ int ExtCfg(int pin, int cfg) {
                 oc = 1;
                 break;
             }
-#ifdef OLIMEX
             if (pin == 6) {
                 P_E6_TRIS = 1;
                 P_E6_OC = 1;
-#else
-            if (pin == 13) {
-#endif
                 INT3Count = INT3Value = 0;
                 ConfigINT3(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_ENABLE);
                 break;
@@ -357,11 +308,7 @@ int ExtCfg(int pin, int cfg) {
 #ifdef  OLIMEX_DUINOMITE_EMEGA
             break;
 #else
-#ifdef OLIMEX
             if (pin == 7) {
-#else
-            if (pin == 14) {
-#endif
                 INT4Count = INT4Value = 0;
                 ConfigINT4(EXT_INT_PRI_2 | RISING_EDGE_INT | EXT_INT_ENABLE);
                 tris = 1;
@@ -375,7 +322,6 @@ int ExtCfg(int pin, int cfg) {
         case EXT_INT_LO: // same as digital input, so fall through
         case EXT_INT_HI: // same as digital input, so fall through
         case EXT_DIG_IN:
-#ifdef OLIMEX
             if (pin == 5) {
                 P_E5_TRIS = 1;
                 P_E5_OC = 1;
@@ -392,11 +338,9 @@ int ExtCfg(int pin, int cfg) {
                 P_E12_TRIS = 1;
                 P_E12_OC = 1;
             }
-#endif
             break;
 
         case EXT_DIG_OUT:
-#ifdef OLIMEX
             if (pin == 11) {
                 P_E11_TRIS = 1;
                 P_E11_OC = 1;
@@ -413,13 +357,11 @@ int ExtCfg(int pin, int cfg) {
                 P_E12_TRIS = 1;
                 P_E12_OC = 1;
             }
-#endif
             tris = 0;
             oc = 0;
             break;
 
         case EXT_OC_OUT:
-#ifdef OLIMEX
             if (pin == 11) {
                 P_E11_TRIS = 1;
                 P_E11_OC = 1;
@@ -436,16 +378,12 @@ int ExtCfg(int pin, int cfg) {
                 P_E12_TRIS = 1;
                 P_E12_OC = 1;
             }
-#else
-            if (pin < 11) return false;
-#endif
             tris = 0;
             break;
 
         case EXT_COM_RESERVED:
         case EXT_CONSOLE_RESERVED:
             ExtCurrentConfig[pin] = cfg; // don't do anything except set the config type
-#ifdef OLIMEX
             if (pin == 5) {
                 P_E5_TRIS = 1;
                 P_E5_OC = 1;
@@ -464,7 +402,6 @@ int ExtCfg(int pin, int cfg) {
                 P_E12_TRIS = 1;
                 P_E12_OC = 1;
             }
-#endif
             return true;
 
         default:
@@ -499,7 +436,6 @@ int ExtCfg(int pin, int cfg) {
             P_E6_OC = oc;
             P_E6_ANALOG = ana;
             break;
-#ifdef OLIMEX
 #ifdef  OLIMEX_DUINOMITE_EMEGA
         case 7: P_E7_TRIS = tris;
             P_E7_OC = oc;
@@ -534,24 +470,6 @@ int ExtCfg(int pin, int cfg) {
             }
             break;
 #endif
-#else
-        case 7: P_E7_TRIS = tris;
-            P_E7_OC = oc;
-            P_E7_ANALOG = ana;
-            break;
-        case 8: P_E8_TRIS = tris;
-            P_E8_OC = oc;
-            P_E8_ANALOG = ana;
-            break;
-        case 9: P_E9_TRIS = tris;
-            P_E9_OC = oc;
-            P_E9_ANALOG = ana;
-            break;
-        case 10: P_E10_TRIS = tris;
-            P_E10_OC = oc;
-            P_E10_ANALOG = ana;
-            break;
-#endif
         case 11: P_E11_TRIS = tris;
             P_E11_OC = oc;
             break;
@@ -576,8 +494,6 @@ int ExtCfg(int pin, int cfg) {
         case 18: P_E18_TRIS = tris;
             P_E18_OC = oc;
             break;
-#ifdef OLIMEX
-            // SPP +
 #ifdef	OLIMEX_DUINOMITE_EMEGA		// edit for DuinoMite eMega
         case 19: P_E19_TRIS = tris;
             P_E19_OC = oc;
@@ -668,107 +584,6 @@ int ExtCfg(int pin, int cfg) {
             P_E23_OC = oc;
             break;
 #endif
-            // SPP -
-#else
-        case 19: P_E19_TRIS = tris;
-            P_E19_OC = oc;
-            break;
-        case 20: P_E20_TRIS = tris;
-            P_E20_OC = oc;
-            break;
-#endif
-#ifdef UBW32
-        case 21: P_E21_TRIS = tris;
-            P_E21_OC = oc;
-            break;
-        case 22: P_E22_TRIS = tris;
-            P_E22_OC = oc;
-            break;
-        case 23: P_E23_TRIS = tris;
-            P_E23_OC = oc;
-            break;
-        case 24: P_E24_TRIS = tris;
-            P_E24_OC = oc;
-            break;
-        case 25: P_E25_TRIS = tris;
-            P_E25_OC = oc;
-            break;
-        case 26: P_E26_TRIS = tris;
-            P_E26_OC = oc;
-            break;
-        case 27: P_E27_TRIS = tris;
-            P_E27_OC = oc;
-            break;
-        case 28: P_E28_TRIS = tris;
-            P_E28_OC = oc;
-            break;
-        case 29: P_E29_TRIS = tris;
-            P_E29_OC = oc;
-            break;
-        case 30: P_E30_TRIS = tris;
-            P_E30_OC = oc;
-            break;
-        case 31: P_E31_TRIS = tris;
-            P_E31_OC = oc;
-            break;
-        case 32: P_E32_TRIS = tris;
-            P_E32_OC = oc;
-            break;
-        case 33: P_E33_TRIS = tris;
-            P_E33_OC = oc;
-            break;
-        case 34: P_E34_TRIS = tris;
-            P_E34_OC = oc;
-            break;
-        case 35: P_E35_TRIS = tris;
-            P_E35_OC = oc;
-            break;
-        case 36: P_E36_TRIS = tris;
-            P_E36_OC = oc;
-            break;
-        case 37: P_E37_TRIS = tris;
-            P_E37_OC = oc;
-            break;
-        case 38: P_E38_TRIS = tris;
-            P_E38_OC = oc;
-            break;
-        case 39: P_E39_TRIS = tris;
-            P_E39_OC = oc;
-            break;
-        case 40: P_E40_TRIS = tris;
-            P_E40_OC = oc;
-            break;
-        case 41: P_E41_TRIS = tris;
-            P_E41_OC = oc;
-            break;
-        case 42: P_E42_TRIS = tris;
-            P_E42_OC = oc;
-            break;
-        case 43: P_E43_TRIS = tris;
-            P_E43_OC = oc;
-            break;
-        case 44: P_E44_TRIS = tris;
-            P_E44_OC = oc;
-            break;
-        case 45: P_E45_TRIS = tris;
-            P_E45_OC = oc;
-            break;
-        case 46: P_E46_TRIS = tris;
-            P_E46_OC = oc;
-            break;
-        case 47: P_E47_TRIS = tris;
-            P_E47_OC = oc;
-            break;
-        case 48: P_E48_TRIS = tris;
-            P_E48_OC = oc;
-            break;
-        case 49: P_E49_TRIS = tris;
-            P_E49_OC = oc;
-            break;
-        case 50: P_E50_TRIS = tris;
-            P_E50_OC = oc;
-            break;
-#endif
     }
 
     if (cfg == EXT_NOT_CONFIG) ExtSet(pin, 0); // set the default output to low
@@ -784,13 +599,8 @@ int ExtSet(int pin, int val) {
     INTDisableInterrupts(); // setting an output bit is NOT atomic and a bit set operation
     // in an interrupt could result in this set corrupting the output
     switch (pin) {
-#ifdef UBW32
-        case 0: P_LED_OUT = !val;
-            break; // this is the LED - the UBW32 wired them upside down !!
-#else
         case 0: P_LED_OUT = val;
             break; // this is the LED
-#endif
         case 1: P_E1_OUT = val;
             break;
         case 2: P_E2_OUT = val;
@@ -805,7 +615,6 @@ int ExtSet(int pin, int val) {
             break;
         case 7: P_E7_OUT = val;
             break;
-#ifdef OLIMEX
 #ifdef  OLIMEX_DUINOMITE_EMEGA
         case 8: P_E8_OUT = val;
             break;
@@ -819,14 +628,6 @@ int ExtSet(int pin, int val) {
         case 9: if (!S.SDEnable) P_E9_OUT = val;
             break;
         case 10: if (!S.SDEnable) P_E10_OUT = val;
-            break;
-#endif
-#else
-        case 8: P_E8_OUT = val;
-            break;
-        case 9: P_E9_OUT = val;
-            break;
-        case 10: P_E10_OUT = val;
             break;
 #endif
         case 11: P_E11_OUT = val;
@@ -845,7 +646,6 @@ int ExtSet(int pin, int val) {
             break;
         case 18: P_E18_OUT = val;
             break;
-#ifdef OLIMEX
 #ifdef  OLIMEX_DUINOMITE_EMEGA
         case 19: P_E19_OUT = val;
             break;
@@ -861,13 +661,7 @@ int ExtSet(int pin, int val) {
         case 23: P_E23_OUT = val;
             break;
 #endif
-#else
-        case 19: P_E19_OUT = val;
-            break;
-        case 20: P_E20_OUT = val;
-            break;
-#endif
-#if defined UBW32 || defined OLIMEX_DUINOMITE_EMEGA
+#if defined OLIMEX_DUINOMITE_EMEGA
         case 21: P_E21_OUT = val;
             break;
         case 22: P_E22_OUT = val;
@@ -905,30 +699,6 @@ int ExtSet(int pin, int val) {
         case 38: P_E38_OUT = val;
             break;
         case 39: P_E39_OUT = val;
-            break;
-#endif
-#ifdef UBW32
-        case 40: P_E40_OUT = val;
-            break;
-        case 41: P_E41_OUT = val;
-            break;
-        case 42: P_E42_OUT = val;
-            break;
-        case 43: P_E43_OUT = val;
-            break;
-        case 44: P_E44_OUT = val;
-            break;
-        case 45: P_E45_OUT = val;
-            break;
-        case 46: P_E46_OUT = val;
-            break;
-        case 47: P_E47_OUT = val;
-            break;
-        case 48: P_E48_OUT = val;
-            break;
-        case 49: P_E49_OUT = val;
-            break;
-        case 50: P_E50_OUT = val;
             break;
 #endif
         default:
@@ -969,7 +739,6 @@ int ExtInp(int pin, int *val) {
                 break;
             case 7: r = P_E7_IN;
                 break;
-#ifdef OLIMEX
 #ifdef  OLIMEX_DUINOMITE_EMEGA
             case 8: r = P_E8_IN;
                 break;
@@ -983,14 +752,6 @@ int ExtInp(int pin, int *val) {
             case 9: if (!S.SDEnable) r = P_E9_IN;
                 break;
             case 10: if (!S.SDEnable) r = P_E10_IN;
-                break;
-#endif
-#else
-            case 8: r = P_E8_IN;
-                break;
-            case 9: r = P_E9_IN;
-                break;
-            case 10: r = P_E10_IN;
                 break;
 #endif
             case 11: r = P_E11_IN;
@@ -1009,7 +770,6 @@ int ExtInp(int pin, int *val) {
                 break;
             case 18: r = P_E18_IN;
                 break;
-#ifdef OLIMEX
 #ifdef  OLIMEX_DUINOMITE_EMEGA
             case 19: r = P_E19_IN;
                 break;
@@ -1025,13 +785,7 @@ int ExtInp(int pin, int *val) {
             case 23: r = P_E23_IN;
                 break;
 #endif
-#else
-            case 19: r = P_E19_IN;
-                break;
-            case 20: r = P_E20_IN;
-                break;
-#endif
-#if defined UBW32 || defined OLIMEX_DUINOMITE_EMEGA
+#if defined OLIMEX_DUINOMITE_EMEGA
             case 21: r = P_E21_IN;
                 break;
             case 22: r = P_E22_IN;
@@ -1071,30 +825,6 @@ int ExtInp(int pin, int *val) {
             case 39: r = P_E39_IN;
                 break;
 #endif
-#ifdef UBW32
-            case 40: r = P_E40_IN;
-                break;
-            case 41: r = P_E41_IN;
-                break;
-            case 42: r = P_E42_IN;
-                break;
-            case 43: r = P_E43_IN;
-                break;
-            case 44: r = P_E44_IN;
-                break;
-            case 45: r = P_E45_IN;
-                break;
-            case 46: r = P_E46_IN;
-                break;
-            case 47: r = P_E47_IN;
-                break;
-            case 48: r = P_E48_IN;
-                break;
-            case 49: r = P_E49_IN;
-                break;
-            case 50: r = P_E50_IN;
-                break;
-#endif
         }
         *val = (r ? 1 : 0); // zero for low, 1 for high
         return true;
@@ -1115,8 +845,6 @@ int ExtInp(int pin, int *val) {
                 break;
             case 6: AD1CHSbits.CH0SA = P_E6_ACHAN;
                 break;
-#ifdef  OLIMEX
-                // SPP +
 #ifdef	OLIMEX_DUINOMITE_EMEGA	// edit for DuinoMite eMega
             case 35: AD1CHSbits.CH0SA = P_E35_ACHAN;
                 break;
@@ -1128,36 +856,20 @@ int ExtInp(int pin, int *val) {
             case 21: AD1CHSbits.CH0SA = P_E21_ACHAN;
                 break;
 #endif
-                // SPP -
-#else
-            case 7: AD1CHSbits.CH0SA = P_E7_ACHAN;
-                break;
-            case 8: AD1CHSbits.CH0SA = P_E8_ACHAN;
-                break;
-            case 9: AD1CHSbits.CH0SA = P_E9_ACHAN;
-                break;
-            case 10: AD1CHSbits.CH0SA = P_E10_ACHAN;
-                break;
-#endif
         }
-#ifdef OLIMEX
-#ifdef  OLIMEX_DUINOMITE_EMEGA
-#else
+#ifndef  OLIMEX_DUINOMITE_EMEGA
         if ((pin == 19 || pin == 20) && S.VideoMode) {
             *val = 0;
             return true;
         }
 #endif
-#endif
         AD1CON1bits.SAMP = 1; // start sampling
         while (!AD1CON1bits.DONE && !MMAbort); // wait conversion complete
         *val = ADC1BUF0; // and get the result
-#ifdef OLIMEX
 #ifdef  OLIMEX_DUINOMITE_EMEGA
         if (pin == 35) *val *= 3.13;
 #else
         if (pin == 21) *val *= 3.13;
-#endif
 #endif
         return true;
     }
@@ -1165,23 +877,12 @@ int ExtInp(int pin, int *val) {
     // read from a frequency/period input
     if (ExtCurrentConfig[pin] == EXT_FREQ_IN || ExtCurrentConfig[pin] == EXT_PER_IN) {
         switch (pin) { // select input channel
-#ifdef OLIMEX
             case 5: *val = INT2Value;
                 break;
             case 6: *val = INT3Value;
                 break;
             case 7: *val = INT4Value;
                 break;
-#else
-            case 11: *val = INT1Value;
-                break;
-            case 12: *val = INT2Value;
-                break;
-            case 13: *val = INT3Value;
-                break;
-            case 14: *val = INT4Value;
-                break;
-#endif
         }
         return true;
     }
@@ -1189,23 +890,12 @@ int ExtInp(int pin, int *val) {
     // read from a counter input
     if (ExtCurrentConfig[pin] == EXT_CNT_IN) {
         switch (pin) { // select input channel
-#ifdef OLIMEX
             case 5: *val = INT2Count;
                 break;
             case 6: *val = INT3Count;
                 break;
             case 7: *val = INT4Count;
                 break;
-#else
-            case 11: *val = INT1Count;
-                break;
-            case 12: *val = INT2Count;
-                break;
-            case 13: *val = INT3Count;
-                break;
-            case 14: *val = INT4Count;
-                break;
-#endif
         }
         return true;
     }
@@ -1214,7 +904,6 @@ int ExtInp(int pin, int *val) {
 }
 
 
-#ifdef OLIMEX
 // perform the counting functions for pin BUT
 
 void __ISR(_EXTERNAL_1_VECTOR, ipl2) INT1Interrupt(void) {
@@ -1263,51 +952,3 @@ void __ISR(_EXTERNAL_4_VECTOR, ipl2) INT4Interrupt(void) {
     mINT4ClearIntFlag(); // Clear the interrupt flag
     return;
 }
-#else
-// perform the counting functions for pin 11
-
-void __ISR(_EXTERNAL_1_VECTOR, ipl2) INT1Interrupt(void) {
-    if (ExtCurrentConfig[11] == EXT_PER_IN) {
-        INT1Value = INT1Count;
-        INT1Count = 0;
-    } else INT1Count++;
-    mINT1ClearIntFlag(); // Clear the interrupt flag
-    return;
-}
-
-
-// perform the counting functions for pin 12
-
-void __ISR(_EXTERNAL_2_VECTOR, ipl2) INT2Interrupt(void) {
-    if (ExtCurrentConfig[12] == EXT_PER_IN) {
-        INT2Value = INT2Count;
-        INT2Count = 0;
-    } else INT2Count++;
-    mINT2ClearIntFlag(); // Clear the interrupt flag
-    return;
-}
-
-
-// perform the counting functions for pin 13
-
-void __ISR(_EXTERNAL_3_VECTOR, ipl2) INT3Interrupt(void) {
-    if (ExtCurrentConfig[13] == EXT_PER_IN) {
-        INT3Value = INT3Count;
-        INT3Count = 0;
-    } else INT3Count++;
-    mINT3ClearIntFlag(); // Clear the interrupt flag
-    return;
-}
-
-
-// perform the counting functions for pin 14
-
-void __ISR(_EXTERNAL_4_VECTOR, ipl2) INT4Interrupt(void) {
-    if (ExtCurrentConfig[14] == EXT_PER_IN) {
-        INT4Value = INT4Count;
-        INT4Count = 0;
-    } else INT4Count++;
-    mINT4ClearIntFlag(); // Clear the interrupt flag
-    return;
-}
-#endif

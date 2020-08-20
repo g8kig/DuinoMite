@@ -13,15 +13,11 @@
             <asminc-extensions/>
             <make-dep-projects/>
             <sourceRootList>
-                <sourceRootElem>../Source/MMBasic</sourceRootElem>
+                <sourceRootElem>../Source</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>
                     <name>OLIMEX</name>
-                    <type>2</type>
-                </confElem>
-                <confElem>
-                    <name>MAXIMITE</name>
                     <type>2</type>
                 </confElem>
             </confList>

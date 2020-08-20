@@ -104,11 +104,6 @@ Initialise the video components
  ***************************************************************************************************/
 void initVideo(void) {
     // setup the I/O pins used by the video
-
-#ifdef MAXIMITE
-    CNCONbits.ON = 1;           // turn on Change Notification module
-    P_VGA_COMP_PULLUP = P_ON;   // turn on the pull up for pin C14 also called CN0
-#endif
     
     TRISBbits.TRISB11 = 1;
     vga = (P_VGA_COMP == P_VGA_SELECT);                                         // VGA will be true if the jumper is NOT there
@@ -133,10 +128,6 @@ void initVideo(void) {
                    VGA_PIX_T);
         
         // enable the output compare which is used to time the width of the horiz sync pulse
-#ifdef MAXIMITE
-        OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, VGA_HSYNC_T);
-#endif
-#ifdef OLIMEX
 #ifdef	OLIMEX_DUINOMITE_EMEGA	// patch for eMega
 
         OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, VGA_HSYNC_T);
@@ -145,9 +136,6 @@ void initVideo(void) {
 
         OpenOC5(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, VGA_HSYNC_T);
 
-#endif
-#else
-        OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, VGA_HSYNC_T);
 #endif
         // enable timer 3 and set to the horizontal scanning frequency
         OpenTimer3(T3_ON | T3_PS_1_1 | T3_SOURCE_INT, VGA_LINE_T - 1);
@@ -163,18 +151,12 @@ void initVideo(void) {
         SpiChnOpen(P_VIDEO_SPI, 
                    SPICON_ON | SPICON_MSTEN | SPICON_MODE32 | SPICON_FRMEN | SPICON_FRMSYNC | SPICON_FRMPOL, 
                    S.C_PIX_T);
-#ifdef MAXIMITE
-        OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, S.C_HSYNC_T);
-#endif
-#ifdef OLIMEX
 #ifdef	OLIMEX_DUINOMITE_EMEGA	// patch for eMega
 
         OpenOC3(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, S.C_HSYNC_T);
 #else
 
         OpenOC5(OC_ON | OC_TIMER3_SRC | OC_CONTINUE_PULSE, 0, S.C_HSYNC_T);
-
-#endif
 #endif
         OpenTimer3(T3_ON | T3_PS_1_1 | T3_SOURCE_INT, S.C_LINE_T - 1);
     }
@@ -216,29 +198,19 @@ void __ISR(_TIMER_3_VECTOR, ipl7) T3Interrupt(void) {
             break;
 
         case SV_SYNC: // 1
-#ifdef MAXIMITE
-            if (!vga) OC3R = S.C_LINE_T - S.C_HSYNC_T; // start the vertical sync pulse for composite
-#endif
-#ifdef OLIMEX
 #ifdef	OLIMEX_DUINOMITE_EMEGA	// patch for eMega
             if (!vga) OC3R = S.C_LINE_T - S.C_HSYNC_T; // start the vertical sync pulse for composite
 #else
             if (!vga) OC5R = S.C_LINE_T - S.C_HSYNC_T; // start the vertical sync pulse for composite
 #endif
-#endif
             if (vga) P_VERT_SET_LO; // start the vertical sync pulse for VGA
             break;
 
         case SV_POSTEQ: // 2
-#ifdef MAXIMITE
-            if (!vga) OC3R = S.C_HSYNC_T; // end of the vertical sync pulse for composite
-#endif
-#ifdef	OLIMEX
 #ifdef	OLIMEX_DUINOMITE_EMEGA	// patch for eMega
             if (!vga) OC3R = S.C_HSYNC_T; // end of the vertical sync pulse for composite
 #else
             if (!vga) OC5R = S.C_HSYNC_T; // end of the vertical sync pulse for composite
-#endif
 #endif
             if (vga) P_VERT_SET_HI; // end of the vertical sync pulse for vga
             break;

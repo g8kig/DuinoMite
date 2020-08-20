@@ -23,11 +23,6 @@ If not, see <http://www.gnu.org/licenses/>.
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
 void cmd_open(void);
 void cmd_close(void);
 void cmd_files(void);
@@ -37,12 +32,9 @@ void cmd_chdir(void);
 void cmd_kill(void);
 void cmd_name(void);
 void cmd_drive(void);
-
 void cmd_msdon(void);
 void cmd_msdoff(void);
 void cmd_sdformat(void);
-
-
 void fun_cwd(void);
 void fun_errno(void);
 void fun_eof(void);
@@ -51,7 +43,6 @@ void fun_lof(void);
 void fun_inputstr(void);
 void fun_mmdrive(void);
 void fun_mmfname(void);
-
 #endif
 
 
@@ -60,12 +51,6 @@ void fun_mmfname(void);
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
-
 	{ "OPEN",		T_CMD,				0, cmd_open		},
 	{ "CLOSE",		T_CMD,				0, cmd_close	},
 	{ "FILES",		T_CMD,				0, cmd_files	},
@@ -85,10 +70,6 @@ void fun_mmfname(void);
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
 	{ "EOF(",		T_FUN | T_NBR,		0, fun_eof		},
 	{ "LOC(",		T_FUN | T_NBR,		0, fun_loc		},
 	{ "LOF(",		T_FUN | T_NBR,		0, fun_lof		},
@@ -99,10 +80,7 @@ void fun_mmfname(void);
 	{ "MM.DRIVE$",	T_FNA | T_STR,		0, fun_mmdrive	},
 	{ "MM.DRIVE",	T_FNA | T_STR,		0, fun_mmdrive	},					// for users who forget that it is a string
 	{ "MM.FNAME$",	T_FNA | T_STR,		0, fun_mmfname	},
-
-
 #endif
-
 
 
 #ifdef INCLUDE_FUNCTION_DEFINES
@@ -113,11 +91,10 @@ void fun_mmfname(void);
 
 #define COM1_FILE_POINTER			(FSFILE *)1								// the file "pointer" to use when COM1 is open
 #define COM2_FILE_POINTER			(FSFILE *)2								// the file "pointer" to use when COM2 is open
-#ifdef OLIMEX
 #define COM3_FILE_POINTER			(FSFILE *)3								// the file "pointer" to use when COM1 is open
 #define COM4_FILE_POINTER			(FSFILE *)4								// the file "pointer" to use when COM2 is open
-#endif
-extern void MMgetline(int filenbr, char *p);
+
+            extern void MMgetline(int filenbr, char *p);
 extern void MMfputs(char *p, int filenbr);
 extern void CheckAbort(void) ;
 extern void MMfopen(char *fname, char *mode, int fnbr);
@@ -140,10 +117,6 @@ extern void FlashList(char *s);
 extern int DefaultDrive;
 
 extern char MSDEnable;
-//#ifndef MAXIMITE
-//	int MMCharPos;
-//#endif
-//
 
 ///////////////////////////// defines for flash storage ///////////////////////////////////////
 #define FLASH_PAGE_SIZE		4096						// size of each page of flash storage

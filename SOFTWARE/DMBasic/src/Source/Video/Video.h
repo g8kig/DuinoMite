@@ -1,6 +1,4 @@
 /************************************************************************************************************************
-Maximite
-
 Video.h
 
 Copyright 2011 Geoff Graham - http://geoffg.net
@@ -36,7 +34,7 @@ struct s_font {
 	void *p;
 	unsigned char width, height;
 	unsigned char start, end;
-        unsigned char binary;                                    //if its a binary font
+    unsigned char binary;                                                       //if its a binary font
 };
 
 extern struct s_font ftbl[NBRFONTS];	
@@ -61,7 +59,9 @@ extern void UnloadFont(int font);
 
 // cursor definition
 void ShowCursor(int show);
+
 typedef enum {C_OFF = 0, C_STANDARD, C_INSERT } Cursor_e ;
+
 extern Cursor_e Cursor;
 
 

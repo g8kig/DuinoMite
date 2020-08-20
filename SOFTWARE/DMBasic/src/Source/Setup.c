@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
 #include <plib.h>
+
 #define INCLUDE_FUNCTION_DEFINES
 
 #include "Maximite.h"
@@ -154,7 +154,6 @@ void SetupMainMenu(void) {
         case 4:
             MMPrintString("Custom");
             break;
-
     }
     MenuPrint(" R) RTC On Boot    - ");
     switch (SS.RTCEnable) {

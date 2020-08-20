@@ -22,32 +22,17 @@ If not, see <http://www.gnu.org/licenses/>.
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
 void cmd_setpin(void);
 void cmd_pin(void);
-
 void fun_pin(void);
-
 #endif
-
-
 
 /**********************************************************************************
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
 	{ "PIN(",		T_CMD | T_FUN,		0, cmd_pin		},
 	{ "SETPIN",		T_CMD,				0, cmd_setpin	},
-
 #endif
 
 
@@ -55,12 +40,7 @@ void fun_pin(void);
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
 	{ "PIN(",		T_FUN | T_NBR,		0, fun_pin		},
-
 #endif
 
 
@@ -87,20 +67,10 @@ extern void ClearExternalIO(void);
 #define EXT_COM_RESERVED                        100				// this pin is reserved and SETPIN and PIN cannot be used
 #define EXT_CONSOLE_RESERVED	EXT_COM_RESERVED + 1                            // this must be one higher than EXT_COM_RESERVED
 
-#ifdef MAXIMITE
-	#define NBRPINS				20				// number of pins for external i/o
-#endif
-#ifdef UBW32
-	#define NBRPINS				50				// number of pins for external i/o
-#endif
-#ifdef OLIMEX
-	// SPP +
-	#ifdef	OLIMEX_DUINOMITE_EMEGA
-		#define NBRPINS				39
-	#else
-		#define NBRPINS				24
-	#endif
-	// SPP -
+#ifdef	OLIMEX_DUINOMITE_EMEGA
+    #define NBRPINS				39
+#else
+    #define NBRPINS				24
 #endif
 
 extern int ExtCurrentConfig[NBRPINS + 1];

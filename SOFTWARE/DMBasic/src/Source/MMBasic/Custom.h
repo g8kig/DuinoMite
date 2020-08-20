@@ -25,12 +25,6 @@ If not, see <http://www.gnu.org/licenses/>.
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
-//	GS OW Start
 void cmd_owReset(void);
 void cmd_owWrite(void);
 void cmd_owRead(void);
@@ -38,11 +32,6 @@ void cmd_owSearch(void);
 void fun_owCRC8(void);
 void fun_owCRC16(void);
 void fun_mmOW(void);
-//	GS OW End
-
-// Ingmar's additions start
-
-// Ingmar's additions end
 #endif
 
 
@@ -50,23 +39,13 @@ void fun_mmOW(void);
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
-//	GS OW Start
 	{ "OWRESET",		T_CMD,				0, cmd_owReset	},
 	{ "OWWRITE",		T_CMD,				0, cmd_owWrite	},
 	{ "OWREAD",			T_CMD,				0, cmd_owRead		},
 	{ "OWSEARCH",		T_CMD,				0, cmd_owSearch },
-//	GS OW End
-// Ingmar's additions start
 	{ "SHIFTOUT",	T_CMD,				0, cmd_shiftout	},
 	{ "SHIFTIN",	T_CMD,				0, cmd_shiftin	},
 	{ "LOADBMP",	T_CMD,				0, cmd_loadbmp	},
-// Ingmar's additions end
-
 #endif
 
 
@@ -74,19 +53,10 @@ void fun_mmOW(void);
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
-
-//	GS OW Start
 	{ "OWCRC8(",	T_FUN | T_NBR,	0, fun_owCRC8 },
 	{ "OWCRC16(",	T_FUN | T_NBR,	0, fun_owCRC16 },
 	{ "MM.OW",		T_FNA | T_NBR,	0, fun_mmOW		},
-//	GS OW End
-// Ingmar's additions start
 	{ "DM.VMEM",	T_FNA | T_NBR,		0, fun_vmem		},
-// Ingmar's additions end
 #endif
 
 
@@ -97,11 +67,9 @@ void fun_mmOW(void);
 #ifndef CUSTOM_HEADER
 #define CUSTOM_HEADER
 
-// Ingmar's additions start
 void cmd_loadbmp(void);
 void fun_vmem(void);
 void cmd_shiftout(void);
 void cmd_shiftin(void);
-// Ingmar's additions end
 #endif
 #endif

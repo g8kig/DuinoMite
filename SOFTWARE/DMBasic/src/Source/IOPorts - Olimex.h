@@ -18,8 +18,8 @@ If not, see <http://www.gnu.org/licenses/>.
 
  ************************************************************************************************************************/
 
-//#include <p32xxxx.h>
-//#include <plib.h>
+#ifndef IOPORTS_OLIMEX_H
+#define IOPORTS_OLIMEX__H
 
 /*
 Note that we never use TRIS to set a pin as an input because that is the default after powerup
@@ -122,21 +122,6 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define P_E5_ODCOFF			{ODCBCLR = _ODCB_ODCB9_MASK;}
 #define P_E5_READ			((PORTB & _PORTB_RB9_MASK) ? 1 : 0)
 
-//#define P_E5A_TRIS			TRISDbits.TRISD9		// MMBasic alternate ext i/o pin 5
-//#define P_E5A_OC			ODCDbits.ODCD9
-//#define P_E5A_OUT			LATDbits.LATD9
-//#define P_E5A_IN			PORTDbits.RD9
-//#define P_E5A_TRISSET(m)		{if(m) TRISDSET = _TRISD_TRISD9_MASK else TRISDCLR = _TRISD_TRISD9_MASK;}
-//#define P_E5A_TRISINP			{TRISDSET = _TRISD_TRISD9_MASK;}
-//#define P_E5A_TRISOUT			{TRISDCLR = _TRISD_TRISD9_MASK;}
-//#define P_E5A_WRITESET(m)		{if(m) LATDSET = _LATD_LATD9_MASK else LATDCLR = _LATD_LATD9_MASK;}
-//#define P_E5A_WRITE1			{LATDSET = _LATD_LATD9_MASK;}
-//#define P_E5A_WRITE0			{LATDCLR = _LATD_LATD9_MASK;}
-//#define P_E5A_ODCSET(m)			{if(m) ODCDSET = _ODCD_ODCD9_MASK else ODCDCLR = _ODCD_ODCD9_MASK;}
-//#define P_E5A_ODCON			{ODCDSET = _ODCD_ODCD9_MASK;}
-//#define P_E5A_ODCOFF			{ODCDCLR = _ODCD_ODCD9_MASK;}
-//#define P_E5A_READ			((PORTD & _PORTD_RD9_MASK) ? 1 : 0)
-
 #define P_E6_TRIS			TRISBbits.TRISB10		// MMBasic ext i/o pin 6
 #define P_E6_ANALOG			AD1PCFGbits.PCFG10
 #define P_E6_ACHAN			10
@@ -153,21 +138,6 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define P_E6_ODCON			{ODCBSET = _ODCB_ODCB10_MASK;}
 #define P_E6_ODCOFF			{ODCBCLR = _ODCB_ODCB10_MASK;}
 #define P_E6_READ			((PORTB & _PORTB_RB10_MASK) ? 1 : 0)
-
-//#define P_E6A_TRIS			TRISDbits.TRISD10		// MMBasic alternate ext i/o pin 6
-//#define P_E6A_OC			ODCDbits.ODCD10
-//#define P_E6A_OUT			LATDbits.LATD10
-//#define P_E6A_IN			PORTDbits.RD10
-//#define P_E6A_TRISSET(m)		{if(m) TRISDSET = _TRISD_TRISD10_MASK else TRISDCLR = _TRISD_TRISD10_MASK;}
-//#define P_E6A_TRISINP			{TRISDSET = _TRISD_TRISD10_MASK;}
-//#define P_E6A_TRISOUT			{TRISDCLR = _TRISD_TRISD10_MASK;}
-//#define P_E6A_WRITESET(m)		{if(m) LATDSET = _LATD_LATD10_MASK else LATDCLR = _LATD_LATD10_MASK;}
-//#define P_E6A_WRITE1			{LATDSET = _LATD_LATD10_MASK;}
-//#define P_E6A_WRITE0			{LATDCLR = _LATD_LATD10_MASK;}
-//#define P_E6A_ODCSET(m)			{if(m) ODCDSET = _ODCD_ODCD10_MASK else ODCDCLR = _ODCD_ODCD10_MASK;}
-//#define P_E6A_ODCON			{ODCDSET = _ODCD_ODCD10_MASK;}
-//#define P_E6A_ODCOFF			{ODCDCLR = _ODCD_ODCD10_MASK;}
-//#define P_E6A_READ			((PORTD & _PORTD_RD10_MASK) ? 1 : 0)
 
 #define P_E7_TRIS			TRISDbits.TRISD11		// MMBasic ext i/o pin 7
 #define P_E7_OC				ODCDbits.ODCD11
@@ -244,23 +214,6 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define P_E11_ODCOFF			{ODCECLR = _ODCE_ODCE0_MASK;}
 #define P_E11_READ			((PORTE & _PORTE_RE0_MASK) ? 1 : 0)
 
-//#define P_E11A_TRIS			TRISBbits.TRISB8		// MMBasic alternate ext i/o pin 11
-//#define P_E11A_ANALOG			AD1PCFGbits.PCFG8
-//#define P_E11A_ACHAN			8
-//#define P_E11A_OC			ODCBbits.ODCB8
-//#define P_E11A_OUT			LATBbits.LATB8
-//#define P_E11A_IN			PORTBbits.RB8
-//#define P_E11A_TRISSET(m)		{if(m) TRISBSET = _TRISB_TRISB8_MASK else TRISBCLR = _TRISB_TRISB8_MASK;}
-//#define P_E11A_TRISINP			{TRISBSET = _TRISB_TRISB8_MASK;}
-//#define P_E11A_TRISOUT			{TRISBCLR = _TRISB_TRISB8_MASK;}
-//#define P_E11A_WRITESET(m)		{if(m) LATBSET = _LATB_LATB8_MASK else LATBCLR = _LATB_LATB8_MASK;}
-//#define P_E11A_WRITE1			{LATBSET = _LATB_LATB8_MASK;}
-//#define P_E11A_WRITE0			{LATBCLR = _LATB_LATB8_MASK;}
-//#define P_E11A_ODCSET(m)		{if(m) ODCBSET = _ODCB_ODCB8_MASK else ODCBCLR = _ODCB_ODCB8_MASK;}
-//#define P_E11A_ODCON			{ODCBSET = _ODCB_ODCB8_MASK;}
-//#define P_E11A_ODCOFF			{ODCBCLR = _ODCB_ODCB8_MASK;}
-//#define P_E11A_READ			((PORTB & _PORTB_RB8_MASK) ? 1 : 0)
-
 #define P_E12_TRIS			TRISEbits.TRISE1		// MMBasic ext i/o pin 12
 #define P_E12_OC			ODCEbits.ODCE1
 #define P_E12_OUT			LATEbits.LATE1
@@ -275,23 +228,6 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define P_E12_ODCON			{ODCESET = _ODCE_ODCE1_MASK;}
 #define P_E12_ODCOFF			{ODCECLR = _ODCE_ODCE1_MASK;}
 #define P_E12_READ			((PORTE & _PORTE_RE1_MASK) ? 1 : 0)
-
-//#define P_E12A_TRIS			TRISBbits.TRISB14		// MMBasic alternate ext i/o pin 12
-//#define P_E12A_ANALOG			AD1PCFGbits.PCFG14
-//#define P_E12A_ACHAN			14
-//#define P_E12A_OC			ODCBbits.ODCB14
-//#define P_E12A_OUT			LATBbits.LATB14
-//#define P_E12A_IN			PORTBbits.RB14
-//#define P_E12A_TRISSET(m)		{if(m) TRISBSET = _TRISB_TRISB14_MASK else TRISBCLR = _TRISB_TRISB14_MASK;}
-//#define P_E12A_TRISINP			{TRISBSET = _TRISB_TRISB14_MASK;}
-//#define P_E12A_TRISOUT			{TRISBCLR = _TRISB_TRISB14_MASK;}
-//#define P_E12A_WRITESET(m)		{if(m) LATBSET = _LATB_LATB14_MASK else LATBCLR = _LATB_LATB14_MASK;}
-//#define P_E12A_WRITE1			{LATBSET = _LATB_LATB14_MASK;}
-//#define P_E12A_WRITE0			{LATBCLR = _LATB_LATB14_MASK;}
-//#define P_E12A_ODCSET(m)		{if(m) ODCBSET = _ODCB_ODCB14_MASK else ODCBCLR = _ODCB_ODCB14_MASK;}
-//#define P_E12A_ODCON			{ODCBSET = _ODCB_ODCB14_MASK;}
-//#define P_E12A_ODCOFF			{ODCBCLR = _ODCB_ODCB14_MASK;}
-//#define P_E12A_READ			((PORTB & _PORTB_RB14_MASK) ? 1 : 0)
 
 #define P_E13_TRIS			TRISEbits.TRISE2		// MMBasic ext i/o pin 13
 #define P_E13_OC			ODCEbits.ODCE2
@@ -476,10 +412,8 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define SD_CS_TRIS				TRISDbits.TRISD5			// SD-SPI Chip Select TRIS bit
 
 #define SD_CD				0       //PORTDbits.RD4			// SD-SPI Card Detect Input bit
-//#define SD_CD_TRIS					TRISDbits.TRISD4	// SD-SPI Card Detect TRIS bit
 
 #define SD_WE				0       //PORTDbits.RD5			// SD-SPI Write Protect Check Input bit
-//#define SD_WE_TRIS					TRISDbits.TRISD5	// SD-SPI Write Protect Check TRIS bit
 
 #define SPICON1				SPI3CON					// The main SPI control register
 #define SPISTAT				SPI3STAT				// The SPI status register
@@ -498,15 +432,6 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define getcSPI()			SpiChnGetC(3)
 #define OpenSPI(config1, config2)	SpiChnOpen(3, config1, config2)
 #define CloseSPI()                      SpiChnClose(3)
-
-
-
-
-// Serial ports defines 
-// COM1 Rx=D2(pin13) Tx=D3(pin14) RTS= D4(pin15) CTS= D5(pin16) 
-// COM2 Rx= D6(pin17) Tx= D7(pin(18)
-// COM3 Rx = UEXT.3 Tx = UEXT.4
-// COM4 Rx = D0 (pn11) Tx = D1 (pin12)
 
 #define P_COM1_RX_PIN_NBR		13
 #define P_COM1_RX_PORT			PORTEbits.RE2
@@ -535,6 +460,7 @@ Note that we never use TRIS to set a pin as an input because that is the default
 #define P_COM4_RX_PIN_NBR		11
 #define P_COM4_TX_PIN_NBR		12
 
-
 // sound output
 #define P_SOUND_TRIS			TRISDbits.TRISD0
+
+#endif

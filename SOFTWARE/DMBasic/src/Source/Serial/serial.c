@@ -26,10 +26,8 @@ If not, see <http://www.gnu.org/licenses/>.
 #include "../MMBasic/MMBasic.h"
 #include "../MMBasic/External.h"
 #include "serial.h"
-#ifdef OLIMEX
 #include "../DuinoMite/RTC.h"
 #include "Setup.h"
-#endif
 
 // variables for com1
 int com1_buf_size; // size of the buffer used to receive chars
@@ -64,7 +62,6 @@ static int com2Tx_start_cnt; // the starting count for com2Tx_cnt
 static unsigned char *com2Tx_buf; // pointer to the buffer for received characters
 static volatile int com2Tx_head, com2Tx_tail; // head and tail of the ring buffer for com2Tx
 
-#ifdef OLIMEX
 // variables for com3  this maps to com3 UART2 on UEXT
 int com3_buf_size; // size of the buffer used to receive chars
 char *com3_interrupt; // pointer to the interrupt routine
@@ -86,7 +83,6 @@ static unsigned char *com4Rx_buf; // pointer to the buffer for received characte
 static volatile int com4Rx_head, com4Rx_tail; // head and tail of the ring buffer for com4Rx
 static unsigned char *com4Tx_buf; // pointer to the buffer for received characters
 static volatile int com4Tx_head, com4Tx_tail; // head and tail of the ring buffer for com4Tx
-#endif
 
 int SerialConsole = 0; // holds the serial port number if the console function is enabled
 
@@ -208,7 +204,6 @@ void SerialOpen(char *spec, int as_console) {
         if (as_console) SerialConsole = 2;
         com2 = true;
     }
-#ifdef OLIMEX
     if (spec[3] == '3') {
         ///////////////////////////////// this is COM3 ////////////////////////////////////
         if (com3) error("COM3: is already open");
@@ -267,7 +262,7 @@ void SerialOpen(char *spec, int as_console) {
         if (as_console) SerialConsole = 4;
         com4 = true;
     }
-#endif
+
     // if timer 5 is off then set it up
     if (T5CON == 0) {
         PR5 = ((BUSFREQ / COM_MAX_BAUD_RATE) / 3) - 1; // ticks at 3 times the max baud rate
@@ -308,7 +303,6 @@ void SerialClose(int comnbr) {
         free(com2Tx_buf);
         HeapUsed -= com2_buf_size * 2;
     }
-#ifdef OLIMEX
     if (comnbr == 3 && com3) {
         UARTEnable(UART2, UART_DISABLE_FLAGS(UART_PERIPHERAL | UART_RX | UART_TX));
         com3 = false;
@@ -329,13 +323,8 @@ void SerialClose(int comnbr) {
         free(com4Tx_buf);
         HeapUsed -= com4_buf_size * 2;
     }
-#endif
     // if all com ports are closed we can disable the interrupts and timer
-#ifdef OLIMEX
     if (!com1 && !com2 && !com3 && !com4) {
-#else
-    if (!com1 && !com2) {
-#endif
         mT5IntEnable(0);
         T5CON = 0;
     }
@@ -401,7 +390,6 @@ int SerialRxStatus(int comnbr) {
         i = com2Rx_head - com2Rx_tail;
         if (i < 0) i += com2_buf_size;
     }
-#ifdef OLIMEX
     if (comnbr == 3) {
         i = com3Rx_head - com3Rx_tail;
         if (i < 0) i += com3_buf_size;
@@ -410,7 +398,6 @@ int SerialRxStatus(int comnbr) {
         i = com4Rx_head - com4Rx_tail;
         if (i < 0) i += com4_buf_size;
     }
-#endif
     return i;
 }
 
@@ -428,7 +415,6 @@ int SerialTxStatus(int comnbr) {
         i = com2Rx_head - com2Rx_tail;
         if (i < 0) i += com2_buf_size;
     }
-#ifdef OLIMEX
     if (comnbr == 3) {
         i = com3Rx_head - com3Rx_tail;
         if (i < 0) i += com3_buf_size;
@@ -437,7 +423,6 @@ int SerialTxStatus(int comnbr) {
         i = com4Rx_head - com4Rx_tail;
         if (i < 0) i += com4_buf_size;
     }
-#endif
 
     return i;
 }
@@ -463,7 +448,6 @@ int SerialGetchar(int comnbr) {
             return c;
         }
     }
-#ifdef OLIMEX
     if (comnbr == 3) {
         if (com3Rx_head != com3Rx_tail) { // if the queue has something in it
             c = com3Rx_buf[com3Rx_tail]; // get the char
@@ -478,7 +462,6 @@ int SerialGetchar(int comnbr) {
             return c;
         }
     }
-#endif
     return -1; // return eof
 }
 
@@ -624,7 +607,6 @@ void __ISR(_TIMER_5_VECTOR, ipl6) T5Interrupt(void) {
             }
         }
     }
-#ifdef OLIMEX
     ///////////////////////////////// this is COM3 ////////////////////////////////////
     if (com3) {
         if (IFS1bits.U2RXIF) {
@@ -651,7 +633,6 @@ void __ISR(_TIMER_5_VECTOR, ipl6) T5Interrupt(void) {
             IFS2bits.U5RXIF = 0;
         }
    }
-#endif
     // Clear the interrupt flag
     mT5ClearIntFlag();
 }

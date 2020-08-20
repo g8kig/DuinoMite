@@ -24,10 +24,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 #define TEST_STACK_OVERFLOW							// define for stack overflow check - will only work on the PIC32
 
-//#ifndef EOF
-//	#define EOF -1
-//#endif
-
 #include "../MMBasic/Files.h"
 #include "../Maximite.h"
 
@@ -226,6 +222,7 @@ extern unsigned char FunKey[NBRPROGKEYS][MAXKEYLEN + 1]; // used by the programm
 
 extern void  __attribute__((noreturn)) MMBasicStart(void);
 extern void __attribute__((noreturn)) error(char *);
+
 int MMround(float);
 void makeargs(char **tp, int maxargs, char *argbuf, char *argv[], int *argc, char *delim);
 void *findvar(char *, int);
@@ -262,7 +259,6 @@ void EditInputLine(int line);
 void ProcessInputLine(void);
 int IsValidLine(int line);
 void InsertLastcmd(char *s);
-
 
 inline int str_equal (const unsigned char *s1, const unsigned char *s2);
 int	 strncasecmp (const char *s1, const char *s2, size_t n);

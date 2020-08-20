@@ -269,7 +269,6 @@
         #define SPI_FREQUENCY			(20000000)
 
 
-/* Maximite:  all the defines are done in IOPorts.h so the Microchip definitions are commented out */
 #include "Maximite.h"
 #include "IOPorts.h"
 

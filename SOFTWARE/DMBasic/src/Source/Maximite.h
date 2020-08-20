@@ -17,7 +17,6 @@ If not, see <http://www.gnu.org/licenses/>.
 
 ************************************************************************************************************************/
 
-
 #ifndef MMHeader
 #define MMHeader
 
@@ -99,9 +98,10 @@ If not, see <http://www.gnu.org/licenses/>.
 	extern int FileXfr;
 	extern int Autorun;
 	extern int USBOn, VideoOn;										// variables controlling the display of the output
-        extern volatile int DisableMMAbort;
-        extern char MSDEnable;
-	// Uncomment the following #define to turn on performance profiling
+    extern volatile int DisableMMAbort;
+    extern char MSDEnable;
+
+    // Uncomment the following #define to turn on performance profiling
 	// To use profiling run a program.  When it terminates the results will be written to the SD card as PROFILE.XLS
 	// Note:  The serial ports cannot be used while profiling and execution speed will be reduced by approx 10%
 	//#define PROFILE
@@ -113,5 +113,4 @@ If not, see <http://www.gnu.org/licenses/>.
 		void StartProfiling(void);
 		void StopProfiling(void);
 	#endif
-
 #endif

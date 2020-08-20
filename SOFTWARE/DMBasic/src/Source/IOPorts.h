@@ -18,6 +18,8 @@ If not, see <http://www.gnu.org/licenses/>.
 
 ************************************************************************************************************************/
 
+#ifndef IOPORTS__H
+#define IOPORTS__H
 
 // General defines
 #define P_INPUT				1						// for setting the TRIS on I/O bits
@@ -25,21 +27,11 @@ If not, see <http://www.gnu.org/licenses/>.
 #define P_ON				1
 #define P_OFF				0
 
-
-#ifdef MAXIMITE
-	#include "IOPorts - Maximite.h"
+#ifdef OLIMEX_DUINOMITE_EMEGA
+        #include "IOPorts - Olimex DuinoMite eMega.h"
+#else
+        #include "IOPorts - Olimex.h"
 #endif
 
-#ifdef UBW32
-	#include "IOPorts - UBW32.h"
 #endif
 
-#ifdef  OLIMEX
-    // SPP +
-    #ifdef OLIMEX_DUINOMITE_EMEGA
-            #include "IOPorts - Olimex DuinoMite eMega.h"
-    #else
-            #include "IOPorts - Olimex.h"
-    #endif
-    // SPP -
-#endif

@@ -33,15 +33,8 @@ void WriteRTC(void);
 
 static const char *DayOfWeek[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 static const char *Months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-static rtccTime tm, tm1; // time structure
-static rtccDate dt, dt1; // date structure
 
 volatile int SleepMMVal;
-
-static char temp[32];
-static char I2CAdd;
-static char StartAdd = 0;
-static char StartDow = 0;
 
 static int dayofweek(void);
 
@@ -99,6 +92,8 @@ void fun_mmss(void) {
 }
 
 void WriteRTCC(void) {
+    rtccTime tm;
+    rtccDate dt;
     tm.l = 0;
     tm.sec = int2bcd(second);
     tm.min = int2bcd(minute);
@@ -114,6 +109,8 @@ void WriteRTCC(void) {
 }
 
 void ReadRTCC(void) {
+    rtccTime tm1;
+    rtccDate dt1;
     RtccGetTimeDate(&tm1, &dt1);
     second = bcd2int(tm1.sec);
     minute = bcd2int(tm1.min);
@@ -143,112 +140,134 @@ unsigned char I2CRXByte(char ack) {
 }
 
 void ReadRTC(void) {
+    rtccTime tm;
+    rtccDate dt;
     if (S.RTCEnable) {
+        char I2CAdd = 0;
+        char StartAdd = 0;
+        char StartDow = 0;
+
         ExtCfg(5, EXT_COM_RESERVED);
         ExtCfg(6, EXT_COM_RESERVED);
         if (S.RTCEnable == 1) {
             I2CAdd = 0xa2;
-            StartAdd = 0x02;
+            StartAdd = 2;
             StartDow = 0;
-        }
-        if (S.RTCEnable == 2) {
+        } else if (S.RTCEnable == 2) {
             I2CAdd = 0xd0;
-            StartAdd = 0x00;
+            StartAdd = 0;
             StartDow = 1;
         }
-        I2CConfigure(I2C1, I2C_ENABLE_SLAVE_CLOCK_STRETCHING | I2C_ENABLE_HIGH_SPEED);
-        I2CSetFrequency(I2C1, 80000000, 100000);
-        I2CEnable(I2C1, true);
-        I2CStart(I2C1);
-        waiti2cIdle();
-        I2CSendByte(I2C1, I2CAdd);
-        while (I2C1STAT & 0x00004000); //wait tx complete
-        if (I2CByteWasAcknowledged(I2C1)) { //I2CByteWasAcknowledged(I2C1))
-            I2CSendByte(I2C1, StartAdd);
+
+        if (I2CAdd != 0) {
+            I2CConfigure(I2C1, I2C_ENABLE_SLAVE_CLOCK_STRETCHING | I2C_ENABLE_HIGH_SPEED);
+            I2CSetFrequency(I2C1, 80000000, 100000);
+            I2CEnable(I2C1, true);
+            I2CStart(I2C1);
             waiti2cIdle();
-            I2CRepeatStart(I2C1);
-            waiti2cIdle();
-            I2CSendByte(I2C1, I2CAdd + 1);
+            I2CSendByte(I2C1, I2CAdd);
             while (I2C1STAT & 0x00004000); //wait tx complete
-            tm.l = 0;
-            tm.sec = (I2CRXByte(1) & 0x7f);
-            tm.min = (I2CRXByte(1) & 0x7f);
-            tm.hour = (I2CRXByte(1) & 0x3f);
-            if (S.RTCEnable == 1) {
-                dt.mday = (I2CRXByte(1) & 0x3f);
-                dt.wday = (I2CRXByte(1) & 0x07);
+            if (I2CByteWasAcknowledged(I2C1)) { //I2CByteWasAcknowledged(I2C1))
+                I2CSendByte(I2C1, StartAdd);
+                waiti2cIdle();
+                I2CRepeatStart(I2C1);
+                waiti2cIdle();
+                I2CSendByte(I2C1, I2CAdd + 1);
+                while (I2C1STAT & 0x00004000); //wait tx complete
+                tm.l = 0;
+                tm.sec = (I2CRXByte(1) & 0x7f);
+                tm.min = (I2CRXByte(1) & 0x7f);
+                tm.hour = (I2CRXByte(1) & 0x3f);
+                if (S.RTCEnable == 1) {
+                    dt.mday = (I2CRXByte(1) & 0x3f);
+                    dt.wday = (I2CRXByte(1) & 0x07);
+                }
+                if (S.RTCEnable == 2) {
+                    dt.wday = (I2CRXByte(1) & 0x07);
+                    dt.mday = ((I2CRXByte(1) & 0x3f) - 1);
+                }
+                dt.mon = (I2CRXByte(1) & 0x1f);
+                dt.year = I2CRXByte(0);
+                I2CStop(I2C1);
             }
-            if (S.RTCEnable == 2) {
-                dt.wday = (I2CRXByte(1) & 0x07);
-                dt.mday = ((I2CRXByte(1) & 0x3f) - 1);
-            }
-            dt.mon = (I2CRXByte(1) & 0x1f);
-            dt.year = I2CRXByte(0);
-            I2CStop(I2C1);
+
+            I2CEnable(I2C1, false);
+            ExtCfg(5, EXT_NOT_CONFIG);
+            ExtCfg(6, EXT_NOT_CONFIG);
         }
     }
-    I2CEnable(I2C1, false);
-    ExtCfg(5, EXT_NOT_CONFIG);
-    ExtCfg(6, EXT_NOT_CONFIG);
+
     RtccOpen(tm.l, dt.l, 0); // set time, date and calibration in a single operation
     RtccSetAlarmTimeDate(tm.l, dt.l);
 }
 
 void WriteRTC(void) {
     if (S.RTCEnable) {
+        rtccTime tm1;
+        rtccDate dt1;
+        char I2CAdd = 0;
+        char StartAdd = 0;
         if (S.RTCEnable == 1) {
             I2CAdd = 0xa2;
-            StartAdd = 0x02;
-        }
-        if (S.RTCEnable == 2) {
+            StartAdd = 2;
+        } else if (S.RTCEnable == 2) {
             I2CAdd = 0xd0;
-            StartAdd = 0x00;
+            StartAdd = 0;
         }
-        ExtCfg(5, EXT_COM_RESERVED); // clear BASIC interrupts and disable PIN and SETPIN
-        ExtCfg(6, EXT_COM_RESERVED);
-        I2CConfigure(I2C1, I2C_ENABLE_SLAVE_CLOCK_STRETCHING | I2C_ENABLE_HIGH_SPEED);
-        I2CSetFrequency(I2C1, 80000000, 100000);
-        I2CEnable(I2C1, true);
-        RtccGetTimeDate(&tm1, &dt1);
-        I2CStart(I2C1);
-        waiti2cIdle();
-        I2CSendByte(I2C1, I2CAdd);
-        while (I2C1STAT & 0x00004000); //wait tx complete
-        if (I2CByteWasAcknowledged(I2C1)) { //I2CByteWasAcknowledged(I2C1))
-            I2CSendByte(I2C1, StartAdd);
+
+        if (I2CAdd != 0) {
+            ExtCfg(5, EXT_COM_RESERVED); // clear BASIC interrupts and disable PIN and SETPIN
+            ExtCfg(6, EXT_COM_RESERVED);
+
+            I2CConfigure(I2C1, I2C_ENABLE_SLAVE_CLOCK_STRETCHING | I2C_ENABLE_HIGH_SPEED);
+            I2CSetFrequency(I2C1, 80000000, 100000);
+            I2CEnable(I2C1, true);
+
+            RtccGetTimeDate(&tm1, &dt1);
+
+            I2CStart(I2C1);
+            waiti2cIdle();
+            I2CSendByte(I2C1, I2CAdd);
             while (I2C1STAT & 0x00004000); //wait tx complete
-            I2CSendByte(I2C1, tm1.sec);
-            while (I2C1STAT & 0x00004000); //wait tx complete
-            I2CSendByte(I2C1, tm1.min);
-            while (I2C1STAT & 0x00004000); //wait tx complete
-            I2CSendByte(I2C1, tm1.hour);
-            while (I2C1STAT & 0x00004000); //wait tx complete
-            if (S.RTCEnable == 1) {
-                I2CSendByte(I2C1, dt1.mday);
+            if (I2CByteWasAcknowledged(I2C1)) { //I2CByteWasAcknowledged(I2C1))
+                I2CSendByte(I2C1, StartAdd);
                 while (I2C1STAT & 0x00004000); //wait tx complete
-                I2CSendByte(I2C1, dt1.wday);
+                I2CSendByte(I2C1, tm1.sec);
                 while (I2C1STAT & 0x00004000); //wait tx complete
+                I2CSendByte(I2C1, tm1.min);
+                while (I2C1STAT & 0x00004000); //wait tx complete
+                I2CSendByte(I2C1, tm1.hour);
+                while (I2C1STAT & 0x00004000); //wait tx complete
+
+                if (S.RTCEnable == 1) {
+                    I2CSendByte(I2C1, dt1.mday);
+                    while (I2C1STAT & 0x00004000); //wait tx complete
+                    I2CSendByte(I2C1, dt1.wday);
+                    while (I2C1STAT & 0x00004000); //wait tx complete
+                } else if (S.RTCEnable == 2) {
+                    I2CSendByte(I2C1, (dt1.wday + 1));
+                    while (I2C1STAT & 0x00004000); //wait tx complete
+                    I2CSendByte(I2C1, dt1.mday);
+                    while (I2C1STAT & 0x00004000); //wait tx complete
+                }
+
+                I2CSendByte(I2C1, dt1.mon);
+                while (I2C1STAT & 0x00004000); //wait tx complete
+                I2CSendByte(I2C1, dt1.year);
+                while (I2C1STAT & 0x00004000); //wait tx complete
+                I2CStop(I2C1);
             }
-            if (S.RTCEnable == 2) {
-                I2CSendByte(I2C1, (dt1.wday + 1));
-                while (I2C1STAT & 0x00004000); //wait tx complete
-                I2CSendByte(I2C1, dt1.mday);
-                while (I2C1STAT & 0x00004000); //wait tx complete
-            }
-            I2CSendByte(I2C1, dt1.mon);
-            while (I2C1STAT & 0x00004000); //wait tx complete
-            I2CSendByte(I2C1, dt1.year);
-            while (I2C1STAT & 0x00004000); //wait tx complete
-            I2CStop(I2C1);
+            
+            I2CEnable(I2C1, false);
+            ExtCfg(5, EXT_NOT_CONFIG); // set pins to unconfigured
+            ExtCfg(6, EXT_NOT_CONFIG);
         }
     }
-    I2CEnable(I2C1, false);
-    ExtCfg(5, EXT_NOT_CONFIG); // set pins to unconfigured
-    ExtCfg(6, EXT_NOT_CONFIG);
 
 }
 
 void PrintDateTime(void) {
+    char temp[32];
     ReadRTCC();
     sprintf(temp, "%s %s %d %d %d:%02d:%02d \n\r", DayOfWeek[dow], Months[month - 1], day, year, hour, minute, second);
     MMPrintString(temp);
@@ -275,26 +294,11 @@ void PrintDateTime(void) {
  * 
  */
 void cmd_sleep(void) {
+    rtccTime tm;
+    rtccDate dt;
     char *p, cmd = 0;
-    /*
-    // valid values of alarm repetition for the RTCC device
-    typedef enum
-    {
-        RTCC_RPT_HALF_SEC,		// repeat alarm every half second
-        RTCC_RPT_SEC,			// repeat alarm every second
-        RTCC_RPT_TEN_SEC,		// repeat alarm every ten seconds
-        RTCC_RPT_MIN,			// repeat alarm every minute
-        RTCC_RPT_TEN_MIN,		// repeat alarm every ten minutes
-        RTCC_RPT_HOUR,			// repeat alarm every hour
-        RTCC_RPT_DAY,			// repeat alarm every day
-        RTCC_RPT_WEEK,			// repeat alarm every week
-        RTCC_RPT_MON,			// repeat alarm every month
-        RTCC_RPT_YEAR			// repeat alarm every year (except when configured for Feb 29th.)
-    }rtccRepeat;
-
-     */
     p = cmdline;
-    // this block of code handles the command:   FONT UNLOAD #n
+
     RtccGetTimeDate(&tm, &dt);
 
     if ((p = checkstring(p, "MINUTE")) != NULL) {

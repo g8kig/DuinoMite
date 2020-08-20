@@ -18,18 +18,16 @@ If not, see <http://www.gnu.org/licenses/>.
 
  ************************************************************************************************************************/
 
-#define INCLUDE_FUNCTION_DEFINES
-
 #include <p32xxxx.h>
 #include <plib.h>
+
+#define INCLUDE_FUNCTION_DEFINES
 #include "Timers.h"
 #include "../Maximite.h"
 #include "../IOPorts.h"
 #include "../Video/Video.h"
 #include "MMBasic/external.h"
-//	GS I2C Start
 #include "MMBasic/I2C.h"
-//	GS I2C End
 #include "Setup.h"
 
 // timer variables
@@ -50,19 +48,14 @@ volatile int hour = 0;
 volatile int day = 1;
 volatile int month = 1;
 volatile int year = 2000;
-
-#ifdef OLIMEX
 volatile int dow = 0;
-#endif
 
 volatile int SDActivityLED = 0;
 
 static const char DaysInMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 volatile int SDCardRemoved = true;
-#ifdef OLIMEX
 volatile char SDLedState = 0;
-#endif
 
 /***************************************************************************************************
 InitTimers
@@ -112,27 +105,13 @@ void __ISR(_TIMER_4_VECTOR, ipl1) T4Interrupt(void) {
         }
     }
     //	GS I2C End
-
-#ifdef MAXIMITE
-    if (SDActivityLED) {
-        P_SD_LED_SET_HI;
-        SDActivityLED--;
-    } else
-        P_SD_LED_SET_LO;
-#endif
-
     // check if the sound has expired
     
     if (SoundPlay > 0) { // if we are still playing the sound
         SoundPlay--;
         if (SoundPlay == 0) {
             CloseTimer2();
-#ifdef MAXIMITE
-            CloseOC2();
-#endif
-#ifdef OLIMEX
             CloseOC1();
-#endif
         }
     }
 

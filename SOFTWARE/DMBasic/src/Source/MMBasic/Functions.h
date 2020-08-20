@@ -24,11 +24,6 @@ If not, see <http://www.gnu.org/licenses/>.
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
 void fun_abs(void);
 void fun_asc(void);
 void fun_atn(void);
@@ -61,32 +56,17 @@ void fun_ucase(void);
 void fun_lcase(void);
 void fun_peek(void);
 void fun_version(void);
-
 #endif
-
-
 
 
 /**********************************************************************************
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 **********************************************************************************/
-#ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
-#endif
-
 
 /**********************************************************************************
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                    P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
 	{ "ABS(",		T_FUN  | T_NBR,			0, fun_abs		},
 	{ "ASC(",		T_FUN  | T_NBR,			0, fun_asc		},
 	{ "ATN(",		T_FUN  | T_NBR,			0, fun_atn		},
@@ -120,5 +100,4 @@ void fun_version(void);
 	{ "LCASE$(",	T_FUN  | T_STR,			0, fun_lcase	},
 	{ "PEEK(",		T_FUN  | T_NBR,			0, fun_peek		},
 	{ "MM.VER",		T_FNA  | T_NBR,			0, fun_version	},
-
 #endif

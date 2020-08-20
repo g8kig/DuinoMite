@@ -169,15 +169,12 @@ void fun_date(void) {
     CtoM(sret);
 }
 
-#ifdef OLIMEX
 void fun_dow(void) { 
     // this will last for the life of the command 											
     // disable the timer interrupt to prevent any conflicts while updating
     ReadRTCC();
     fret = dow;
 }
-#endif
-
 
 // this is invoked as a command (ie, time$ = "6:10:45")
 // search through the line looking for the equals sign and step over it,
@@ -248,14 +245,8 @@ void cmd_sound(void) {
 
     if (d == 0 || f == 0) { // see if the user wants to cancel any playing sound
         SoundPlay = 0;
-        CloseTimer2();
-        
-#ifdef MAXIMITE
-        CloseOC2();
-#endif
-#ifdef OLIMEX
+        CloseTimer2();        
         CloseOC1();
-#endif
         return;
     }
 
@@ -266,22 +257,12 @@ void cmd_sound(void) {
 
     if (SoundPlay && f == sf) {
         
-#ifdef MAXIMITE
-        SetDCOC2PWM((period * dcy) / 1000); // if only changing the duty cycle (avoids glitches)
-#endif
-#ifdef OLIMEX
-        SetDCOC1PWM((period * dcy) / 1000); // if only changing the duty cycle (avoids glitches)
-#endif
+    SetDCOC1PWM((period * dcy) / 1000); // if only changing the duty cycle (avoids glitches)
     }
     else {
         // we are starting up or changing the frequency so do the full configuration
         // enable the output compare which is used to generate the duty cycle
-#ifdef MAXIMITE
-        OpenOC2(OC_ON | OC_TIMER_MODE16 | OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE, (period * dcy) / 1000, 0x0000);
-#endif
-#ifdef OLIMEX
         OpenOC1(OC_ON | OC_TIMER_MODE16 | OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE, (period * dcy) / 1000, 0x0000);
-#endif
 
         // enable timer 2 and set to the desired frequency
         OpenTimer2(T2_ON | ((f < 1250) ? T2_PS_1_64 : T2_PS_1_1), period);
@@ -339,18 +320,8 @@ void fun_tab(void) {
 }
 
 void cmd_copyright(void) {
-#ifdef MAXIMITE
-    MMPrintString("Maximite Firmware and MMBasic V" VERSION "\r\n");
-    MMPrintString("For updates goto http://geoffg.net/maximite.html\r\n\n");
-#endif
-#ifdef UBW32
-    MMPrintString("UBW32 Firmware and MMBasic V" VERSION "\r\n");
-    MMPrintString("For updates goto http://geoffg.net/ubw32.html\r\n\n");
-#endif
-#ifdef DUINOMITE
     MMPrintString("Duinomite Firmware and MMBasic V" VERSION "\r\n");
     MMPrintString("For updates goto http://olimex.com\r\n\n");
-#endif
 
     MMPrintString("Overall Copyright (c) " YEAR " Geoff Graham.\r\n");
     MMPrintString("I2C, One Wire Support Copyright 2011 Gerard Sexton.\r\n");
@@ -633,7 +604,6 @@ int check_interrupt(void) {
         nextstmt = com2_interrupt; // set the next stmt to the interrupt location
         return 1;
     }
-#ifdef OLIMEX
     if (com3_interrupt != NULL && SerialRxStatus(3) >= com3_ilevel) {// do we need to interrupt?
         InterruptReturn = nextstmt; // save where we are
         nextstmt = com3_interrupt; // set the next stmt to the interrupt location
@@ -644,7 +614,6 @@ int check_interrupt(void) {
         nextstmt = com4_interrupt; // set the next stmt to the interrupt location
         return 1;
     }
-#endif
     // ksd pin 0 int
     for (i = 0; i < NBRPINS + 1; i++) {
         if (inttbl[i].intp != NULL) { // if an interrupt is enabled for this pin

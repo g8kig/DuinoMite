@@ -24,11 +24,6 @@ If not, see <http://www.gnu.org/licenses/>.
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
 void cmd_cls(void);
 void cmd_circle(void);
 void cmd_line(void);
@@ -41,21 +36,12 @@ void cmd_savebmp(void);
 void fun_pixel(void);
 void fun_hres(void);
 void fun_vres(void);
-
 #endif
-
-
-
 
 /**********************************************************************************
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
 	{ "CLS",		T_CMD,				0, cmd_cls		},
 	{ "CIRCLE",		T_CMD,				0, cmd_circle	},
 	{ "LINE",		T_CMD,				0, cmd_line		},
@@ -64,7 +50,6 @@ void fun_vres(void);
 	{ "LOCATE",		T_CMD,				0, cmd_locate	},
 	{ "PIXEL(",		T_CMD | T_FUN,		0, cmd_pixel	},
 	{ "SAVEBMP",	T_CMD,				0, cmd_savebmp	},
-
 #endif
 
 
@@ -72,13 +57,7 @@ void fun_vres(void);
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
 	{ "PIXEL(",		T_FUN | T_NBR,		0, fun_pixel	},
 	{ "MM.HRES",	T_FNA | T_NBR,		0, fun_hres		},
 	{ "MM.VRES",	T_FNA | T_NBR,		0, fun_vres		},
-
 #endif
-

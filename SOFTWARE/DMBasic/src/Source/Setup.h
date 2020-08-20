@@ -5,48 +5,26 @@
 
 */
 
-
-
 /**********************************************************************************
  the C language function associated with commands, functions or operators should be
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
 void cmd_setup(void);
 void fun_setup(void);
-
 #endif
 /**********************************************************************************
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
 	{ "SETUP",		T_CMD,				0, cmd_setup,	},
 #endif
 /**********************************************************************************
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
 	{ "MM.SETUP",	T_FNA | T_NBR,		0, fun_setup	},
-
-
 #endif
-
-//#ifdef INCLUDE_FUNCTION_DEFINES
-// General definitions used by other modules
 
 #ifndef SETUP_HEADER
 #define SETUP_HEADER
@@ -104,4 +82,3 @@ struct  _SetupStruct{
 extern struct _SetupStruct S;
 
 #endif
-//#endif

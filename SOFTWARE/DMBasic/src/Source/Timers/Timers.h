@@ -32,10 +32,7 @@ extern volatile int hour;
 extern volatile int day;
 extern volatile int month;
 extern volatile int year;
-
-#ifdef OLIMEX
 extern volatile int dow;
-#endif
 
 // sound variables
 extern volatile int SoundPlay;

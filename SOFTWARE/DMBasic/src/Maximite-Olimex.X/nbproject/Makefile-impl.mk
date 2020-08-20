@@ -31,7 +31,7 @@ DEFAULTCONF=OLIMEX
 CONF=${DEFAULTCONF}
 
 # All Configurations
-ALLCONFS=OLIMEX MAXIMITE 
+ALLCONFS=OLIMEX 
 
 
 # build
@@ -46,14 +46,12 @@ ALLCONFS=OLIMEX MAXIMITE
 # clobber
 .clobber-impl: .clobber-pre .depcheck-impl
 	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=OLIMEX clean
-	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=MAXIMITE clean
 
 
 
 # all
 .all-impl: .all-pre .depcheck-impl
 	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=OLIMEX build
-	    ${MAKE} SUBPROJECTS=${SUBPROJECTS} CONF=MAXIMITE build
 
 
 

@@ -24,11 +24,6 @@ If not, see <http://www.gnu.org/licenses/>.
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
 void cmd_print(void);
 void cmd_let(void);
 void cmd_list(void);
@@ -81,21 +76,13 @@ extern int DimUsed;
 extern void mergefile(char *fname);
 extern char *llist(char *b, char *p);
 extern char LastFile[];
-
 #endif
-
-
 
 
 /**********************************************************************************
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
 	{ "REM",		T_CMD,				0, cmd_null,	},
 	{ "LET",		T_CMD,				0, cmd_let	},
 	{ "PRINT",		T_CMD,				0, cmd_print	},
@@ -151,11 +138,7 @@ extern char LastFile[];
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
-//	{ "IF",			T_NA,				0, op_invalid	},
+	{ "IF",			T_NA,				0, op_invalid	},
 	{ "THEN",		T_NA,				0, op_invalid	},
 	{ "ELSE",		T_NA,				0, op_invalid	},
 	{ "GOTO",		T_NA,				0, op_invalid	},
@@ -165,5 +148,4 @@ extern char LastFile[];
 	{ "FOR",		T_NA,				0, op_invalid	},
 	{ "WHILE",		T_NA,				0, op_invalid	},
 	{ "UNTIL",		T_NA,				0, op_invalid	},
-
 #endif

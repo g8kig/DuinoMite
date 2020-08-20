@@ -1,6 +1,4 @@
 /************************************************************************************************************************
-Maximite
-
 I2C.h
 
 Header file for I2C.c
@@ -18,18 +16,11 @@ If not, see <http://www.gnu.org/licenses/>.
 ************************************************************************************************************************/
 
 
-//	GS I2C
-
 /**********************************************************************************
  the C language function associated with commands, functions or operators should be
  declared here
 **********************************************************************************/
 #ifdef INCLUDE_FUNCTION_DEFINES
-// format:
-//      void cmd_???(void)
-//      void fun_???(void)
-//      void op_???(void)
-
 void cmd_i2cEnable(void);
 void cmd_i2cDisable(void);
 void cmd_i2cSend(void);
@@ -42,21 +33,12 @@ void cmd_num2byte(void);
 
 void fun_byte2num(void);
 void fun_mmi2c(void);
-
 #endif
-
-
-
 
 /**********************************************************************************
  All command tokens tokens (eg, PRINT, FOR, etc) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_COMMAND_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is always T_CMD
-// and P is the precedence (which is only used for operators and not commands)
-
 	{ "I2CEN",		T_CMD,				0, cmd_i2cEnable	},
 	{ "I2CDIS",		T_CMD,				0, cmd_i2cDisable	},
 	{ "I2CSEND",	T_CMD,				0, cmd_i2cSend		},
@@ -66,22 +48,14 @@ void fun_mmi2c(void);
 	{ "I2CSSEND",	T_CMD,				0, cmd_i2cSlaveSend },
 	{ "I2CSRCV",	T_CMD,				0, cmd_i2cSlaveReceive },
 	{ "NUM2BYTE",	T_CMD,				0, cmd_num2byte },
-
 #endif
-
 
 /**********************************************************************************
  All other tokens (keywords, functions, operators) should be inserted in this table
 **********************************************************************************/
 #ifdef INCLUDE_TOKEN_TABLE
-// the format is:
-//    TEXT      	TYPE                P  FUNCTION TO CALL
-// where type is T_NA, T_FUN, T_FNA or T_OPER argumented by the types T_STR and/or T_NBR
-// and P is the precedence (which is only used for operators)
-
 	{ "BYTE2NUM(",	T_FUN | T_NBR,	0, fun_byte2num },
 	{ "MM.I2C",			T_FNA | T_NBR,	0, fun_mmi2c		},
-
 #endif
 
 

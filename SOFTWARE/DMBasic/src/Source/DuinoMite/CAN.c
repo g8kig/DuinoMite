@@ -21,9 +21,10 @@
 /***********************************************************************************************************************
  Include files
  ***********************************************************************************************************************/
-#define INCLUDE_FUNCTION_DEFINES
 #include <p32xxxx.h>
 #include <plib.h>
+
+#define INCLUDE_FUNCTION_DEFINES
 #include "../MMBasic/MMBasic.h"
 #include "../Maximite.h"
 
