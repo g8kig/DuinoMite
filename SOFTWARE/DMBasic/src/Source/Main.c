@@ -114,7 +114,7 @@ Configuration defines
 /*****************************************************************************************************************************
 Other defines
  ******************************************************************************************************************************/
-#define MES_SIGNON  "\rDMBasic Build Date: " __DATE__ " Time:" __TIME__ "\r\n"\
+#define MES_SIGNON  "\rDuinomite Basic Build Date: " __DATE__ " Time: " __TIME__ "\r\n"\
 		    "www.olimex.com, Based On MMBasic By Geoff Graham\r\n"
 #define MES_EXCEPTION   "\rException code %d at 0x%X\r\n"\
 			"An internal error was trapped (sorry).\r\n"\

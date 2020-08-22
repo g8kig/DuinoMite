@@ -169,7 +169,7 @@ void fun_date(void) {
     CtoM(sret);
 }
 
-void fun_dow(void) { 
+void fun_dow(void) {
     // this will last for the life of the command 											
     // disable the timer interrupt to prevent any conflicts while updating
     ReadRTCC();
@@ -245,8 +245,12 @@ void cmd_sound(void) {
 
     if (d == 0 || f == 0) { // see if the user wants to cancel any playing sound
         SoundPlay = 0;
-        CloseTimer2();        
+        CloseTimer2();
+#ifdef OLIMEX_DUINOMITE_EMEGA        
+        CloseOC4();
+#else
         CloseOC1();
+#endif        
         return;
     }
 
@@ -256,14 +260,20 @@ void cmd_sound(void) {
     if (f < 1250) period /= 64; // adjust if we need to scale the timer's clock
 
     if (SoundPlay && f == sf) {
-        
-    SetDCOC1PWM((period * dcy) / 1000); // if only changing the duty cycle (avoids glitches)
-    }
-    else {
+
+#ifdef OLIMEX_DUINOMITE_EMEGA        
+        SetDCOC4PWM((period * dcy) / 1000); // if only changing the duty cycle (avoids glitches)
+#else
+        SetDCOC1PWM((period * dcy) / 1000); // if only changing the duty cycle (avoids glitches)
+#endif        
+    } else {
         // we are starting up or changing the frequency so do the full configuration
         // enable the output compare which is used to generate the duty cycle
+#ifdef OLIMEX_DUINOMITE_EMEGA        
+        OpenOC4(OC_ON | OC_TIMER_MODE16 | OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE, (period * dcy) / 1000, 0x0000);
+#else
         OpenOC1(OC_ON | OC_TIMER_MODE16 | OC_TIMER2_SRC | OC_PWM_FAULT_PIN_DISABLE, (period * dcy) / 1000, 0x0000);
-
+#endif        
         // enable timer 2 and set to the desired frequency
         OpenTimer2(T2_ON | ((f < 1250) ? T2_PS_1_64 : T2_PS_1_1), period);
     }
@@ -280,6 +290,7 @@ void cmd_ireturn(void) {
 }
 
 // set up the tick interrupt
+
 void cmd_settick(void) {
     int period;
     int dest;
