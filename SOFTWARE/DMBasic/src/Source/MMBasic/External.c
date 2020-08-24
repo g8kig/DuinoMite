@@ -188,7 +188,11 @@ void ClearExternalIO(void) {
     // stop the sound
     SoundPlay = 0;
     CloseTimer2();
+#ifdef OLIMEX_DUINOMITE_EMEGA        
+    CloseOC4();
+#else
     CloseOC1();
+#endif
     inttbl[NBRPINS + 2].intp = NULL; // disable the tick interrupt
     for (i = 1; i < NBRPINS + 1; i++) {
         inttbl[i].intp = NULL; // disable all interrupts

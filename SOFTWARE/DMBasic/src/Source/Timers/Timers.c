@@ -111,7 +111,11 @@ void __ISR(_TIMER_4_VECTOR, ipl1) T4Interrupt(void) {
         SoundPlay--;
         if (SoundPlay == 0) {
             CloseTimer2();
+#ifdef OLIMEX_DUINOMITE_EMEGA        
+            CloseOC4();
+#else
             CloseOC1();
+#endif 
         }
     }
 
