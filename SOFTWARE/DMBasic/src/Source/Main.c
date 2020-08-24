@@ -211,6 +211,9 @@ int main(void) {
     ODCGbits.ODCG13 = 1;
     LATGbits.LATG13 = 0;
     TRISDbits.TRISD1 = 1;
+
+    LATEbits.LATE8  = 1;    TRISEbits.TRISE8  = 1;    // 'BUT'
+    LATCbits.LATC1  = 1;    TRISCbits.TRISC1  = 0;    // LED2
 #else           // original by Geoff Graham for DuinoMite-Mega
     TRISBbits.TRISB13 = 0;
     ODCBbits.ODCB13 = 1;

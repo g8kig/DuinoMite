@@ -119,6 +119,10 @@ void __ISR(_TIMER_4_VECTOR, ipl1) T4Interrupt(void) {
     ////////////////////////////////// this code runs once a second /////////////////////////////////
     if (++SecondsTimer >= 1000) {
         SecondsTimer = 0; // reset every second
+
+#ifdef	OLIMEX_DUINOMITE_EMEGA        
+        PORTCbits.RC1 = ~PORTCbits.RC1;
+#endif          
         if (S.ScreenSave) { //if screen saver is enabled count it down
             if (ScreenSaveTime > 0)
                 ScreenSaveTime--;
