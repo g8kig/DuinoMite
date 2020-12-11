@@ -31,28 +31,28 @@ CFLAGS = -x c -c -mprocessor=32MX795F512L -DPIC32MX795F512L_PIM -DOLIMEX -DOLIME
 LFLAGS = -mprocessor=32MX795F512L -MMD -MP -O3 -Wall -Wl,--defsym=__MPLAB_BUILD=1,--script="..\Source\Maximite.ld",--defsym=_min_heap_size=42000,--defsym=_min_stack_size=6144,--gc-sections,-L"C:/Program Files/Microchip/MPLAB C32/pic32mx/lib",-Map="${MAP}"
 
 $(BUILD_DIR)/$(ELF): $(OBJS)
-	"C:\Program Files\Microchip\MPLAB C32\bin\pic32-gcc.exe" $(OBJS) -o $@ $(LFLAGS)
+	pic32-gcc.exe $(OBJS) -o $@ $(LFLAGS)
 
 $(BUILD_DIR)/%.c.o: $(SOURCE_DIR)%.c
-	"C:\Program Files\Microchip\MPLAB C32\bin\pic32-gcc.exe" $(CFLAGS) $< -o $@
+	pic32-gcc.exe $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/%.C.o: $(SOURCE_DIR)%.C
-	"C:\Program Files\Microchip\MPLAB C32\bin\pic32-gcc.exe" $(CFLAGS) $< -o $@
+	pic32-gcc.exe $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/FSIO.o: $(SOURCE_DIR)./SDCard/Microchip/MDD\ File\ System/FSIO.c
-	"C:\Program Files\Microchip\MPLAB C32\bin\pic32-gcc.exe" $(CFLAGS) "$(SOURCE_DIR)./SDCard/Microchip/MDD File System/FSIO.c" -o $@
+	pic32-gcc.exe $(CFLAGS) "$(SOURCE_DIR)./SDCard/Microchip/MDD File System/FSIO.c" -o $@
 
 $(BUILD_DIR)/SD-SPI.o: $(SOURCE_DIR)./SDCard/Microchip/MDD\ File\ System/SD-SPI.c
-	"C:\Program Files\Microchip\MPLAB C32\bin\pic32-gcc.exe" $(CFLAGS) "$(SOURCE_DIR)./SDCard/Microchip/MDD File System/SD-SPI.c" -o $@
+	pic32-gcc.exe $(CFLAGS) "$(SOURCE_DIR)./SDCard/Microchip/MDD File System/SD-SPI.c" -o $@
 
 $(BUILD_DIR)/usb_function_cdc.o: $(SOURCE_DIR)./USB/Microchip/USB/CDC\ Device\ Driver/usb_function_cdc.c
-	"C:\Program Files\Microchip\MPLAB C32\bin\pic32-gcc.exe" $(CFLAGS) "$(SOURCE_DIR)./USB/Microchip/USB/CDC Device Driver/usb_function_cdc.c" -o $@
+	pic32-gcc.exe $(CFLAGS) "$(SOURCE_DIR)./USB/Microchip/USB/CDC Device Driver/usb_function_cdc.c" -o $@
 
 $(BUILD_DIR)/usb_function_msd.o: $(SOURCE_DIR)./USB/Microchip/USB/MSD\ Device\ Driver/usb_function_msd.c
-	"C:\Program Files\Microchip\MPLAB C32\bin\pic32-gcc.exe" $(CFLAGS) "$(SOURCE_DIR)./USB/Microchip/USB/MSD Device Driver/usb_function_msd.c" -o $@
+	pic32-gcc.exe $(CFLAGS) "$(SOURCE_DIR)./USB/Microchip/USB/MSD Device Driver/usb_function_msd.c" -o $@
 
 $(BUILD_DIR)/$(HEX): $(BUILD_DIR)/$(ELF)   
-	"C:\Program Files\Microchip\MPLAB C32\bin\pic32-bin2hex" $<  
+	pic32-bin2hex $<  
 
 .PHONY: clean
 .PHONY: create
@@ -81,7 +81,6 @@ clean:
 	-rm -rf $(BUILD_DIR)
 
 all: clean create build
-
 
 -include $(DEPS)
 
